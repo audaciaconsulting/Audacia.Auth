@@ -1,0 +1,89 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Audacia.Auth.OpenIddict.Common.Configuration;
+using Audacia.Auth.OpenIddict.Common.Extensions;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
+using OpenIddict.Abstractions;
+using OpenIddict.Server.AspNetCore;
+using static OpenIddict.Abstractions.OpenIddictConstants;
+using SignInResult = Microsoft.AspNetCore.Mvc.SignInResult;
+
+namespace Audacia.Auth.OpenIddict.Token
+{
+    /// <summary>
+    /// A class that can handle requests to the /connect/token endpoint.
+    /// </summary>
+    public class GetTokenHandler
+    {
+        private readonly OpenIdConnectConfig _identityServerConfig;
+        private readonly IClaimsPrincipalProviderFactory _claimsPrincipalProviderFactory;
+
+        /// <summary>
+        /// Initializes an instance of <see cref="GetTokenHandler"/>.
+        /// </summary>
+        /// <param name="identityServerConfig">The configuration.</param>
+        /// <param name="claimsPrincipalProviderFactory">An instance of <see cref="IClaimsPrincipalProviderFactory"/>.</param>
+        public GetTokenHandler(
+            OpenIdConnectConfig identityServerConfig,
+            IClaimsPrincipalProviderFactory claimsPrincipalProviderFactory)
+        {
+            _identityServerConfig = identityServerConfig;
+            _claimsPrincipalProviderFactory = claimsPrincipalProviderFactory;
+        }
+
+        /// <summary>
+        /// Handles the given <paramref name="openIddictRequest"/> by issuing a token or returning an error result as appropriate.
+        /// </summary>
+        /// <param name="openIddictRequest">The <see cref="OpenIddictRequest"/> object for which to get a token.</param>
+        /// <returns>An <see cref="IActionResult"/> object representing the result that should be returned to the client.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="openIddictRequest"/> is <see langword="null"/>.</exception>
+        public async Task<IActionResult> HandleAsync(OpenIddictRequest openIddictRequest)
+        {
+            if (openIddictRequest == null) throw new ArgumentNullException(nameof(openIddictRequest));
+
+            var claimsPrincipalProvider = _claimsPrincipalProviderFactory.CreateProvider(openIddictRequest);
+
+            ClaimsPrincipal principal;
+            try
+            {
+                principal = await claimsPrincipalProvider.GetPrincipalAsync(openIddictRequest).ConfigureAwait(false);
+            }
+            catch (InvalidGrantException invalidGrantException)
+            {
+                return InvalidGrantResult(invalidGrantException);
+            }
+
+            principal.SetDestinations();
+            AdjustAccessTokenLifetime(openIddictRequest, principal);
+
+            // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
+            return new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, principal);
+        }
+
+        private static IActionResult InvalidGrantResult(InvalidGrantException exception)
+        {
+            return new ForbidResult(
+                OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
+                new AuthenticationProperties(new Dictionary<string, string?>
+                {
+                    [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
+                    [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = exception.Message
+                }));
+        }
+
+        private void AdjustAccessTokenLifetime(OpenIddictRequest openIddictRequest, ClaimsPrincipal principal)
+        {
+            // Adjust access token lifetimes if configured to be different in the appsettings
+            if (!string.IsNullOrEmpty(openIddictRequest.ClientId) &&
+                _identityServerConfig.TryFindClient(openIddictRequest.ClientId, out var clientConfig) &&
+                clientConfig?.AccessTokenLifetime != null)
+            {
+                var accessTokenLifetime = clientConfig.AccessTokenLifetime.GetLifetime(nameof(clientConfig.AccessTokenLifetime));
+                principal.SetAccessTokenLifetime(accessTokenLifetime);
+            }
+        }
+    }
+}
