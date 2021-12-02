@@ -1,0 +1,24 @@
+name: $(Year:yy)$(DayOfYear).$(rev:r)
+trigger:
+  branches:
+    include: [main]
+  paths:
+    include:
+      - 'openiddict/core/src/*'
+pr: { branches: { include: [main] } }
+resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build } ] }
+pool: { vmImage: windows-latest }
+
+stages:
+- stage: Build
+  displayName: Build
+  jobs:
+    - template: pipelines/build/nuget-package.job.yaml@templates
+      parameters:
+        projects: 'openiddict/core/src/Audacia.Auth.OpenIddict/Audacia.Auth.OpenIddict.csproj'
+        tests: 'openiddict/core/src/Audacia.Auth.OpenIddict/Audacia.Auth.OpenIddict.csproj' # No tests so just pass in the main project
+
+- stage: Release
+  displayName: Release
+  jobs: [ { template: pipelines/release/internal-nuget-package.job.yaml@templates } ]
+  condition: and(succeeded(), and(not(eq(variables['Build.Reason'], 'PullRequest')), not(eq(variables['Build.Reason'], 'Schedule'))))
