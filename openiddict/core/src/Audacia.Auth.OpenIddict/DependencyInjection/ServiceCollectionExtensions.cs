@@ -9,9 +9,9 @@ using Audacia.Auth.OpenIddict.UserInfo;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Audacia.Auth.OpenIddict.DependencyInjection
@@ -28,23 +28,23 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
         /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
         /// <param name="services">The <see cref="IServiceCollection"/> object to which to add the services.</param>
         /// <param name="optionsBuilder">A delegate containing the additional OpenIddict configuration.</param>
-        /// <param name="configuration">The current <see cref="IConfiguration"/> object.</param>
+        /// <param name="openIdConnectConfig">An <see cref="IOptions{TOptions}"/> instance wrapping an <see cref="OpenIdConnectConfig"/> object, which represents the configuration of the authorization server.</param>
         /// <param name="hostingEnvironment">The current <see cref="IWebHostEnvironment"/>.</param>
         /// <returns>An instance of <see cref="OpenIddictBuilder"/> to which further configuration can be performed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="configuration"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="openIdConnectConfig"/> is <see langword="null"/>.</exception>
         public static OpenIddictBuilder AddOpenIddict<TUser, TKey>(
             this IServiceCollection services,
             Action<OpenIddictCoreBuilder> optionsBuilder,
-            IConfiguration configuration,
+            IOptions<OpenIdConnectConfig> openIdConnectConfig,
             IWebHostEnvironment hostingEnvironment)
             where TUser : IdentityUser<TKey>
             where TKey : IEquatable<TKey>
         {
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+            if (openIdConnectConfig == null) throw new ArgumentNullException(nameof(openIdConnectConfig));
             
             return services
                 .AddServices<TUser, TKey>()
-                .ConfigureOpenIddict(optionsBuilder, configuration, hostingEnvironment);
+                .ConfigureOpenIddict(optionsBuilder, openIdConnectConfig.Value, hostingEnvironment);
         }
 
         private static IServiceCollection AddServices<TUser, TKey>(this IServiceCollection services)
@@ -66,13 +66,9 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
         private static OpenIddictBuilder ConfigureOpenIddict(
             this IServiceCollection services,
             Action<OpenIddictCoreBuilder> optionsBuilder,
-            IConfiguration configuration,
+            OpenIdConnectConfig openIdConnectConfig,
             IWebHostEnvironment hostingEnvironment)
         {
-            var openIdConnectConfig = configuration
-                .GetSection(nameof(OpenIdConnectConfig))
-                .Get<OpenIdConnectConfig>();
-
             return services
                 .AddOpenIddict()
                 .AddCore(optionsBuilder)
