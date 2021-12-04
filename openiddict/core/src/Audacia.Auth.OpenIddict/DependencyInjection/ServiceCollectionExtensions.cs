@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Audacia.Auth.OpenIddict.DependencyInjection
@@ -28,14 +27,14 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
         /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
         /// <param name="services">The <see cref="IServiceCollection"/> object to which to add the services.</param>
         /// <param name="optionsBuilder">A delegate containing the additional OpenIddict configuration.</param>
-        /// <param name="openIdConnectConfig">An <see cref="IOptions{TOptions}"/> instance wrapping an <see cref="OpenIdConnectConfig"/> object, which represents the configuration of the authorization server.</param>
+        /// <param name="openIdConnectConfig">An <see cref="OpenIdConnectConfig"/> object, which represents the configuration of the authorization server.</param>
         /// <param name="hostingEnvironment">The current <see cref="IWebHostEnvironment"/>.</param>
         /// <returns>An instance of <see cref="OpenIddictBuilder"/> to which further configuration can be performed.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="openIdConnectConfig"/> is <see langword="null"/>.</exception>
         public static OpenIddictBuilder AddOpenIddict<TUser, TKey>(
             this IServiceCollection services,
             Action<OpenIddictCoreBuilder> optionsBuilder,
-            IOptions<OpenIdConnectConfig> openIdConnectConfig,
+            OpenIdConnectConfig openIdConnectConfig,
             IWebHostEnvironment hostingEnvironment)
             where TUser : IdentityUser<TKey>
             where TKey : IEquatable<TKey>
@@ -44,7 +43,7 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
             
             return services
                 .AddServices<TUser, TKey>()
-                .ConfigureOpenIddict(optionsBuilder, openIdConnectConfig.Value, hostingEnvironment);
+                .ConfigureOpenIddict(optionsBuilder, openIdConnectConfig, hostingEnvironment);
         }
 
         private static IServiceCollection AddServices<TUser, TKey>(this IServiceCollection services)
