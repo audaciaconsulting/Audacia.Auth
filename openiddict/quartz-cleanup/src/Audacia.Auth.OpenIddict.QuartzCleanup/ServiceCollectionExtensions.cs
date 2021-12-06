@@ -1,4 +1,5 @@
 ﻿using Audacia.Auth.OpenIddict.Common.Configuration;
+using Audacia.Auth.OpenIddict.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +14,7 @@ namespace Audacia.Auth.OpenIddict.QuartzCleanup
     {
         /// <summary>
         /// Adds OpenIddict services to the given <paramref name="services"/>.
-        /// Automatic cleanup of expired tokens via a hosted service is set up.
+        /// Automatic cleanup of expired tokens via a hosted service is also set up.
         /// </summary>
         /// <typeparam name="TUser">The user type.</typeparam>
         /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
@@ -23,7 +24,7 @@ namespace Audacia.Auth.OpenIddict.QuartzCleanup
         /// <param name="hostingEnvironment">The current <see cref="IWebHostEnvironment"/>.</param>
         /// <returns>An instance of <see cref="OpenIddictBuilder"/> to which further configuration can be performed.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="openIdConnectConfig"/> is <see langword="null"/>.</exception>
-        public static OpenIddictBuilder AddOpenIddict<TUser, TKey>(
+        public static OpenIddictBuilder AddOpenIddictWithCleanup<TUser, TKey>(
             this IServiceCollection services,
             Action<OpenIddictCoreBuilder> optionsBuilder,
             OpenIdConnectConfig openIdConnectConfig,
