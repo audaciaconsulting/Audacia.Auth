@@ -1,4 +1,5 @@
-﻿using Audacia.Auth.OpenIddict.Common.Configuration;
+﻿using System;
+using Audacia.Auth.OpenIddict.Common.Configuration;
 using Audacia.Auth.OpenIddict.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
