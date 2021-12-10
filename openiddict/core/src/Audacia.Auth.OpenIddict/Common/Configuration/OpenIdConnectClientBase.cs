@@ -17,7 +17,7 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
         /// <summary>
         /// Gets or sets the scopes that you want to make available to this client.
         /// </summary>
-        public IReadOnlyCollection<string> ClientScopes { get; set; } = Array.Empty<string>();
+        public IReadOnlyCollection<string>? ClientScopes { get; set; }
 
         /// <summary>
         /// Gets or sets a description of the length of time that an access token is applicable for.

@@ -4,6 +4,7 @@ using System.Security.Cryptography.X509Certificates;
 using Audacia.Auth.OpenIddict.Authorize;
 using Audacia.Auth.OpenIddict.Common;
 using Audacia.Auth.OpenIddict.Common.Configuration;
+using Audacia.Auth.OpenIddict.Common.Extensions;
 using Audacia.Auth.OpenIddict.Token;
 using Audacia.Auth.OpenIddict.UserInfo;
 using Microsoft.AspNetCore.Authentication;
@@ -52,9 +53,9 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
         {
             return services
                 .AddTransient<IAdditionalClaimsProvider<TUser, TKey>, DefaultAdditionalClaimsProvider<TUser, TKey>>()
-                .AddTransient<AuthenticateResultHandler<TUser, TKey>>()
-                .AddTransient<GetTokenHandler>()
-                .AddTransient<UserInfoHandler<TUser, TKey>>()
+                .AddTransient<IAuthenticateResultHandler<TUser, TKey>, DefaultAuthenticateResultHandler<TUser, TKey>>()
+                .AddTransient<IGetTokenHandler, DefaultGetTokenHandler>()
+                .AddTransient<IUserInfoHandler<TUser, TKey>, DefaultUserInfoHandler<TUser, TKey>>()
                 .AddTransient<IClaimsPrincipalProviderFactory, ClaimsPrincipalProviderFactory<TUser, TKey>>()
                 .AddTransient<ClientCredentialsClaimPrincipalProvider>()
                 .AddTransient<PasswordClaimsPrincipalProvider<TUser, TKey>>()
@@ -103,18 +104,18 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
 
         private static void AddFlows(OpenIddictServerBuilder options, OpenIdConnectConfig openIdConnectConfig)
         {
-            if (openIdConnectConfig.UiClients.Any())
+            if (openIdConnectConfig.UiClients?.Any() == true)
             {
                 options.AllowAuthorizationCodeFlow()
                     .RequireProofKeyForCodeExchange();
             }
             
-            if (openIdConnectConfig.ApiClients.Any())
+            if (openIdConnectConfig.ApiClients?.Any() == true)
             {
                 options.AllowClientCredentialsFlow();
             }
                 
-            if (openIdConnectConfig.TestAutomationClients.Any())
+            if (openIdConnectConfig.TestAutomationClients?.Any() == true)
             {
                 options.AllowPasswordFlow();
             }
@@ -126,7 +127,7 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
         {
             // Get configured scopes i.e. "email", "profile", "roles", "bookings-api"...
             var configurableScopes = openIdConnectConfig.AllClients
-                .SelectMany(c => c.ClientScopes)
+                .SelectMany(c => c.ClientScopes.EmptyIfNull())
                 .Concat(new[]
                 { // default required scopes
                         Scopes.Profile,

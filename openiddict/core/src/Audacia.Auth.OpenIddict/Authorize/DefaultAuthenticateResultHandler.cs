@@ -22,7 +22,7 @@ namespace Audacia.Auth.OpenIddict.Authorize
     /// </summary>
     /// <typeparam name="TUser">The type of user.</typeparam>
     /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
-    public class AuthenticateResultHandler<TUser, TKey>
+    public class DefaultAuthenticateResultHandler<TUser, TKey> : IAuthenticateResultHandler<TUser, TKey>
         where TUser : IdentityUser<TKey>
         where TKey : IEquatable<TKey>
     {
@@ -33,7 +33,7 @@ namespace Audacia.Auth.OpenIddict.Authorize
         private readonly UserManager<TUser> _userManager;
 
         /// <summary>
-        /// Initializes an instance of <see cref="AuthenticateResultHandler{TUser, TKey}"/>.
+        /// Initializes an instance of <see cref="DefaultAuthenticateResultHandler{TUser, TKey}"/>.
         /// </summary>
         /// <param name="applicationManager">The <see cref="IOpenIddictApplicationManager"/> instance to use.</param>
         /// <param name="authorizationManager">The <see cref="IOpenIddictAuthorizationManager"/> instance to use.</param>
@@ -41,7 +41,7 @@ namespace Audacia.Auth.OpenIddict.Authorize
         /// <param name="signInManager">The <see cref="SignInManager{TUser}"/> instance to use.</param>
         /// <param name="userManager">The <see cref="UserManager{TUser}"/> instance to use.</param>
         [SuppressMessage("Maintainability", "ACL1003:Signature contains too many parameters", Justification = "Needs five parameters.")]
-        public AuthenticateResultHandler(
+        public DefaultAuthenticateResultHandler(
             IOpenIddictApplicationManager applicationManager,
             IOpenIddictAuthorizationManager authorizationManager,
             IOpenIddictScopeManager scopeManager,

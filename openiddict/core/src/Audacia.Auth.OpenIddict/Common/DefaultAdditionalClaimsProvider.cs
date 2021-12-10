@@ -5,7 +5,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using OpenIddict.Abstractions;
 
-namespace Audacia.Auth.OpenIddict.UserInfo
+namespace Audacia.Auth.OpenIddict.Common
 {
     /// <summary>
     /// Default implementation of <see cref="IAdditionalClaimsProvider{TUser, TKey}"/> that gets basic claims from the given user.

@@ -17,6 +17,6 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
         /// Gets or sets the URLs that the client will be connecting from.
         /// Used for auth-callbacks, slient-renewals, and redirect-uris...
         /// </summary>
-        public IReadOnlyCollection<Uri> RedirectUris { get; set; } = new List<Uri>();
+        public IReadOnlyCollection<Uri>? RedirectUris { get; set; }
     }
 }

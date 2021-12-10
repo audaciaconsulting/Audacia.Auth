@@ -1,57 +1,56 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Audacia.Auth.OpenIddict.Common.Configuration;
+using OpenIddict.Abstractions;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Audacia.Auth.OpenIddict.Seeding
 {
-    public static class OpenIddictSeedingRunner
+    /// <summary>
+    /// Class to run the seeding of OpenIddict configuration data.
+    /// </summary>
+    public class OpenIddictSeedingRunner
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IOpenIddictApplicationManager _applicationManager;
+        private readonly IOpenIddictScopeManager _scopeManager;
+        private readonly OpenIdConnectConfig _configuration;
 
-        public OpenIddictWorker(IServiceProvider serviceProvider)
+        /// <summary>
+        /// Initializes an instance of <see cref="OpenIddictSeedingRunner"/>.
+        /// </summary>
+        /// <param name="applicationManager">The <see cref="IOpenIddictApplicationManager"/> instance to use.</param>
+        /// <param name="scopeManager">The <see cref="IOpenIddictScopeManager"/> instance to use.</param>
+        /// <param name="configuration">The <see cref="OpenIdConnectConfig"/> object representing the current configuration.</param>
+        public OpenIddictSeedingRunner(
+            IOpenIddictApplicationManager applicationManager,
+            IOpenIddictScopeManager scopeManager,
+            OpenIdConnectConfig configuration)
         {
-            _serviceProvider = serviceProvider;
+            _applicationManager = applicationManager;
+            _scopeManager = scopeManager;
+            _configuration = configuration;
         }
 
-        public static async Task RunAsync(CancellationToken cancellationToken)
+        /// <summary>
+        /// Asynchronously runs the seeding of OpenIddict data.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public async Task RunAsync()
         {
-            using var scope = _serviceProvider.CreateScope();
-
-            var configuration = scope.ServiceProvider.GetService<OpenIdConnectConfig>();
-            var applicationManager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
-            var scopeManager = scope.ServiceProvider.GetRequiredService<IOpenIddictScopeManager>();
-
-            if (configuration != null)
-            {
-                await RegisterApplicationsAsync(applicationManager, configuration);
-                await RegisterScopesAsync(scopeManager, configuration);
-            }
+            await RegisterApplicationsAsync().ConfigureAwait(false);
+            await RegisterScopesAsync().ConfigureAwait(false);
+            await CheckForDeletedApplicationsAsync().ConfigureAwait(false);
         }
 
-        private static async Task RegisterApplicationsAsync(IOpenIddictApplicationManager manager, OpenIdConnectConfig config)
+        private async Task RegisterApplicationsAsync()
         {
-            if (config.Clients is null) { return; }
-
-            foreach (var clientConfig in config.Clients)
-            {
-                if (await manager.FindByClientIdAsync(clientConfig.ClientId) is null)
-                {
-                    OpenIddictApplicationDescriptor client;
-                    if (clientConfig.GrantType == OAuthGrantType.AuthorizationCode)
-                    {
-                        client = CreateApplicationUserClient(clientConfig);
-                    }
-                    else
-                    {
-                        client = CreateApplicationResourceClient(clientConfig);
-                    }
-
-                    await manager.CreateAsync(client);
-                }
-            }
+            await RegisterUiClientsAsync(_configuration.UiClients).ConfigureAwait(false);
+            await RegisterApiClientsAsync(_configuration.ApiClients).ConfigureAwait(false);
+            await RegisterTestAutomationClientsAsync(_configuration.TestAutomationClients).ConfigureAwait(false);
         }
 
-        private static async Task CreateUiClientsAsync(IEnumerable<UiClient> clients, IOpenIddictApplicationManager manager)
+        private async Task RegisterUiClientsAsync(IEnumerable<UiClient>? clients)
         {
             if (clients is null)
             {
@@ -61,19 +60,17 @@ namespace Audacia.Auth.OpenIddict.Seeding
             foreach (var client in clients)
             {
                 var applicationDescriptor = CreateUiClient(client);
-                await manager.CreateAsync(applicationDescriptor);
+                await SaveClientAsync(applicationDescriptor).ConfigureAwait(false);
             }
         }
 
-        /// <summary>
-        /// Creates an application client for use by end users.
-        /// </summary>
         private static OpenIddictApplicationDescriptor CreateUiClient(UiClient clientConfig)
         {
             var applicationClient = new OpenIddictApplicationDescriptor
             {
                 ClientId = clientConfig.ClientId,
                 ConsentType = ConsentTypes.Implicit, // Whether the user needs to provide consent to resource access
+                Type = ClientTypes.Public,
                 Permissions =
                 {
                     Permissions.Endpoints.Authorization,
@@ -97,24 +94,45 @@ namespace Audacia.Auth.OpenIddict.Seeding
             applicationClient.PostLogoutRedirectUris.Add(clientConfig.BaseUrl);
 
             // Attach URLs required for authentication, i.e. auth-callbacks, silent renew
-            foreach (var uri in clientConfig.RedirectUris)
+            if (clientConfig.RedirectUris == null)
             {
-                applicationClient.RedirectUris.Add(uri);
+                applicationClient.RedirectUris.Add(clientConfig.BaseUrl);
+            }
+            else
+            {
+                foreach (var uri in clientConfig.RedirectUris)
+                {
+                    applicationClient.RedirectUris.Add(uri);
+                }
             }
 
-            // Define what client scopes this client can access, i.e. booking-api, finance-api
-            foreach (var scope in clientConfig.ClientScopes)
+            if (clientConfig.ClientScopes != null)
             {
-                applicationClient.Permissions.Add(Permissions.Prefixes.Scope + scope);
+                // Define what client scopes this client can access, i.e. booking-api, finance-api
+                foreach (var scope in clientConfig.ClientScopes)
+                {
+                    applicationClient.Permissions.Add(Permissions.Prefixes.Scope + scope);
+                }
             }
 
             return applicationClient;
         }
 
-        /// <summary>
-        /// Creates an application client for use by API (resource servers).
-        /// </summary>
-        private static OpenIddictApplicationDescriptor CreateApplicationResourceClient(OpenIdConnectClientBase clientConfig)
+        private async Task RegisterApiClientsAsync(IEnumerable<ApiClient>? clients)
+        {
+            if (clients == null)
+            {
+                return;
+            }
+
+            foreach (var client in clients)
+            {
+                var applicationDescriptor = CreateApiClient(client);
+                await SaveClientAsync(applicationDescriptor).ConfigureAwait(false);
+            }
+        }
+
+        private static OpenIddictApplicationDescriptor CreateApiClient(ApiClient clientConfig)
         {
             var applicationClient = new OpenIddictApplicationDescriptor
             {
@@ -128,16 +146,9 @@ namespace Audacia.Auth.OpenIddict.Seeding
                     Permissions.Endpoints.Introspection,
                     // Required for resources that also interact with the identity server
                     Permissions.Endpoints.Token,
-                    clientConfig.GrantType == OAuthGrantType.ClientCredentials
-                        ? Permissions.GrantTypes.ClientCredentials
-                        : Permissions.GrantTypes.Password
+                    Permissions.GrantTypes.ClientCredentials
                 }
             };
-
-            if (clientConfig.GrantType == OAuthGrantType.ResourceOwnerPasswordCredential)
-            {
-                applicationClient.Permissions.Add(Permissions.GrantTypes.RefreshToken);
-            }
 
             // Attach what client scopes can be inspected by this resource client, i.e. booking-api, finance-api
             if (clientConfig.ClientScopes != null)
@@ -151,34 +162,125 @@ namespace Audacia.Auth.OpenIddict.Seeding
             return applicationClient;
         }
 
-        private static OpenIddictScopeDescriptor CreateApplicationScope(IdentityServerScope scopeConfig)
+        private async Task RegisterTestAutomationClientsAsync(IEnumerable<TestAutomationClient>? clients)
+        {
+            if (clients == null)
+            {
+                return;
+            }
+
+            foreach (var client in clients)
+            {
+                var applicationDescriptor = CreateTestAutomationClient(client);
+                await SaveClientAsync(applicationDescriptor).ConfigureAwait(false);
+            }
+        }
+
+        private static OpenIddictApplicationDescriptor CreateTestAutomationClient(TestAutomationClient clientConfig)
+        {
+            var applicationClient = new OpenIddictApplicationDescriptor
+            {
+                ClientId = clientConfig.ClientId,
+                ClientSecret = clientConfig.ClientSecret,
+                ConsentType = ConsentTypes.Implicit,
+                Type = ClientTypes.Confidential,
+                Permissions =
+                {
+                    // Minimum requirement for a resource server
+                    Permissions.Endpoints.Introspection,
+                    // Required for resources that also interact with the identity server
+                    Permissions.Endpoints.Token,
+                    Permissions.GrantTypes.Password,
+                    Permissions.GrantTypes.RefreshToken
+                }
+            };
+
+            // Attach what client scopes can be inspected by this resource client, i.e. booking-api, finance-api
+            if (clientConfig.ClientScopes != null)
+            {
+                foreach (var scope in clientConfig.ClientScopes)
+                {
+                    applicationClient.Permissions.Add(Permissions.Prefixes.Scope + scope);
+                }
+            }
+
+            return applicationClient;
+        }
+
+        private async ValueTask SaveClientAsync(OpenIddictApplicationDescriptor client)
+        {
+            if (client.ClientId is null)
+            {
+                return;
+            }
+
+            var existingClient = await _applicationManager.FindByClientIdAsync(client.ClientId).ConfigureAwait(false);
+            if (existingClient == null)
+            {
+                await _applicationManager.CreateAsync(client).ConfigureAwait(false);
+            }
+            else
+            {
+                await _applicationManager.UpdateAsync(existingClient, client).ConfigureAwait(false);
+            }
+        }
+
+        private async Task RegisterScopesAsync()
+        {
+            if (_configuration.Scopes == null) { return; }
+
+            foreach (var scopeConfig in _configuration.Scopes)
+            {
+                if (await _scopeManager.FindByNameAsync(scopeConfig.Name).ConfigureAwait(false) is null)
+                {
+                    var applicationScope = CreateApplicationScope(scopeConfig);
+                    await _scopeManager.CreateAsync(applicationScope).ConfigureAwait(false);
+                }
+            }
+        }
+
+        private static OpenIddictScopeDescriptor CreateApplicationScope(OpenIdConnectScope scopeConfig)
         {
             var scope = new OpenIddictScopeDescriptor
             {
                 Name = scopeConfig.Name
             };
 
-            // Define the api clients that have permission to use this scope (can introspect / can provide data)
-            foreach (var resource in scopeConfig.Resources)
+            if (scopeConfig.Resources != null)
             {
-                scope.Resources.Add(resource);
+                // Define the api clients that have permission to use this scope (can introspect / can provide data)
+                foreach (var resource in scopeConfig.Resources)
+                {
+                    scope.Resources.Add(resource);
+                }
             }
 
             return scope;
         }
 
-        private static async Task RegisterScopesAsync(IOpenIddictScopeManager manager, IdentityServerConfig config)
+        private async ValueTask CheckForDeletedApplicationsAsync()
         {
-            if (config.Scopes is null) { return; }
-
-            foreach (var scopeConfig in config.Scopes)
+            var deletedApplications = await GetDeletedApplicationsAsync().ConfigureAwait(false);
+            foreach (var application in deletedApplications)
             {
-                if (await manager.FindByNameAsync(scopeConfig.Name) is null)
+                await _applicationManager.DeleteAsync(application).ConfigureAwait(false);
+            }
+        }
+
+        private async Task<IEnumerable<object>> GetDeletedApplicationsAsync()
+        {
+            var deletedApplications = new List<object>();
+            await foreach (var application in _applicationManager.ListAsync())
+            {
+                var applicationDescriptor = new OpenIddictApplicationDescriptor();
+                await _applicationManager.PopulateAsync(applicationDescriptor, application).ConfigureAwait(false);
+                if (_configuration.AllClients.All(client => client.ClientId != applicationDescriptor.ClientId))
                 {
-                    var applicationScope = CreateApplicationScope(scopeConfig);
-                    await manager.CreateAsync(applicationScope);
+                    deletedApplications.Add(application);
                 }
             }
+
+            return deletedApplications;
         }
     }
 }

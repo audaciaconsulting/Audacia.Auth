@@ -16,17 +16,17 @@ namespace Audacia.Auth.OpenIddict.Token
     /// <summary>
     /// A class that can handle requests to the /connect/token endpoint.
     /// </summary>
-    public class GetTokenHandler
+    public class DefaultGetTokenHandler : IGetTokenHandler
     {
         private readonly OpenIdConnectConfig _identityServerConfig;
         private readonly IClaimsPrincipalProviderFactory _claimsPrincipalProviderFactory;
 
         /// <summary>
-        /// Initializes an instance of <see cref="GetTokenHandler"/>.
+        /// Initializes an instance of <see cref="DefaultGetTokenHandler"/>.
         /// </summary>
         /// <param name="identityServerConfig">The configuration.</param>
         /// <param name="claimsPrincipalProviderFactory">An instance of <see cref="IClaimsPrincipalProviderFactory"/>.</param>
-        public GetTokenHandler(
+        public DefaultGetTokenHandler(
             OpenIdConnectConfig identityServerConfig,
             IClaimsPrincipalProviderFactory claimsPrincipalProviderFactory)
         {

@@ -1,14 +1,46 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Audacia.Auth.OpenIddict.Common.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using OpenIddict.Abstractions;
 
 namespace Audacia.Auth.OpenIddict.Seeding
 {
+    /// <summary>
+    /// Hosted service that can seed OpenIddict configuration data.
+    /// </summary>
     public class OpenIddictWorker : IHostedService
     {
-        public Task StartAsync(CancellationToken cancellationToken)
+        private readonly IServiceProvider _serviceProvider;
+
+        /// <summary>
+        /// Initializes an instance of <see cref="OpenIddictWorker"/>.
+        /// </summary>
+        /// <param name="serviceProvider">A <see cref="IServiceProvider"/> instance.</param>
+        public OpenIddictWorker(IServiceProvider serviceProvider)
         {
-            throw new NotImplementedException();
+            _serviceProvider = serviceProvider;
         }
 
+        /// <inheritdoc />
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            using var scope = _serviceProvider.CreateScope();
+
+            var configuration = scope.ServiceProvider.GetService<OpenIdConnectConfig>();
+            var applicationManager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
+            var scopeManager = scope.ServiceProvider.GetRequiredService<IOpenIddictScopeManager>();
+
+            if (configuration != null)
+            {
+                var runner = new OpenIddictSeedingRunner(applicationManager, scopeManager, configuration);
+                await runner.RunAsync().ConfigureAwait(false);
+            }
+        }
+
+        /// <inheritdoc />
         public Task StopAsync(CancellationToken cancellationToken)
         {
             return Task.CompletedTask;

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
     <Nullable>enable</Nullable>
-    <Version>0.1.7</Version>
+    <Version>0.1.12</Version>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
@@ -16,12 +16,6 @@
     <PackageReference Include="OpenIddict" Version="3.1.1" />
     <PackageReference Include="OpenIddict.AspNetCore" Version="3.1.1" />
     <PackageReference Include="OpenIddict.Server.AspNetCore" Version="3.1.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Authorize\" />
-    <Folder Include="Common\Extensions\" />
-    <Folder Include="Token\" />
   </ItemGroup>
 
 </Project>

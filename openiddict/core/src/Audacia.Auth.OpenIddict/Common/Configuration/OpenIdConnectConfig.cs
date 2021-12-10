@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Audacia.Auth.OpenIddict.Common.Extensions;
 
 namespace Audacia.Auth.OpenIddict.Common.Configuration
 {
     /// <summary>
-    /// Represents the IdentityServerConfig section of the app settings.
+    /// Represents the OpenIdConnectConfig section of the app settings.
+    /// Contains the configuration necessary to use the Audacia.Auth.OpenIddict package.
     /// </summary>
     public class OpenIdConnectConfig
     {
-        private ICollection<OpenIdConnectClientBase> _clients = Array.Empty<OpenIdConnectClientBase>();
+        private ICollection<OpenIdConnectClientBase>? _clients;
 
         /// <summary>
         /// Gets or sets the thumbprint of the certificate to use for token encryption.
@@ -31,17 +33,22 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
         /// <summary>
         /// Gets or sets the configuration to be used by API clients.
         /// </summary>
-        public IReadOnlyCollection<ApiClient> ApiClients { get; set; } = new List<ApiClient>();
+        public IReadOnlyCollection<ApiClient>? ApiClients { get; set; }
 
         /// <summary>
         /// Gets or sets the configuration to be used by UI clients.
         /// </summary>
-        public IReadOnlyCollection<UiClient> UiClients { get; set; } = new List<UiClient>();
+        public IReadOnlyCollection<UiClient>? UiClients { get; set; }
 
         /// <summary>
         /// Gets or sets the configuration to be used by Test Automation clients.
         /// </summary>
-        public IReadOnlyCollection<TestAutomationClient> TestAutomationClients { get; set; } = new List<TestAutomationClient>();
+        public IReadOnlyCollection<TestAutomationClient>? TestAutomationClients { get; set; }
+
+        /// <summary>
+        /// Gets or sets the scopes to be registered for the Open ID Connect server.
+        /// </summary>
+        public IReadOnlyCollection<OpenIdConnectScope>? Scopes { get; set; }
 
         /// <summary>
         /// Gets all configured clients.
@@ -50,9 +57,9 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
         {
             get
             {
-                return _clients ??= ApiClients.Cast<OpenIdConnectClientBase>()
-                                .Union(UiClients.Cast<OpenIdConnectClientBase>())
-                                .Union(TestAutomationClients.Cast<OpenIdConnectClientBase>())
+                return _clients ??= ApiClients.EmptyIfNull().Cast<OpenIdConnectClientBase>()
+                                .Union(UiClients.EmptyIfNull().Cast<OpenIdConnectClientBase>())
+                                .Union(TestAutomationClients.EmptyIfNull().Cast<OpenIdConnectClientBase>())
                                 .ToList();
             }
         }

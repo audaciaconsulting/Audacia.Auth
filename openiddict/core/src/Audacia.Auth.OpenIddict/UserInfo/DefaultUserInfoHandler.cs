@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Audacia.Auth.OpenIddict.Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,7 @@ namespace Audacia.Auth.OpenIddict.UserInfo
     /// </summary>
     /// <typeparam name="TUser">The type of user.</typeparam>
     /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
-    public class UserInfoHandler<TUser, TKey>
+    public class DefaultUserInfoHandler<TUser, TKey> : IUserInfoHandler<TUser, TKey>
         where TUser : IdentityUser<TKey>
         where TKey : IEquatable<TKey>
     {
@@ -24,11 +25,11 @@ namespace Audacia.Auth.OpenIddict.UserInfo
         private readonly IAdditionalClaimsProvider<TUser, TKey> _additionalClaimsProvider;
 
         /// <summary>
-        /// Initializes an instance of <see cref="UserInfoHandler{TUser, TKey}"/>.
+        /// Initializes an instance of <see cref="DefaultUserInfoHandler{TUser, TKey}"/>.
         /// </summary>
         /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/>.</param>
         /// <param name="additionalClaimsProvider">An implementation of <see cref="IAdditionalClaimsProvider{TUser, TKey}"/>.</param>
-        public UserInfoHandler(
+        public DefaultUserInfoHandler(
             UserManager<TUser> userManager,
             IAdditionalClaimsProvider<TUser, TKey> additionalClaimsProvider)
         {

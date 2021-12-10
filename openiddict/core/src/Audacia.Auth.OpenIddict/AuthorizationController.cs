@@ -19,17 +19,17 @@ namespace Audacia.Auth.OpenIddict
         where TUser : IdentityUser<TKey>
         where TKey : IEquatable<TKey>
     {
-        private readonly AuthenticateResultHandler<TUser, TKey> _authenticateResultHandler;
-        private readonly GetTokenHandler _getTokenHandler;
+        private readonly IAuthenticateResultHandler<TUser, TKey> _authenticateResultHandler;
+        private readonly IGetTokenHandler _getTokenHandler;
 
         /// <summary>
         /// Initializes an instance of <see cref="AuthorizationController{TUser, TKey}"/>.
         /// </summary>
-        /// <param name="authenticateResultHandler">The <see cref="AuthenticateResultHandler{TUser, TKey}"/> instance.</param>
-        /// <param name="getTokenHandler">The <see cref="GetTokenHandler"/> instance.</param>
+        /// <param name="authenticateResultHandler">The <see cref="DefaultAuthenticateResultHandler{TUser, TKey}"/> instance.</param>
+        /// <param name="getTokenHandler">The <see cref="DefaultGetTokenHandler"/> instance.</param>
         public AuthorizationController(
-            AuthenticateResultHandler<TUser, TKey> authenticateResultHandler,
-            GetTokenHandler getTokenHandler)
+            IAuthenticateResultHandler<TUser, TKey> authenticateResultHandler,
+            IGetTokenHandler getTokenHandler)
         {
             _authenticateResultHandler = authenticateResultHandler;
             _getTokenHandler = getTokenHandler;

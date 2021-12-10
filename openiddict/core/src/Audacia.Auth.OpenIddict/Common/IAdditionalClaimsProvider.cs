@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 
-namespace Audacia.Auth.OpenIddict.UserInfo
+namespace Audacia.Auth.OpenIddict.Common
 {
     /// <summary>
     /// Represents a type that can obtain claims from a <typeparamref name="TUser"/>.

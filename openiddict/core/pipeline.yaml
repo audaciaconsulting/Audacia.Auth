@@ -16,7 +16,7 @@ stages:
     - template: pipelines/build/nuget-package.job.yaml@templates
       parameters:
         projects: 'openiddict/core/src/Audacia.Auth.OpenIddict/Audacia.Auth.OpenIddict.csproj'
-        tests: 'openiddict/core/src/Audacia.Auth.OpenIddict/Audacia.Auth.OpenIddict.csproj' # No tests so just pass in the main project
+        tests: 'openiddict/core/tests/Audacia.Auth.OpenIddict.Tests/Audacia.Auth.OpenIddict.Tests.csproj'
 
 - stage: Release
   displayName: Release
