@@ -22,6 +22,34 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
     public static class ServiceCollectionExtensions
     {
         /// <summary>
+        /// Adds the given <typeparamref name="TProvider"/> to the dependency injection container
+        /// as the implementation of <see cref="IAdditionalClaimsProvider{TUser, TKey}"/>.
+        /// </summary>
+        /// <typeparam name="TProvider">The type of <see cref="IAdditionalClaimsProvider{TUser, TKey}"/> implementation.</typeparam>
+        /// <typeparam name="TUser">The user type.</typeparam>
+        /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/> instance to which to add the <typeparamref name="TProvider"/>.</param>
+        /// <returns>The given <paramref name="services"/>.</returns>
+        public static IServiceCollection AddAdditionalClaimsProvider<TProvider, TUser, TKey>(this IServiceCollection services)
+            where TProvider : class, IAdditionalClaimsProvider<TUser, TKey>
+            where TUser : IdentityUser<TKey>
+            where TKey : IEquatable<TKey> => services.AddTransient<IAdditionalClaimsProvider<TUser, TKey>, TProvider>();
+
+        /// <summary>
+        /// Adds the given <typeparamref name="TService"/> to the dependency injection container
+        /// as the implementation of <see cref="IProfileService{TUser, TKey}"/>.
+        /// </summary>
+        /// <typeparam name="TService">The type of <see cref="IProfileService{TUser, TKey}"/> implementation.</typeparam>
+        /// <typeparam name="TUser">The user type.</typeparam>
+        /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/> instance to which to add the <typeparamref name="TService"/>.</param>
+        /// <returns>The given <paramref name="services"/>.</returns>
+        public static IServiceCollection AddProfileService<TService, TUser, TKey>(this IServiceCollection services)
+            where TService : class, IProfileService<TUser, TKey>
+            where TUser : IdentityUser<TKey>
+            where TKey : IEquatable<TKey> => services.AddTransient<IProfileService<TUser, TKey>, TService>();
+
+        /// <summary>
         /// Adds OpenIddict services to the given <paramref name="services"/>.
         /// </summary>
         /// <typeparam name="TUser">The user type.</typeparam>
@@ -44,6 +72,7 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
             
             return services
                 .AddServices<TUser, TKey>()
+                .AddSingleton(openIdConnectConfig)
                 .ConfigureOpenIddict(optionsBuilder, openIdConnectConfig, hostingEnvironment);
         }
 
@@ -53,6 +82,7 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
         {
             return services
                 .AddTransient<IAdditionalClaimsProvider<TUser, TKey>, DefaultAdditionalClaimsProvider<TUser, TKey>>()
+                .AddTransient<IProfileService<TUser, TKey>, DefaultProfileService<TUser, TKey>>()
                 .AddTransient<IAuthenticateResultHandler<TUser, TKey>, DefaultAuthenticateResultHandler<TUser, TKey>>()
                 .AddTransient<IGetTokenHandler, DefaultGetTokenHandler>()
                 .AddTransient<IUserInfoHandler<TUser, TKey>, DefaultUserInfoHandler<TUser, TKey>>()

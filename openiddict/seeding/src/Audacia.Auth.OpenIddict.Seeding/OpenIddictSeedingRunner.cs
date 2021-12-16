@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Audacia.Auth.OpenIddict.Common.Configuration;
+using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
@@ -15,6 +16,7 @@ namespace Audacia.Auth.OpenIddict.Seeding
         private readonly IOpenIddictApplicationManager _applicationManager;
         private readonly IOpenIddictScopeManager _scopeManager;
         private readonly OpenIdConnectConfig _configuration;
+        private readonly ILogger<OpenIddictSeedingRunner> _logger;
 
         /// <summary>
         /// Initializes an instance of <see cref="OpenIddictSeedingRunner"/>.
@@ -22,14 +24,17 @@ namespace Audacia.Auth.OpenIddict.Seeding
         /// <param name="applicationManager">The <see cref="IOpenIddictApplicationManager"/> instance to use.</param>
         /// <param name="scopeManager">The <see cref="IOpenIddictScopeManager"/> instance to use.</param>
         /// <param name="configuration">The <see cref="OpenIdConnectConfig"/> object representing the current configuration.</param>
+        /// <param name="logger">An <see cref="ILogger"/> instance.</param>
         public OpenIddictSeedingRunner(
             IOpenIddictApplicationManager applicationManager,
             IOpenIddictScopeManager scopeManager,
-            OpenIdConnectConfig configuration)
+            OpenIdConnectConfig configuration,
+            ILogger<OpenIddictSeedingRunner> logger)
         {
             _applicationManager = applicationManager;
             _scopeManager = scopeManager;
             _configuration = configuration;
+            _logger = logger;
         }
 
         /// <summary>
@@ -57,6 +62,7 @@ namespace Audacia.Auth.OpenIddict.Seeding
                 return;
             }
 
+            _logger.LogInformation("Registering UI clients.");
             foreach (var client in clients)
             {
                 var applicationDescriptor = CreateUiClient(client);
@@ -125,6 +131,7 @@ namespace Audacia.Auth.OpenIddict.Seeding
                 return;
             }
 
+            _logger.LogInformation("Registering API clients.");
             foreach (var client in clients)
             {
                 var applicationDescriptor = CreateApiClient(client);
@@ -169,6 +176,7 @@ namespace Audacia.Auth.OpenIddict.Seeding
                 return;
             }
 
+            _logger.LogInformation("Registering Test Automation clients.");
             foreach (var client in clients)
             {
                 var applicationDescriptor = CreateTestAutomationClient(client);
@@ -217,10 +225,12 @@ namespace Audacia.Auth.OpenIddict.Seeding
             var existingClient = await _applicationManager.FindByClientIdAsync(client.ClientId).ConfigureAwait(false);
             if (existingClient == null)
             {
+                _logger.LogInformation("Creating client '{ClientId}'.", client.ClientId);
                 await _applicationManager.CreateAsync(client).ConfigureAwait(false);
             }
             else
             {
+                _logger.LogInformation("Updating client '{ClientId}'.", client.ClientId);
                 await _applicationManager.UpdateAsync(existingClient, client).ConfigureAwait(false);
             }
         }
@@ -229,13 +239,11 @@ namespace Audacia.Auth.OpenIddict.Seeding
         {
             if (_configuration.Scopes == null) { return; }
 
+            _logger.LogInformation("Registering scopes.");
             foreach (var scopeConfig in _configuration.Scopes)
             {
-                if (await _scopeManager.FindByNameAsync(scopeConfig.Name).ConfigureAwait(false) is null)
-                {
-                    var applicationScope = CreateApplicationScope(scopeConfig);
-                    await _scopeManager.CreateAsync(applicationScope).ConfigureAwait(false);
-                }
+                var applicationScope = CreateApplicationScope(scopeConfig);
+                await SaveScopeAsync(scopeConfig, applicationScope).ConfigureAwait(false);
             }
         }
 
@@ -258,11 +266,28 @@ namespace Audacia.Auth.OpenIddict.Seeding
             return scope;
         }
 
+        private async Task SaveScopeAsync(OpenIdConnectScope scopeConfig, OpenIddictScopeDescriptor applicationScope)
+        {
+            var existingScope = await _scopeManager.FindByNameAsync(scopeConfig.Name).ConfigureAwait(false);
+            if (existingScope == null)
+            {
+                _logger.LogInformation("Creating scope '{Scope}'.", applicationScope.Name);
+                await _scopeManager.CreateAsync(applicationScope).ConfigureAwait(false);
+            }
+            else
+            {
+                _logger.LogInformation("Updating scope '{Scope}'.", applicationScope.Name);
+                await _scopeManager.UpdateAsync(existingScope, applicationScope).ConfigureAwait(false);
+            }
+        }
+
         private async ValueTask CheckForDeletedApplicationsAsync()
         {
+            _logger.LogInformation("Checking for deleted clients.");
             var deletedApplications = await GetDeletedApplicationsAsync().ConfigureAwait(false);
             foreach (var application in deletedApplications)
             {
+                _logger.LogInformation("Deleting client '{Client}'.", application);
                 await _applicationManager.DeleteAsync(application).ConfigureAwait(false);
             }
         }

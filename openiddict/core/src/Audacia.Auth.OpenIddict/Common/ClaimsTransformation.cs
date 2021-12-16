@@ -16,7 +16,7 @@ namespace Audacia.Auth.OpenIddict.Common
         where TUser : IdentityUser<TKey>
         where TKey : IEquatable<TKey>
     {
-        private readonly IAdditionalClaimsProvider<TUser, TKey> _additionalClaimsProvider;
+        private readonly IProfileService<TUser, TKey> _profileService;
         private readonly UserManager<TUser> _userManager;
         
         /// <summary>
@@ -28,13 +28,13 @@ namespace Audacia.Auth.OpenIddict.Common
         /// Initializes an instance of <see cref="ClaimsTransformation{TUser, TKey}"/>.
         /// </summary>
         /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/>.</param>
-        /// <param name="additionalClaimsProvider">An implementation of <see cref="IAdditionalClaimsProvider{TUser, TKey}"/>.</param>
+        /// <param name="profileService">An implementation of <see cref="IAdditionalClaimsProvider{TUser, TKey}"/>.</param>
         public ClaimsTransformation(
             UserManager<TUser> userManager,
-            IAdditionalClaimsProvider<TUser, TKey> additionalClaimsProvider)
+            IProfileService<TUser, TKey> profileService)
         {
             _userManager = userManager;
-            _additionalClaimsProvider = additionalClaimsProvider;
+            _profileService = profileService;
         }
 
         /// <inheritdoc />
@@ -42,13 +42,13 @@ namespace Audacia.Auth.OpenIddict.Common
         {
             if (principal == null) throw new ArgumentNullException(nameof(principal));
 
-            if (_isTransformed || !(principal.Identity is ClaimsIdentity identity))
+            if (_isTransformed)
             {
                 return principal;
             }
 
             var user = await FindUserAsync(principal).ConfigureAwait(false);
-            AppendDynamicClaims(identity, user);
+            await AppendDynamicClaimsAsync(principal, user).ConfigureAwait(false);
 
             return principal;
         }
@@ -66,19 +66,13 @@ namespace Audacia.Auth.OpenIddict.Common
             return await _userManager.FindByIdAsync(userId).ConfigureAwait(false);
         }
 
-        private void AppendDynamicClaims(ClaimsIdentity identity, TUser? user)
+        private async Task AppendDynamicClaimsAsync(ClaimsPrincipal principal, TUser? user)
         {
-            if (user != null)
+            if (user != null &&
+                principal.Identity is ClaimsIdentity identity)
             {
-                foreach (var factory in _additionalClaimsProvider.ClaimFactories)
-                {
-                    var claim = factory(user);
-                    if (!identity.HasClaim(claim.Type, claim.Value))
-                    {
-                        identity.AddClaim(claim);
-                    }
-                }
-
+                var claims = await _profileService.GetClaimsAsync(user, principal).ConfigureAwait(false);
+                identity.AddClaims(claims);
                 _isTransformed = true;
             }
         }

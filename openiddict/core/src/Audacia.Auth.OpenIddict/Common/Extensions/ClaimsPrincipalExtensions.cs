@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
@@ -70,5 +71,13 @@ namespace Audacia.Auth.OpenIddict.Common.Extensions
                     yield break;
             }
         }
+
+        /// <summary>
+        /// Converts the claims in the given <paramref name="principal"/> to a dictionary.
+        /// </summary>
+        /// <param name="principal">The <see cref="ClaimsPrincipal"/> from which to get the claims.</param>
+        /// <returns>An <see cref="IDictionary{TKey, TValue}"/> representing the claims of the given <paramref name="principal"/> as key-value pairs.</returns>
+        internal static IDictionary<string, string> ToClaimsDictionary(this ClaimsPrincipal principal) =>
+            principal.Claims.ToDictionary(claim => claim.Type, claim => claim.Value);
     }
 }

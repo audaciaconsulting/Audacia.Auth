@@ -22,19 +22,19 @@ namespace Audacia.Auth.OpenIddict.UserInfo
         where TKey : IEquatable<TKey>
     {
         private readonly UserManager<TUser> _userManager;
-        private readonly IAdditionalClaimsProvider<TUser, TKey> _additionalClaimsProvider;
+        private readonly IProfileService<TUser, TKey> _profileService;
 
         /// <summary>
         /// Initializes an instance of <see cref="DefaultUserInfoHandler{TUser, TKey}"/>.
         /// </summary>
         /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/>.</param>
-        /// <param name="additionalClaimsProvider">An implementation of <see cref="IAdditionalClaimsProvider{TUser, TKey}"/>.</param>
+        /// <param name="profileService">An implementation of <see cref="IProfileService{TUser, TKey}"/>.</param>
         public DefaultUserInfoHandler(
             UserManager<TUser> userManager,
-            IAdditionalClaimsProvider<TUser, TKey> additionalClaimsProvider)
+            IProfileService<TUser, TKey> profileService)
         {
             _userManager = userManager;
-            _additionalClaimsProvider = additionalClaimsProvider;
+            _profileService = profileService;
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Audacia.Auth.OpenIddict.UserInfo
                 [Claims.Subject] = user.Id.ToString()!
             };
             await AddClaimsForRequestedScopesAsync(claimsPrincipal, user, claims).ConfigureAwait(false);
-            AddDynamicClaims(user, claims);
+            await AddDynamicClaimsAsync(user, claimsPrincipal, claims).ConfigureAwait(false);
 
             return claims;
         }
@@ -95,14 +95,14 @@ namespace Audacia.Auth.OpenIddict.UserInfo
             }
         }
 
-        private void AddDynamicClaims(TUser user, Dictionary<string, object> claims)
+        private async Task AddDynamicClaimsAsync(TUser user, ClaimsPrincipal principal, Dictionary<string, object> claims)
         {
             // Note: the complete list of standard claims supported by the OpenID Connect specification
             // can be found here: http://openid.net/specs/openid-connect-core-1_0.html#StandardClaims
 
-            foreach (var factory in _additionalClaimsProvider.ClaimFactories)
+            var dynamicClaims = await _profileService.GetClaimsAsync(user, principal).ConfigureAwait(false);
+            foreach (var dynamicClaim in dynamicClaims)
             {
-                var dynamicClaim = factory(user);
                 claims.TryAdd(dynamicClaim.Type, dynamicClaim.Value);
             }
         }

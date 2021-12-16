@@ -17,13 +17,13 @@ namespace Audacia.Auth.OpenIddict
         where TUser : IdentityUser<TKey>
         where TKey : IEquatable<TKey>
     {
-        private readonly DefaultUserInfoHandler<TUser, TKey> _userInfoHandler;
+        private readonly IUserInfoHandler<TUser, TKey> _userInfoHandler;
 
         /// <summary>
         /// Initializes an instance of <see cref="UserInfoController{TUser, TKey}"/>.
         /// </summary>
         /// <param name="userInfoHandler">A <see cref="DefaultUserInfoHandler{TUser, TKey}"/> instance.</param>
-        public UserInfoController(DefaultUserInfoHandler<TUser, TKey> userInfoHandler)
+        public UserInfoController(IUserInfoHandler<TUser, TKey> userInfoHandler)
         {
             _userInfoHandler = userInfoHandler;
         }

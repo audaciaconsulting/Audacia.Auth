@@ -42,7 +42,8 @@ namespace Audacia.Auth.OpenIddict
         /// <exception cref="InvalidOperationException">If the OpenID Connect request is not found.</exception>
         [HttpGet("~/connect/authorize")]
         [HttpPost("~/connect/authorize")]
-        [AllowAnonymous, IgnoreAntiforgeryToken]
+        [AllowAnonymous]
+        [IgnoreAntiforgeryToken]
         public async Task<IActionResult> Authorize()
         {
             var request = HttpContext.GetOpenIddictServerRequest() ??
@@ -59,8 +60,10 @@ namespace Audacia.Auth.OpenIddict
         /// </summary>
         /// <returns>An <see cref="IActionResult"/> object representing the action taken.</returns>
         /// <exception cref="InvalidOperationException">If the OpenID Connect request is not found.</exception>
-        [HttpPost("~/connect/token"), Produces("application/json")]
-        [AllowAnonymous, IgnoreAntiforgeryToken]
+        [HttpPost("~/connect/token")]
+        [Produces("application/json")]
+        [AllowAnonymous]
+        [IgnoreAntiforgeryToken]
         public Task<IActionResult> Exchange()
         {
             var request = HttpContext.GetOpenIddictServerRequest() ??
