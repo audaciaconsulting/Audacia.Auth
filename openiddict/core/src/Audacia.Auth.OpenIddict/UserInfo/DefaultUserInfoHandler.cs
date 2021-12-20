@@ -57,6 +57,18 @@ namespace Audacia.Auth.OpenIddict.UserInfo
                     }));
             }
 
+            if (!await _profileService.IsActiveAsync(user, claimsPrincipal).ConfigureAwait(false))
+            {
+                return new ChallengeResult(
+                    OpenIddictServerAspNetCoreDefaults.AuthenticationScheme,
+                    new AuthenticationProperties(new Dictionary<string, string?>
+                    {
+                        [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidToken,
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] =
+                            "The specified access token is bound to an account that is no longer active."
+                    }));
+            }
+
             var claims = await GetClaimsAsync(claimsPrincipal, user).ConfigureAwait(false);
 
             return new OkObjectResult(claims);

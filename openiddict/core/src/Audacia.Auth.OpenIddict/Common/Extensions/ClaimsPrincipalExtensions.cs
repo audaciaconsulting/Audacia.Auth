@@ -79,5 +79,18 @@ namespace Audacia.Auth.OpenIddict.Common.Extensions
         /// <returns>An <see cref="IDictionary{TKey, TValue}"/> representing the claims of the given <paramref name="principal"/> as key-value pairs.</returns>
         internal static IDictionary<string, string> ToClaimsDictionary(this ClaimsPrincipal principal) =>
             principal.Claims.ToDictionary(claim => claim.Type, claim => claim.Value);
+
+        /// <summary>
+        /// Adds the given <paramref name="claims"/> to the given <paramref name="principal"/>, provided its identity is a <see cref="ClaimsIdentity"/>.
+        /// </summary>
+        /// <param name="principal">The <see cref="ClaimsPrincipal"/> to which to add the claims.</param>
+        /// <param name="claims">The <see cref="Claim"/> objects to add to the <paramref name="principal"/>.</param>
+        internal static void AddClaims(this ClaimsPrincipal principal, IEnumerable<Claim> claims)
+        {
+            if (principal.Identity is ClaimsIdentity identity)
+            {
+                identity.AddClaims(claims);
+            }
+        }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Audacia.Auth.OpenIddict.Common;
 using Audacia.Auth.OpenIddict.Common.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -20,6 +22,7 @@ namespace Audacia.Auth.OpenIddict.Token
         private readonly UserManager<TUser> _userManager;
         private readonly SignInManager<TUser> _signInManager;
         private readonly IOpenIddictScopeManager _scopeManager;
+        private readonly IProfileService<TUser, TKey> _profileService;
         private readonly ILogger<PasswordClaimsPrincipalProvider<TUser, TKey>> _logger;
 
         /// <summary>
@@ -28,16 +31,20 @@ namespace Audacia.Auth.OpenIddict.Token
         /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/>.</param>
         /// <param name="signInManager">An instance of <see cref="SignInManager{TUser}"/>.</param>
         /// <param name="scopeManager">An instance of <see cref="IOpenIddictScopeManager"/>.</param>
+        /// <param name="profileService">An instance of <see cref="IProfileService{TUser, TKey}"/>.</param>
         /// <param name="logger">An instance of <see cref="ILogger"/>.</param>
+        [SuppressMessage("Maintainability", "ACL1003:Signature contains too many parameters", Justification = "Needs five parameters.")]
         public PasswordClaimsPrincipalProvider(
             UserManager<TUser> userManager,
             SignInManager<TUser> signInManager,
             IOpenIddictScopeManager scopeManager,
+            IProfileService<TUser, TKey> profileService,
             ILogger<PasswordClaimsPrincipalProvider<TUser, TKey>> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _scopeManager = scopeManager;
+            _profileService = profileService;
             _logger = logger;
         }
 
@@ -83,9 +90,15 @@ namespace Audacia.Auth.OpenIddict.Token
         private async Task<ClaimsPrincipal> CreatePrincipalForPasswordFlowAsync(OpenIddictRequest openIddictRequest, TUser user)
         {
             var principal = await _signInManager.CreateUserPrincipalAsync(user).ConfigureAwait(false);
+            if (!await _profileService.IsActiveAsync(user, principal).ConfigureAwait(false))
+            {
+                _logger.LogInformation("User {UserId} is not active.", user.Id);
+                throw new InvalidGrantException("The user is not active.");
+            }
 
             principal.SetScopes(openIddictRequest.GetScopes());
             principal.SetResources(await _scopeManager.ListResourcesAsync(principal.GetScopes()).ToListAsync().ConfigureAwait(false));
+            principal.AddClaims(await _profileService.GetClaimsAsync(user, principal).ConfigureAwait(false));
 
             return principal;
         }

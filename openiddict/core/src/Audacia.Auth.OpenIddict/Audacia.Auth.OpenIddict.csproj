@@ -2,11 +2,21 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
-    <Version>0.1.17</Version>
+    <Version>0.1.21</Version>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <Authors>Audacia</Authors>
+    <Description>Library for using OpenIddict as an authorization server.</Description>
+    <PackageIcon>package-icon.png</PackageIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\package-icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
   
   <ItemGroup>
     <PackageReference Include="Audacia.CodeAnalysis" Version="1.1.21329.2">

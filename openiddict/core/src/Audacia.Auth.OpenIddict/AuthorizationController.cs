@@ -26,7 +26,7 @@ namespace Audacia.Auth.OpenIddict
         /// Initializes an instance of <see cref="AuthorizationController{TUser, TKey}"/>.
         /// </summary>
         /// <param name="authenticateResultHandler">The <see cref="DefaultAuthenticateResultHandler{TUser, TKey}"/> instance.</param>
-        /// <param name="getTokenHandler">The <see cref="DefaultGetTokenHandler"/> instance.</param>
+        /// <param name="getTokenHandler">The <see cref="IGetTokenHandler"/> instance.</param>
         public AuthorizationController(
             IAuthenticateResultHandler<TUser, TKey> authenticateResultHandler,
             IGetTokenHandler getTokenHandler)

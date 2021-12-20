@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Audacia.Auth.OpenIddict.Common.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
 
 namespace Audacia.Auth.OpenIddict.Seeding
@@ -32,10 +33,11 @@ namespace Audacia.Auth.OpenIddict.Seeding
             var configuration = scope.ServiceProvider.GetService<OpenIdConnectConfig>();
             var applicationManager = scope.ServiceProvider.GetRequiredService<IOpenIddictApplicationManager>();
             var scopeManager = scope.ServiceProvider.GetRequiredService<IOpenIddictScopeManager>();
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<OpenIddictSeedingRunner>>();
 
             if (configuration != null)
             {
-                var runner = new OpenIddictSeedingRunner(applicationManager, scopeManager, configuration);
+                var runner = new OpenIddictSeedingRunner(applicationManager, scopeManager, configuration, logger);
                 await runner.RunAsync().ConfigureAwait(false);
             }
         }

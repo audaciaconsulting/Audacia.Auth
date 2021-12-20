@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Audacia.Auth.OpenIddict.Common;
+using Audacia.Auth.OpenIddict.Common.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -21,6 +23,7 @@ namespace Audacia.Auth.OpenIddict.Token
     {
         private readonly UserManager<TUser> _userManager;
         private readonly SignInManager<TUser> _signInManager;
+        private readonly IProfileService<TUser, TKey> _profileService;
         private readonly HttpContext _httpContext;
 
         /// <summary>
@@ -28,13 +31,19 @@ namespace Audacia.Auth.OpenIddict.Token
         /// </summary>
         /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/>.</param>
         /// <param name="signInManager">An instance of <see cref="SignInManager{TUser}"/>.</param>
+        /// <param name="profileService">An instance of <see cref="IProfileService{TUser, TKey}"/>.</param>
         /// <param name="httpContextAccessor">An instance of <see cref="IHttpContextAccessor"/>.</param>
-        public CodeExchangeClaimsPrincipalProvider(UserManager<TUser> userManager, SignInManager<TUser> signInManager, IHttpContextAccessor httpContextAccessor)
+        public CodeExchangeClaimsPrincipalProvider(
+            UserManager<TUser> userManager,
+            SignInManager<TUser> signInManager,
+            IProfileService<TUser, TKey> profileService,
+            IHttpContextAccessor httpContextAccessor)
         {
             if (httpContextAccessor == null) throw new ArgumentNullException(nameof(httpContextAccessor));
 
             _userManager = userManager;
             _signInManager = signInManager;
+            _profileService = profileService;
             _httpContext = httpContextAccessor.HttpContext!;
         }
 
@@ -59,6 +68,8 @@ namespace Audacia.Auth.OpenIddict.Token
             {
                 throw new InvalidGrantException("The user is no longer allowed to sign in.");
             }
+
+            principal.AddClaims(await _profileService.GetClaimsAsync(user, principal).ConfigureAwait(false));
 
             return principal;
         }

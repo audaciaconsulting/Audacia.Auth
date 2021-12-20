@@ -185,6 +185,29 @@ public class CustomProfileService : DefaultProfileService<ApplicationUser, int>
 }
 ```
 
+## API Authentication
+
+Any API must use OpenIddict to validate access tokens. This can be achieved using the code below (where `services` is an instance of `IServiceCollection`). If you are replacing `IdentityServer4` then this will likely replace a call to `AddIdentityServerAuthentication`.
+
+```csharp
+services
+    .AddOpenIddict()
+    .AddValidation(options =>
+    {
+        options.SetIssuer(/*Identity app url*/);
+
+        options.AddAudiences(/*Client ID of the API*/);
+
+        // DON'T INCLUDE THIS SECTION IF OPENIDDICT IS HOSTED IN THE SAME WEB APP AS THE API
+        options.UseIntrospection()
+            .SetClientId(/*Client ID of the API*/)
+            .SetClientSecret(/*Client secret of the API*/);
+
+        options.UseSystemNetHttp();
+        options.UseAspNetCore();
+    });
+```
+
 # Replacing IdentityServer4 Checklist
 
 If you are replacing IdentityServer4 with OpenIddict, here is a high-level checklist of what needs to be done. More details for each point can be found in the relevant section above:
@@ -196,12 +219,14 @@ If you are replacing IdentityServer4 with OpenIddict, here is a high-level check
    - `OpenIddict.EntityFrameworkCore` or `OpenIddict.EntityFramework`, as necessary
 - [ ] Install the `OpenIddict.EntityFrameworkCore` (or `OpenIddict.EntityFramework`) package in your Entity Framework project
 - [ ] If you have a separate API project, install the `OpenIddict.AspNetCore` package
-- [ ] Add Entity Framework (Core) setup (see above)
-- [ ] Add OpenIddict services (see above)
-- [ ] Write code to convert existing IdentityServer configuration to an `OpenIdConnectConfig` object (see above)
+- [ ] Add Entity Framework (Core) setup (see [here](#entity-framework-and-entity-framework-core))
+- [ ] Add OpenIddict services (see [here](#register-openiddict-services))
+- [ ] Register the OpenIddict controllers (see [here](#configure-mvc-controllers))
+- [ ] Change API authentication to use OpenIddict (see [here](#api-authentication))
+- [ ] Write code to convert existing IdentityServer configuration to an `OpenIdConnectConfig` object (see [here](#configuration-in-appsettingsjson))
    - This must include adding scopes to the configuration so that they are registered in the database; this is an `OpenIdConnectScope` object that has 
-- [ ] Set some claim types in ASP.NET Core Identity setup (see above)
-- [ ] If a custom profile service has been written, modify it to implement the `IProfileService<TUser, TKey>` interface (see above)
+- [ ] Set some claim types in ASP.NET Core Identity setup (see [here](#aspnet-core-identity-configuration))
+- [ ] If a custom profile service and/or additional claims provider have been written, modify using the information [here](#adding-additional-claims-to-tokens)
 - [ ] Remove any IdentityServer4-specific code, such as:
    - `ApiResources`
    - `IdentityResources`

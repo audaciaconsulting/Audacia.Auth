@@ -7,7 +7,6 @@ using Audacia.Auth.OpenIddict.Common.Configuration;
 using Audacia.Auth.OpenIddict.Common.Extensions;
 using Audacia.Auth.OpenIddict.Token;
 using Audacia.Auth.OpenIddict.UserInfo;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -89,8 +88,7 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
                 .AddTransient<IClaimsPrincipalProviderFactory, ClaimsPrincipalProviderFactory<TUser, TKey>>()
                 .AddTransient<ClientCredentialsClaimPrincipalProvider>()
                 .AddTransient<PasswordClaimsPrincipalProvider<TUser, TKey>>()
-                .AddTransient<CodeExchangeClaimsPrincipalProvider<TUser, TKey>>()
-                .AddScoped<IClaimsTransformation, ClaimsTransformation<TUser, TKey>>();
+                .AddTransient<CodeExchangeClaimsPrincipalProvider<TUser, TKey>>();
         }
 
         private static OpenIddictBuilder ConfigureOpenIddict(
@@ -99,9 +97,11 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
             OpenIdConnectConfig openIdConnectConfig,
             IWebHostEnvironment hostingEnvironment)
         {
+            Action<OpenIddictCoreBuilder> additionalOptions = options => options.ReplaceApplicationManager(typeof(CustomOpenIddictApplicationManager<>));
+
             return services
                 .AddOpenIddict()
-                .AddCore(optionsBuilder)
+                .AddCore(optionsBuilder + additionalOptions)
                 .ConfigureOpenIddictServer(openIdConnectConfig, hostingEnvironment)
                 .ConfigureOpenIddictValidation(openIdConnectConfig);
         }
