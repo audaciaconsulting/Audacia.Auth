@@ -2,26 +2,23 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 
 namespace Audacia.Auth.OpenIddict.Common
 {
     /// <summary>
-    /// Default implementation of <see cref="IProfileService{TUser, TKey}"/>.
+    /// Default implementation of <see cref="IProfileService{TUser}"/>.
     /// </summary>
     /// <typeparam name="TUser">The type of user.</typeparam>
-    /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
-    public class DefaultProfileService<TUser, TKey> : IProfileService<TUser, TKey>
-        where TUser : IdentityUser<TKey>
-        where TKey : IEquatable<TKey>
+    public class DefaultProfileService<TUser> : IProfileService<TUser>
+        where TUser : class
     {
-        private readonly IAdditionalClaimsProvider<TUser, TKey> _additionalClaimsProvider;
+        private readonly IAdditionalClaimsProvider<TUser> _additionalClaimsProvider;
 
         /// <summary>
-        /// Initializes an instance of <see cref="DefaultProfileService{TUser, TKey}"/>.
+        /// Initializes an instance of <see cref="DefaultProfileService{TUser}"/>.
         /// </summary>
         /// <param name="additionalClaimsProvider">The claims provider from which to get claims.</param>
-        public DefaultProfileService(IAdditionalClaimsProvider<TUser, TKey> additionalClaimsProvider)
+        public DefaultProfileService(IAdditionalClaimsProvider<TUser> additionalClaimsProvider)
         {
             _additionalClaimsProvider = additionalClaimsProvider;
         }

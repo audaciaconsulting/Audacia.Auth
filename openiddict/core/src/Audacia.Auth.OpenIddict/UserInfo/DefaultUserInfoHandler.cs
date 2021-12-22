@@ -16,22 +16,19 @@ namespace Audacia.Auth.OpenIddict.UserInfo
     /// A class that can handle requests to the /connect/userinfo endpoint.
     /// </summary>
     /// <typeparam name="TUser">The type of user.</typeparam>
-    /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
-    public class DefaultUserInfoHandler<TUser, TKey> : IUserInfoHandler<TUser, TKey>
-        where TUser : IdentityUser<TKey>
-        where TKey : IEquatable<TKey>
+    /// <typeparam name="TId">The type of the user's primary key.</typeparam>
+    public class DefaultUserInfoHandler<TUser, TId> : IUserInfoHandler<TUser, TId>
+        where TUser : class
     {
         private readonly UserManager<TUser> _userManager;
-        private readonly IProfileService<TUser, TKey> _profileService;
+        private readonly IProfileService<TUser> _profileService;
 
         /// <summary>
-        /// Initializes an instance of <see cref="DefaultUserInfoHandler{TUser, TKey}"/>.
+        /// Initializes an instance of <see cref="DefaultUserInfoHandler{TUser, TId}"/>.
         /// </summary>
         /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/>.</param>
-        /// <param name="profileService">An implementation of <see cref="IProfileService{TUser, TKey}"/>.</param>
-        public DefaultUserInfoHandler(
-            UserManager<TUser> userManager,
-            IProfileService<TUser, TKey> profileService)
+        /// <param name="profileService">An implementation of <see cref="IProfileService{TUser}"/>.</param>
+        public DefaultUserInfoHandler(UserManager<TUser> userManager, IProfileService<TUser> profileService)
         {
             _userManager = userManager;
             _profileService = profileService;
@@ -42,7 +39,7 @@ namespace Audacia.Auth.OpenIddict.UserInfo
         /// </summary>
         /// <param name="claimsPrincipal">The <see cref="ClaimsPrincipal"/> instance from the claims should be extracted.</param>
         /// <returns>An <see cref="IActionResult"/> object representing the result that should be returned to the client.</returns>
-        public async Task<IActionResult> HandleAsync(ClaimsPrincipal claimsPrincipal)
+        public virtual async Task<IActionResult> HandleAsync(ClaimsPrincipal claimsPrincipal)
         {
             var user = await _userManager.GetUserAsync(claimsPrincipal).ConfigureAwait(false);
             if (user is null)
@@ -69,17 +66,17 @@ namespace Audacia.Auth.OpenIddict.UserInfo
                     }));
             }
 
-            var claims = await GetClaimsAsync(claimsPrincipal, user).ConfigureAwait(false);
+            var claims = await GetClaimsAsync(claimsPrincipal, new UserWrapper<TUser, TId>(user)).ConfigureAwait(false);
 
             return new OkObjectResult(claims);
         }
 
-        private async Task<Dictionary<string, object>> GetClaimsAsync(ClaimsPrincipal claimsPrincipal, TUser user)
+        private async Task<Dictionary<string, object>> GetClaimsAsync(ClaimsPrincipal claimsPrincipal, UserWrapper<TUser, TId> user)
         {
             var claims = new Dictionary<string, object>(StringComparer.Ordinal)
             {
                 // Note: the "sub" claim is a mandatory claim and must be included in the JSON response.
-                [Claims.Subject] = user.Id.ToString()!
+                [Claims.Subject] = user.GetId()!.ToString()!
             };
             await AddClaimsForRequestedScopesAsync(claimsPrincipal, user, claims).ConfigureAwait(false);
             await AddDynamicClaimsAsync(user, claimsPrincipal, claims).ConfigureAwait(false);
@@ -89,18 +86,6 @@ namespace Audacia.Auth.OpenIddict.UserInfo
 
         private async Task AddClaimsForRequestedScopesAsync(ClaimsPrincipal claimsPrincipal, TUser user, Dictionary<string, object> claims)
         {
-            if (claimsPrincipal.HasScope(Scopes.Email))
-            {
-                claims[Claims.Email] = user.Email;
-                claims[Claims.EmailVerified] = user.EmailConfirmed;
-            }
-
-            if (claimsPrincipal.HasScope(Scopes.Phone))
-            {
-                claims[Claims.PhoneNumber] = user.PhoneNumber;
-                claims[Claims.PhoneNumberVerified] = user.PhoneNumberConfirmed;
-            }
-
             if (claimsPrincipal.HasScope(Scopes.Roles))
             {
                 claims[Claims.Role] = await _userManager.GetRolesAsync(user).ConfigureAwait(false);

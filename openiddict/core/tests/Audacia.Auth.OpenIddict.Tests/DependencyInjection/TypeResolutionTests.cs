@@ -27,6 +27,7 @@ namespace Audacia.Auth.OpenIddict.Tests.DependencyInjection
                 .AddUserManager<UserManager<DummyUser>>();
             _services.AddOpenIddict<DummyUser, int>(
                 _ => { },
+                user => user.Id,
                 new Common.Configuration.OpenIdConnectConfig(),
                 mockHostingEnvironment.Object);
         }

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 
 namespace Audacia.Auth.OpenIddict.Common
 {
@@ -10,10 +8,8 @@ namespace Audacia.Auth.OpenIddict.Common
     /// Represents a type that can add additional claims for a user.
     /// </summary>
     /// <typeparam name="TUser">The type of user.</typeparam>
-    /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
-    public interface IProfileService<TUser, TKey>
-        where TUser : IdentityUser<TKey>
-        where TKey : IEquatable<TKey>
+    public interface IProfileService<TUser>
+        where TUser : class
     {
         /// <summary>
         /// Adds additional claims to the given <paramref name="claimsPrincipal"/>.

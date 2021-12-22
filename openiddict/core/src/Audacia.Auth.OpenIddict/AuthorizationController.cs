@@ -14,21 +14,20 @@ namespace Audacia.Auth.OpenIddict
     /// A controller to handle requests to the /connect/authorize and /connect/token endpoints.
     /// </summary>
     /// <typeparam name="TUser">The user type.</typeparam>
-    /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
-    public class AuthorizationController<TUser, TKey> : Controller
-        where TUser : IdentityUser<TKey>
-        where TKey : IEquatable<TKey>
+    /// <typeparam name="TId">The type of the user's primary key.</typeparam>
+    public class AuthorizationController<TUser, TId> : Controller
+        where TUser : class
     {
-        private readonly IAuthenticateResultHandler<TUser, TKey> _authenticateResultHandler;
+        private readonly IAuthenticateResultHandler<TUser, TId> _authenticateResultHandler;
         private readonly IGetTokenHandler _getTokenHandler;
 
         /// <summary>
-        /// Initializes an instance of <see cref="AuthorizationController{TUser, TKey}"/>.
+        /// Initializes an instance of <see cref="AuthorizationController{TUser, TId}"/>.
         /// </summary>
-        /// <param name="authenticateResultHandler">The <see cref="DefaultAuthenticateResultHandler{TUser, TKey}"/> instance.</param>
+        /// <param name="authenticateResultHandler">The <see cref="DefaultAuthenticateResultHandler{TUser, TId}"/> instance.</param>
         /// <param name="getTokenHandler">The <see cref="IGetTokenHandler"/> instance.</param>
         public AuthorizationController(
-            IAuthenticateResultHandler<TUser, TKey> authenticateResultHandler,
+            IAuthenticateResultHandler<TUser, TId> authenticateResultHandler,
             IGetTokenHandler getTokenHandler)
         {
             _authenticateResultHandler = authenticateResultHandler;
@@ -46,13 +45,13 @@ namespace Audacia.Auth.OpenIddict
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> Authorize()
         {
-            var request = HttpContext.GetOpenIddictServerRequest() ??
+            var openIddictRequest = HttpContext.GetOpenIddictServerRequest() ??
                 throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
 
             // Retrieve the user principal stored in the authentication cookie.
             var result = await HttpContext.AuthenticateAsync(IdentityConstants.ApplicationScheme).ConfigureAwait(false);
 
-            return await _authenticateResultHandler.HandleAsync(request, Request, ViewData, result).ConfigureAwait(false);
+            return await _authenticateResultHandler.HandleAsync(openIddictRequest, Request, ViewData, result).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -66,10 +65,10 @@ namespace Audacia.Auth.OpenIddict
         [IgnoreAntiforgeryToken]
         public Task<IActionResult> Exchange()
         {
-            var request = HttpContext.GetOpenIddictServerRequest() ??
+            var openIddictRequest = HttpContext.GetOpenIddictServerRequest() ??
                 throw new InvalidOperationException("The OpenID Connect request cannot be retrieved.");
 
-            return _getTokenHandler.HandleAsync(request);
+            return _getTokenHandler.HandleAsync(openIddictRequest, Request);
         }
     }
 }

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Audacia.Auth.OpenIddict.Common;
 using Audacia.Auth.OpenIddict.Common.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -21,38 +23,41 @@ namespace Audacia.Auth.OpenIddict.Authorize
     /// A class that can handle requests to the /connect/authorize endpoint.
     /// </summary>
     /// <typeparam name="TUser">The type of user.</typeparam>
-    /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
-    public class DefaultAuthenticateResultHandler<TUser, TKey> : IAuthenticateResultHandler<TUser, TKey>
-        where TUser : IdentityUser<TKey>
-        where TKey : IEquatable<TKey>
+    /// <typeparam name="TId">The type of the user's primary key.</typeparam>
+    public class DefaultAuthenticateResultHandler<TUser, TId> : IAuthenticateResultHandler<TUser, TId>
+        where TUser : class
     {
         private readonly IOpenIddictApplicationManager _applicationManager;
         private readonly IOpenIddictAuthorizationManager _authorizationManager;
         private readonly IOpenIddictScopeManager _scopeManager;
         private readonly SignInManager<TUser> _signInManager;
         private readonly UserManager<TUser> _userManager;
+        private readonly IPostAuthenticateHandler<TUser, TId> _postAuthenticateHandler;
 
         /// <summary>
-        /// Initializes an instance of <see cref="DefaultAuthenticateResultHandler{TUser, TKey}"/>.
+        /// Initializes an instance of <see cref="DefaultAuthenticateResultHandler{TUser, TId}"/>.
         /// </summary>
         /// <param name="applicationManager">The <see cref="IOpenIddictApplicationManager"/> instance to use.</param>
         /// <param name="authorizationManager">The <see cref="IOpenIddictAuthorizationManager"/> instance to use.</param>
         /// <param name="scopeManager">The <see cref="IOpenIddictScopeManager"/> instance to use.</param>
         /// <param name="signInManager">The <see cref="SignInManager{TUser}"/> instance to use.</param>
         /// <param name="userManager">The <see cref="UserManager{TUser}"/> instance to use.</param>
-        [SuppressMessage("Maintainability", "ACL1003:Signature contains too many parameters", Justification = "Needs five parameters.")]
+        /// <param name="postAuthenticateHandler">The <see cref="IPostAuthenticateHandler{TUser, TKey}"/> instance to use.</param>
+        [SuppressMessage("Maintainability", "ACL1003:Signature contains too many parameters", Justification = "Needs six parameters.")]
         public DefaultAuthenticateResultHandler(
             IOpenIddictApplicationManager applicationManager,
             IOpenIddictAuthorizationManager authorizationManager,
             IOpenIddictScopeManager scopeManager,
             SignInManager<TUser> signInManager,
-            UserManager<TUser> userManager)
+            UserManager<TUser> userManager,
+            IPostAuthenticateHandler<TUser, TId> postAuthenticateHandler)
         {
             _applicationManager = applicationManager;
             _authorizationManager = authorizationManager;
             _scopeManager = scopeManager;
             _signInManager = signInManager;
             _userManager = userManager;
+            _postAuthenticateHandler = postAuthenticateHandler;
         }
 
         /// <summary>
@@ -66,7 +71,7 @@ namespace Audacia.Auth.OpenIddict.Authorize
         /// <exception cref="ArgumentNullException">An argument is <see langword="null"/>.</exception>
         /// <exception cref="InvalidOperationException">User or client data cannot be found.</exception>
         [SuppressMessage("Maintainability", "ACL1002:Member or local function contains too many statements", Justification = "Could reduce further by returning moving getting the user, application, etc. to helper methods, but I don't think that would actually improve the method.")]
-        public async Task<IActionResult> HandleAsync(
+        public virtual async Task<IActionResult> HandleAsync(
             OpenIddictRequest openIddictRequest,
             HttpRequest httpRequest,
             ViewDataDictionary viewDataDictionary,
@@ -95,8 +100,7 @@ namespace Audacia.Auth.OpenIddict.Authorize
             }
 
             // Retrieve the profile of the logged in user.
-            var user = await _userManager.GetUserAsync(result.Principal).ConfigureAwait(false) ??
-                throw new InvalidOperationException("The user details cannot be retrieved.");
+            var user = await GetUserAsync(result!.Principal!).ConfigureAwait(false);
 
             // Retrieve the application details from the database.
             var application = await _applicationManager.FindByClientIdAsync(openIddictRequest.ClientId!).ConfigureAwait(false) ??
@@ -105,20 +109,28 @@ namespace Audacia.Auth.OpenIddict.Authorize
             // Retrieve the permanent authorizations associated with the user and the calling client application.
             var applicationId = await _applicationManager.GetIdAsync(application).ConfigureAwait(false) ?? string.Empty;
             var authorizations = await _authorizationManager.FindAsync(
-                subject: user.Id.ToString()!,
+                subject: user?.GetId()?.ToString()!,
                 client: applicationId,
                 status: Statuses.Valid,
                 type: AuthorizationTypes.Permanent,
                 scopes: openIddictRequest.GetScopes()).ToListAsync().ConfigureAwait(false);
 
-            return await ProcessConsentTypesAsync(openIddictRequest, viewDataDictionary, user, application, applicationId, authorizations).ConfigureAwait(false);
+            return await ProcessConsentTypesAsync(openIddictRequest, viewDataDictionary, user!, application, applicationId, authorizations).ConfigureAwait(false);
+        }
+
+        private async Task<UserWrapper<TUser, TId>> GetUserAsync(ClaimsPrincipal principal)
+        {
+            var user = await _userManager.GetUserAsync(principal).ConfigureAwait(false) ??
+                throw new InvalidOperationException("The user details cannot be retrieved.");
+
+            return new UserWrapper<TUser, TId>(user);
         }
 
         [SuppressMessage("Maintainability", "ACL1003:Signature contains too many parameters", Justification = "All parameters are needed.")]
         private async Task<IActionResult> ProcessConsentTypesAsync(
             OpenIddictRequest openIddictRequest,
             ViewDataDictionary viewDataDictionary,
-            TUser user,
+            UserWrapper<TUser, TId> user,
             object application,
             string applicationId,
             List<object> authorizations)
@@ -160,7 +172,7 @@ namespace Audacia.Auth.OpenIddict.Authorize
                 }));
         }
 
-        private async Task<IActionResult> HandleSuccessfulSignInAsync(OpenIddictRequest openIddictRequest, TUser user, string applicationId, List<object> authorizations)
+        private async Task<IActionResult> HandleSuccessfulSignInAsync(OpenIddictRequest openIddictRequest, UserWrapper<TUser, TId> user, string applicationId, List<object> authorizations)
         {
             var principal = await _signInManager.CreateUserPrincipalAsync(user).ConfigureAwait(false);
 
@@ -177,15 +189,15 @@ namespace Audacia.Auth.OpenIddict.Authorize
             {
                 authorization = await _authorizationManager.CreateAsync(
                     principal: principal,
-                    subject: user.Id.ToString()!,
+                    subject: user.GetId()!.ToString()!,
                     client: applicationId,
                     type: AuthorizationTypes.Permanent,
                     scopes: principal.GetScopes()).ConfigureAwait(false);
             }
 
             principal.SetAuthorizationId(await _authorizationManager.GetIdAsync(authorization).ConfigureAwait(false));
-
             principal.SetDestinations();
+            await _postAuthenticateHandler.HandleAsync(user, principal).ConfigureAwait(false);
 
             return new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, principal);
         }

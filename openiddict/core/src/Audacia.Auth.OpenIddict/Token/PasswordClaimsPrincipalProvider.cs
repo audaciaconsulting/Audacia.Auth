@@ -14,32 +14,31 @@ namespace Audacia.Auth.OpenIddict.Token
     /// Implementation of <see cref="IClaimsPrincipalProvider"/> that can get a <see cref="ClaimsPrincipal"/> for the resource owner password credential flow.
     /// </summary>
     /// <typeparam name="TUser">The type of user.</typeparam>
-    /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
-    public class PasswordClaimsPrincipalProvider<TUser, TKey> : IClaimsPrincipalProvider
-        where TUser : IdentityUser<TKey>
-        where TKey : IEquatable<TKey>
+    /// <typeparam name="TId">The type of the user's primary key.</typeparam>
+    public class PasswordClaimsPrincipalProvider<TUser, TId> : IClaimsPrincipalProvider
+        where TUser : class
     {
         private readonly UserManager<TUser> _userManager;
         private readonly SignInManager<TUser> _signInManager;
         private readonly IOpenIddictScopeManager _scopeManager;
-        private readonly IProfileService<TUser, TKey> _profileService;
-        private readonly ILogger<PasswordClaimsPrincipalProvider<TUser, TKey>> _logger;
+        private readonly IProfileService<TUser> _profileService;
+        private readonly ILogger<PasswordClaimsPrincipalProvider<TUser, TId>> _logger;
 
         /// <summary>
-        /// Initializes an instance of <see cref="PasswordClaimsPrincipalProvider{TUser, TKey}"/>.
+        /// Initializes an instance of <see cref="PasswordClaimsPrincipalProvider{TUser, TId}"/>.
         /// </summary>
         /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/>.</param>
         /// <param name="signInManager">An instance of <see cref="SignInManager{TUser}"/>.</param>
         /// <param name="scopeManager">An instance of <see cref="IOpenIddictScopeManager"/>.</param>
-        /// <param name="profileService">An instance of <see cref="IProfileService{TUser, TKey}"/>.</param>
+        /// <param name="profileService">An instance of <see cref="IProfileService{TUser}"/>.</param>
         /// <param name="logger">An instance of <see cref="ILogger"/>.</param>
         [SuppressMessage("Maintainability", "ACL1003:Signature contains too many parameters", Justification = "Needs five parameters.")]
         public PasswordClaimsPrincipalProvider(
             UserManager<TUser> userManager,
             SignInManager<TUser> signInManager,
             IOpenIddictScopeManager scopeManager,
-            IProfileService<TUser, TKey> profileService,
-            ILogger<PasswordClaimsPrincipalProvider<TUser, TKey>> logger)
+            IProfileService<TUser> profileService,
+            ILogger<PasswordClaimsPrincipalProvider<TUser, TId>> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -60,39 +59,40 @@ namespace Audacia.Auth.OpenIddict.Token
             }
 
             // Validate the username/password parameters and ensure the account is not locked out.
+            var userProxy = new UserWrapper<TUser, TId>(user);
             var result = await _signInManager.CheckPasswordSignInAsync(user, openIddictRequest.Password, lockoutOnFailure: true).ConfigureAwait(false);
             if (!result.Succeeded)
             {
-                HandleFailedSignIn(result, user);
+                HandleFailedSignIn(result, userProxy);
             }
 
-            return await CreatePrincipalForPasswordFlowAsync(openIddictRequest, user).ConfigureAwait(false);
+            return await CreatePrincipalForPasswordFlowAsync(openIddictRequest, userProxy).ConfigureAwait(false);
         }
 
-        private void HandleFailedSignIn(SignInResult result, TUser user)
+        private void HandleFailedSignIn(SignInResult result, UserWrapper<TUser, TId> user)
         {
             if (result.IsLockedOut)
             {
-                _logger.LogInformation("User {UserId} is locked out.", user.Id);
+                _logger.LogInformation("User {UserId} is locked out.", user.GetId());
             }
             else if (result.IsNotAllowed)
             {
-                _logger.LogInformation("User {UserId} is not allowed to sign in.", user.Id);
+                _logger.LogInformation("User {UserId} is not allowed to sign in.", user.GetId());
             }
             else
             {
-                _logger.LogInformation("Invalid credentials for user {UserId}.", user.Id);
+                _logger.LogInformation("Invalid credentials for user {UserId}.", user.GetId());
             }
 
             throw new InvalidGrantException("The username/password couple is invalid.");
         }
 
-        private async Task<ClaimsPrincipal> CreatePrincipalForPasswordFlowAsync(OpenIddictRequest openIddictRequest, TUser user)
+        private async Task<ClaimsPrincipal> CreatePrincipalForPasswordFlowAsync(OpenIddictRequest openIddictRequest, UserWrapper<TUser, TId> user)
         {
             var principal = await _signInManager.CreateUserPrincipalAsync(user).ConfigureAwait(false);
             if (!await _profileService.IsActiveAsync(user, principal).ConfigureAwait(false))
             {
-                _logger.LogInformation("User {UserId} is not active.", user.Id);
+                _logger.LogInformation("User {UserId} is not active.", user.GetId());
                 throw new InvalidGrantException("The user is not active.");
             }
 

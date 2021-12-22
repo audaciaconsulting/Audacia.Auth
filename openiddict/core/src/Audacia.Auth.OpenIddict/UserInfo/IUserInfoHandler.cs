@@ -1,7 +1,5 @@
-﻿using System;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Audacia.Auth.OpenIddict.UserInfo
@@ -10,10 +8,9 @@ namespace Audacia.Auth.OpenIddict.UserInfo
     /// Represents a type that can handle requests to the /connect/userinfo endpoint.
     /// </summary>
     /// <typeparam name="TUser">The type of user.</typeparam>
-    /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
-    public interface IUserInfoHandler<TUser, TKey>
-        where TUser : IdentityUser<TKey>
-        where TKey : IEquatable<TKey>
+    /// <typeparam name="TId">The type of the user's primary key.</typeparam>
+    public interface IUserInfoHandler<TUser, TId>
+        where TUser : class
     {
         /// <summary>
         /// Handles the given <paramref name="claimsPrincipal"/>.

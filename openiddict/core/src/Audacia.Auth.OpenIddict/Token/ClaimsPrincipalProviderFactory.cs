@@ -1,28 +1,26 @@
 ﻿using System;
-using Microsoft.AspNetCore.Identity;
 using OpenIddict.Abstractions;
 
 namespace Audacia.Auth.OpenIddict.Token
 {
     /// <inheritdoc />
-    public class ClaimsPrincipalProviderFactory<TUser, TKey> : IClaimsPrincipalProviderFactory
-        where TUser : IdentityUser<TKey>
-        where TKey : IEquatable<TKey>
+    public class ClaimsPrincipalProviderFactory<TUser, TId> : IClaimsPrincipalProviderFactory
+        where TUser : class
     {
         private readonly ClientCredentialsClaimPrincipalProvider _clientCredentialsClaimPrincipalProvider;
-        private readonly PasswordClaimsPrincipalProvider<TUser, TKey> _passwordClaimsPrincipalProvider;
-        private readonly CodeExchangeClaimsPrincipalProvider<TUser, TKey> _codeExchangeClaimsPrincipalProvider;
+        private readonly PasswordClaimsPrincipalProvider<TUser, TId> _passwordClaimsPrincipalProvider;
+        private readonly CodeExchangeClaimsPrincipalProvider<TUser> _codeExchangeClaimsPrincipalProvider;
 
         /// <summary>
-        /// Initializes an instance of <see cref="ClaimsPrincipalProviderFactory{TUser, TKey}"/>.
+        /// Initializes an instance of <see cref="ClaimsPrincipalProviderFactory{TUser, TId}"/>.
         /// </summary>
         /// <param name="clientCredentialsClaimPrincipalProvider">The <see cref="IClaimsPrincipalProvider"/> for the client credentials flow.</param>
         /// <param name="passwordClaimsPrincipalProvider">The <see cref="IClaimsPrincipalProvider"/> for the resource owner password credential flow.</param>
         /// <param name="codeExchangeClaimsPrincipalProvider">The <see cref="IClaimsPrincipalProvider"/> for the exchanging a code for a token.</param>
         public ClaimsPrincipalProviderFactory(
             ClientCredentialsClaimPrincipalProvider clientCredentialsClaimPrincipalProvider,
-            PasswordClaimsPrincipalProvider<TUser, TKey> passwordClaimsPrincipalProvider,
-            CodeExchangeClaimsPrincipalProvider<TUser, TKey> codeExchangeClaimsPrincipalProvider)
+            PasswordClaimsPrincipalProvider<TUser, TId> passwordClaimsPrincipalProvider,
+            CodeExchangeClaimsPrincipalProvider<TUser> codeExchangeClaimsPrincipalProvider)
         {
             _clientCredentialsClaimPrincipalProvider = clientCredentialsClaimPrincipalProvider;
             _passwordClaimsPrincipalProvider = passwordClaimsPrincipalProvider;

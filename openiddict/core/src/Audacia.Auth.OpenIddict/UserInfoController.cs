@@ -1,8 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Audacia.Auth.OpenIddict.UserInfo;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OpenIddict.Server.AspNetCore;
 
@@ -12,18 +10,17 @@ namespace Audacia.Auth.OpenIddict
     /// A controller to handle requests to the /connect/userinfo endpoint.
     /// </summary>
     /// <typeparam name="TUser">The user type.</typeparam>
-    /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
-    public class UserInfoController<TUser, TKey> : Controller
-        where TUser : IdentityUser<TKey>
-        where TKey : IEquatable<TKey>
+    /// <typeparam name="TId">The type of the user's primary key.</typeparam>
+    public class UserInfoController<TUser, TId> : Controller
+        where TUser : class
     {
-        private readonly IUserInfoHandler<TUser, TKey> _userInfoHandler;
+        private readonly IUserInfoHandler<TUser, TId> _userInfoHandler;
 
         /// <summary>
-        /// Initializes an instance of <see cref="UserInfoController{TUser, TKey}"/>.
+        /// Initializes an instance of <see cref="UserInfoController{TUser, TId}"/>.
         /// </summary>
-        /// <param name="userInfoHandler">A <see cref="DefaultUserInfoHandler{TUser, TKey}"/> instance.</param>
-        public UserInfoController(IUserInfoHandler<TUser, TKey> userInfoHandler)
+        /// <param name="userInfoHandler">A <see cref="DefaultUserInfoHandler{TUser, TId}"/> instance.</param>
+        public UserInfoController(IUserInfoHandler<TUser, TId> userInfoHandler)
         {
             _userInfoHandler = userInfoHandler;
         }

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using OpenIddict.Abstractions;
@@ -13,10 +11,9 @@ namespace Audacia.Auth.OpenIddict.Authorize
     /// Represents a type that can handle requests to the /connect/authorize endpoint.
     /// </summary>
     /// <typeparam name="TUser">The type of user.</typeparam>
-    /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
-    public interface IAuthenticateResultHandler<TUser, TKey>
-        where TUser : IdentityUser<TKey>
-        where TKey : IEquatable<TKey>
+    /// <typeparam name="TId">The type of the user's primary key.</typeparam>
+    public interface IAuthenticateResultHandler<TUser, TId>
+        where TUser : class
     {
         /// <summary>
         /// Handles the given <paramref name="result"/>.

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Audacia.Auth.OpenIddict.Authorize;
@@ -22,73 +23,86 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
     {
         /// <summary>
         /// Adds the given <typeparamref name="TProvider"/> to the dependency injection container
-        /// as the implementation of <see cref="IAdditionalClaimsProvider{TUser, TKey}"/>.
+        /// as the implementation of <see cref="IAdditionalClaimsProvider{TUser}"/>.
         /// </summary>
-        /// <typeparam name="TProvider">The type of <see cref="IAdditionalClaimsProvider{TUser, TKey}"/> implementation.</typeparam>
+        /// <typeparam name="TProvider">The type of <see cref="IAdditionalClaimsProvider{TUser}"/> implementation.</typeparam>
         /// <typeparam name="TUser">The user type.</typeparam>
-        /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
         /// <param name="services">The <see cref="IServiceCollection"/> instance to which to add the <typeparamref name="TProvider"/>.</param>
         /// <returns>The given <paramref name="services"/>.</returns>
-        public static IServiceCollection AddAdditionalClaimsProvider<TProvider, TUser, TKey>(this IServiceCollection services)
-            where TProvider : class, IAdditionalClaimsProvider<TUser, TKey>
-            where TUser : IdentityUser<TKey>
-            where TKey : IEquatable<TKey> => services.AddTransient<IAdditionalClaimsProvider<TUser, TKey>, TProvider>();
+        public static IServiceCollection AddAdditionalClaimsProvider<TProvider, TUser>(this IServiceCollection services)
+            where TProvider : class, IAdditionalClaimsProvider<TUser>
+            where TUser : class => services.AddTransient<IAdditionalClaimsProvider<TUser>, TProvider>();
 
         /// <summary>
         /// Adds the given <typeparamref name="TService"/> to the dependency injection container
-        /// as the implementation of <see cref="IProfileService{TUser, TKey}"/>.
+        /// as the implementation of <see cref="IProfileService{TUser}"/>.
         /// </summary>
-        /// <typeparam name="TService">The type of <see cref="IProfileService{TUser, TKey}"/> implementation.</typeparam>
+        /// <typeparam name="TService">The type of the <see cref="IProfileService{TUser}"/> implementation.</typeparam>
         /// <typeparam name="TUser">The user type.</typeparam>
-        /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
         /// <param name="services">The <see cref="IServiceCollection"/> instance to which to add the <typeparamref name="TService"/>.</param>
         /// <returns>The given <paramref name="services"/>.</returns>
-        public static IServiceCollection AddProfileService<TService, TUser, TKey>(this IServiceCollection services)
-            where TService : class, IProfileService<TUser, TKey>
-            where TUser : IdentityUser<TKey>
-            where TKey : IEquatable<TKey> => services.AddTransient<IProfileService<TUser, TKey>, TService>();
+        public static IServiceCollection AddProfileService<TService, TUser>(this IServiceCollection services)
+            where TService : class, IProfileService<TUser>
+            where TUser : class => services.AddTransient<IProfileService<TUser>, TService>();
+
+        /// <summary>
+        /// Adds the given <typeparamref name="THandler"/> to the dependency injection container
+        /// as the implementation of <see cref="IPostAuthenticateHandler{TUser, TId}"/>.
+        /// </summary>
+        /// <typeparam name="THandler">The type of the <see cref="IPostAuthenticateHandler{TUser, TId}"/> implementation.</typeparam>
+        /// <typeparam name="TUser">The type of user.</typeparam>
+        /// <typeparam name="TId">The type of the user's primary key.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/> instance to which to add the <typeparamref name="THandler"/>.</param>
+        /// <returns>The given <paramref name="services"/>.</returns>
+        public static IServiceCollection AddPostAuthenticateHandler<THandler, TUser, TId>(this IServiceCollection services)
+            where THandler : class, IPostAuthenticateHandler<TUser, TId>
+            where TUser : class => services.AddTransient<IPostAuthenticateHandler<TUser, TId>, THandler>();
 
         /// <summary>
         /// Adds OpenIddict services to the given <paramref name="services"/>.
         /// </summary>
         /// <typeparam name="TUser">The user type.</typeparam>
-        /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
+        /// <typeparam name="TId">The type of the user's primary key.</typeparam>
         /// <param name="services">The <see cref="IServiceCollection"/> object to which to add the services.</param>
         /// <param name="optionsBuilder">A delegate containing the additional OpenIddict configuration.</param>
+        /// <param name="userIdGetter">A delegate that, when invoked, gets the ID for a given user.</param>
         /// <param name="openIdConnectConfig">An <see cref="OpenIdConnectConfig"/> object, which represents the configuration of the authorization server.</param>
         /// <param name="hostingEnvironment">The current <see cref="IWebHostEnvironment"/>.</param>
         /// <returns>An instance of <see cref="OpenIddictBuilder"/> to which further configuration can be performed.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="openIdConnectConfig"/> is <see langword="null"/>.</exception>
-        public static OpenIddictBuilder AddOpenIddict<TUser, TKey>(
+        [SuppressMessage("Maintainability", "ACL1003:Signature contains too many parameters", Justification = "Needs all parameters.")]
+        public static OpenIddictBuilder AddOpenIddict<TUser, TId>(
             this IServiceCollection services,
             Action<OpenIddictCoreBuilder> optionsBuilder,
+            Func<TUser, TId> userIdGetter,
             OpenIdConnectConfig openIdConnectConfig,
             IWebHostEnvironment hostingEnvironment)
-            where TUser : IdentityUser<TKey>
-            where TKey : IEquatable<TKey>
+            where TUser : class
         {
             if (openIdConnectConfig == null) throw new ArgumentNullException(nameof(openIdConnectConfig));
+
+            UserWrapper<TUser, TId>.UserIdGetter = userIdGetter;
             
             return services
-                .AddServices<TUser, TKey>()
+                .AddServices<TUser, TId>()
                 .AddSingleton(openIdConnectConfig)
                 .ConfigureOpenIddict(optionsBuilder, openIdConnectConfig, hostingEnvironment);
         }
 
-        private static IServiceCollection AddServices<TUser, TKey>(this IServiceCollection services)
-            where TUser : IdentityUser<TKey>
-            where TKey : IEquatable<TKey>
+        private static IServiceCollection AddServices<TUser, TId>(this IServiceCollection services)
+            where TUser : class
         {
             return services
-                .AddTransient<IAdditionalClaimsProvider<TUser, TKey>, DefaultAdditionalClaimsProvider<TUser, TKey>>()
-                .AddTransient<IProfileService<TUser, TKey>, DefaultProfileService<TUser, TKey>>()
-                .AddTransient<IAuthenticateResultHandler<TUser, TKey>, DefaultAuthenticateResultHandler<TUser, TKey>>()
+                .AddAdditionalClaimsProvider<DefaultAdditionalClaimsProvider<TUser>, TUser>()
+                .AddProfileService<DefaultProfileService<TUser>, TUser>()
+                .AddPostAuthenticateHandler<DefaultPostAuthenticateHandler<TUser, TId>, TUser, TId>()
+                .AddTransient<IAuthenticateResultHandler<TUser, TId>, DefaultAuthenticateResultHandler<TUser, TId>>()
                 .AddTransient<IGetTokenHandler, DefaultGetTokenHandler>()
-                .AddTransient<IUserInfoHandler<TUser, TKey>, DefaultUserInfoHandler<TUser, TKey>>()
-                .AddTransient<IClaimsPrincipalProviderFactory, ClaimsPrincipalProviderFactory<TUser, TKey>>()
+                .AddTransient<IUserInfoHandler<TUser, TId>, DefaultUserInfoHandler<TUser, TId>>()
+                .AddTransient<IClaimsPrincipalProviderFactory, ClaimsPrincipalProviderFactory<TUser, TId>>()
                 .AddTransient<ClientCredentialsClaimPrincipalProvider>()
-                .AddTransient<PasswordClaimsPrincipalProvider<TUser, TKey>>()
-                .AddTransient<CodeExchangeClaimsPrincipalProvider<TUser, TKey>>();
+                .AddTransient<PasswordClaimsPrincipalProvider<TUser, TId>>()
+                .AddTransient<CodeExchangeClaimsPrincipalProvider<TUser>>();
         }
 
         private static OpenIddictBuilder ConfigureOpenIddict(
@@ -97,11 +111,9 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
             OpenIdConnectConfig openIdConnectConfig,
             IWebHostEnvironment hostingEnvironment)
         {
-            Action<OpenIddictCoreBuilder> additionalOptions = options => options.ReplaceApplicationManager(typeof(CustomOpenIddictApplicationManager<>));
-
             return services
                 .AddOpenIddict()
-                .AddCore(optionsBuilder + additionalOptions)
+                .AddCore(optionsBuilder)
                 .ConfigureOpenIddictServer(openIdConnectConfig, hostingEnvironment)
                 .ConfigureOpenIddictValidation(openIdConnectConfig);
         }

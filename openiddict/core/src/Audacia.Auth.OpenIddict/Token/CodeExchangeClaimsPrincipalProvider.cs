@@ -16,27 +16,25 @@ namespace Audacia.Auth.OpenIddict.Token
     /// e.g. exchanging an authorization code for a token.
     /// </summary>
     /// <typeparam name="TUser">The type of user.</typeparam>
-    /// <typeparam name="TKey">The type of the user's primary key.</typeparam>
-    public class CodeExchangeClaimsPrincipalProvider<TUser, TKey> : IClaimsPrincipalProvider
-        where TUser : IdentityUser<TKey>
-        where TKey : IEquatable<TKey>
+    public class CodeExchangeClaimsPrincipalProvider<TUser> : IClaimsPrincipalProvider
+        where TUser : class
     {
         private readonly UserManager<TUser> _userManager;
         private readonly SignInManager<TUser> _signInManager;
-        private readonly IProfileService<TUser, TKey> _profileService;
+        private readonly IProfileService<TUser> _profileService;
         private readonly HttpContext _httpContext;
 
         /// <summary>
-        /// Initializes an instance of <see cref="CodeExchangeClaimsPrincipalProvider{TUser, TKey}"/>.
+        /// Initializes an instance of <see cref="CodeExchangeClaimsPrincipalProvider{TUser}"/>.
         /// </summary>
         /// <param name="userManager">An instance of <see cref="UserManager{TUser}"/>.</param>
         /// <param name="signInManager">An instance of <see cref="SignInManager{TUser}"/>.</param>
-        /// <param name="profileService">An instance of <see cref="IProfileService{TUser, TKey}"/>.</param>
+        /// <param name="profileService">An instance of <see cref="IProfileService{TUser}"/>.</param>
         /// <param name="httpContextAccessor">An instance of <see cref="IHttpContextAccessor"/>.</param>
         public CodeExchangeClaimsPrincipalProvider(
             UserManager<TUser> userManager,
             SignInManager<TUser> signInManager,
-            IProfileService<TUser, TKey> profileService,
+            IProfileService<TUser> profileService,
             IHttpContextAccessor httpContextAccessor)
         {
             if (httpContextAccessor == null) throw new ArgumentNullException(nameof(httpContextAccessor));
