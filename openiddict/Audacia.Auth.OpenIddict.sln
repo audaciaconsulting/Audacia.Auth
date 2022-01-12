@@ -1,0 +1,78 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.Auth.OpenIddict", "src\Audacia.Auth.OpenIddict\Audacia.Auth.OpenIddict.csproj", "{98616CCA-5E54-4D29-B5B5-CE80779D622F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{290E7549-383B-4D3F-AF87-28B28F1E3261}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.Auth.OpenIddict.Tests", "tests\Audacia.Auth.OpenIddict.Tests\Audacia.Auth.OpenIddict.Tests.csproj", "{2A552980-6F04-44A2-94F7-99EE00A2635F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{A76A5B49-2EB8-4391-A6FD-4EBD5293A324}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Seeding", "Seeding", "{F878B551-A182-43F2-9503-84F2090106FC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "QuartzCleanup", "QuartzCleanup", "{DECA6256-261D-49F4-AF13-C021F43CB141}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.Auth.OpenIddict.QuartzCleanup", "src\Audacia.Auth.OpenIddict.QuartzCleanup\Audacia.Auth.OpenIddict.QuartzCleanup.csproj", "{092892FF-C1AC-4BC9-9976-B152866F43A3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.Auth.OpenIddict.Seeding", "src\Audacia.Auth.OpenIddict.Seeding\Audacia.Auth.OpenIddict.Seeding.csproj", "{29E5477A-6483-4689-A698-DC5C8A3818AF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.Auth.OpenIddict.Seeding.EntityFrameworkCore", "src\Audacia.Auth.OpenIddict.Seeding.EntityFrameworkCore\Audacia.Auth.OpenIddict.Seeding.EntityFrameworkCore.csproj", "{13A91CB4-0E74-42D0-8AB5-AA41268E90E7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.Auth.OpenIddict.Seeding.EntityFramework", "src\Audacia.Auth.OpenIddict.Seeding.EntityFramework\Audacia.Auth.OpenIddict.Seeding.EntityFramework.csproj", "{037D91FE-31EC-46D8-9E3C-94798C9EB3FA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.Auth.OpenIddict.EntityFramework", "src\Audacia.Auth.OpenIddict.EntityFramework\Audacia.Auth.OpenIddict.EntityFramework.csproj", "{C7870014-244D-4CF7-8376-DDEA7BC8A45A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{98616CCA-5E54-4D29-B5B5-CE80779D622F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98616CCA-5E54-4D29-B5B5-CE80779D622F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98616CCA-5E54-4D29-B5B5-CE80779D622F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98616CCA-5E54-4D29-B5B5-CE80779D622F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A552980-6F04-44A2-94F7-99EE00A2635F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A552980-6F04-44A2-94F7-99EE00A2635F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A552980-6F04-44A2-94F7-99EE00A2635F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A552980-6F04-44A2-94F7-99EE00A2635F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{092892FF-C1AC-4BC9-9976-B152866F43A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{092892FF-C1AC-4BC9-9976-B152866F43A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{092892FF-C1AC-4BC9-9976-B152866F43A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{092892FF-C1AC-4BC9-9976-B152866F43A3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29E5477A-6483-4689-A698-DC5C8A3818AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29E5477A-6483-4689-A698-DC5C8A3818AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29E5477A-6483-4689-A698-DC5C8A3818AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29E5477A-6483-4689-A698-DC5C8A3818AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13A91CB4-0E74-42D0-8AB5-AA41268E90E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13A91CB4-0E74-42D0-8AB5-AA41268E90E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13A91CB4-0E74-42D0-8AB5-AA41268E90E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13A91CB4-0E74-42D0-8AB5-AA41268E90E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{037D91FE-31EC-46D8-9E3C-94798C9EB3FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{037D91FE-31EC-46D8-9E3C-94798C9EB3FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{037D91FE-31EC-46D8-9E3C-94798C9EB3FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{037D91FE-31EC-46D8-9E3C-94798C9EB3FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7870014-244D-4CF7-8376-DDEA7BC8A45A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7870014-244D-4CF7-8376-DDEA7BC8A45A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7870014-244D-4CF7-8376-DDEA7BC8A45A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7870014-244D-4CF7-8376-DDEA7BC8A45A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{98616CCA-5E54-4D29-B5B5-CE80779D622F} = {A76A5B49-2EB8-4391-A6FD-4EBD5293A324}
+		{2A552980-6F04-44A2-94F7-99EE00A2635F} = {290E7549-383B-4D3F-AF87-28B28F1E3261}
+		{092892FF-C1AC-4BC9-9976-B152866F43A3} = {DECA6256-261D-49F4-AF13-C021F43CB141}
+		{29E5477A-6483-4689-A698-DC5C8A3818AF} = {F878B551-A182-43F2-9503-84F2090106FC}
+		{13A91CB4-0E74-42D0-8AB5-AA41268E90E7} = {F878B551-A182-43F2-9503-84F2090106FC}
+		{037D91FE-31EC-46D8-9E3C-94798C9EB3FA} = {F878B551-A182-43F2-9503-84F2090106FC}
+		{C7870014-244D-4CF7-8376-DDEA7BC8A45A} = {A76A5B49-2EB8-4391-A6FD-4EBD5293A324}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D472C07F-346A-483A-8F20-F3F002270932}
+	EndGlobalSection
+EndGlobal

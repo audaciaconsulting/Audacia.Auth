@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
+    <Version>0.2.0</Version>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenIddict.EntityFramework" Version="3.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Audacia.Auth.OpenIddict.EntityFramework\Audacia.Auth.OpenIddict.EntityFramework.csproj" />
+    <ProjectReference Include="..\Audacia.Auth.OpenIddict.Seeding\Audacia.Auth.OpenIddict.Seeding.csproj" />
+  </ItemGroup>
+
+</Project>
