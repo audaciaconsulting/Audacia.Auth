@@ -29,7 +29,7 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFramework
         protected override IServiceCollection ConfigureAdditionalServices(IServiceCollection services, IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString(_connectionStringName);
-            services.AddScoped(_ => new OpenIddictContext(connectionString));
+            services.AddScoped(_ => new OpenIddictContext<TKey>(connectionString));
 
             return base.ConfigureAdditionalServices(services, configuration);
         }
@@ -39,7 +39,7 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFramework
         {
             var entityFrameworkBuilder = builder
                 .UseEntityFramework()
-                .UseDbContext<OpenIddictContext>();
+                .UseDbContext<OpenIddictContext<TKey>>();
 
             if (typeof(TKey) == typeof(int))
             {
