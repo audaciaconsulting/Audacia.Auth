@@ -17,6 +17,7 @@ stages:
       parameters:
         projects: 'openiddict/src/**/*.csproj'
         tests: 'openiddict/tests/Audacia.Auth.OpenIddict.Tests/Audacia.Auth.OpenIddict.Tests.csproj'
+        skipDependencyChecks: true
 
 - stage: Release
   displayName: Release
