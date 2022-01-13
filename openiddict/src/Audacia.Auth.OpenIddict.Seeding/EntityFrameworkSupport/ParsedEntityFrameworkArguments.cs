@@ -8,11 +8,6 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFrameworkSupport
     public class ParsedEntityFrameworkArguments
     {
         /// <summary>
-        /// Gets the path to the directory containing the appsettings.json file.
-        /// </summary>
-        public string AppSettingsFilepath { get; }
-
-        /// <summary>
         /// Gets the name of the configuration section that maps to an <see cref="Common.Configuration.OpenIdConnectConfig"/> object.
         /// </summary>
         public string OpenIdConnectConfigSectionName { get; }
@@ -45,14 +40,10 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFrameworkSupport
                 throw new ArgumentException("Exactly four arguments are expected.");
             }
 
-            AppSettingsFilepath = GetAppSettingsFilepath(rawArguments);
             OpenIdConnectConfigSectionName = GetOpenIdConnectConfigSectionName(rawArguments);
             OpenIddictEntitiesKeyType = GetOpenIddictEntitiesKeyType(rawArguments);
             DatabaseConnectionStringName = GetDatabaseConnectionStringName(rawArguments);
         }
-
-        private static string GetAppSettingsFilepath(string[] rawArguments) =>
-            rawArguments[0];
 
         private static string GetOpenIdConnectConfigSectionName(string[] rawArguments) =>
             rawArguments[1];

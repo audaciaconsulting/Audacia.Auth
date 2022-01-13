@@ -26,7 +26,6 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFramework
             if (parsedArguments.OpenIddictEntitiesKeyType == typeof(int))
             {
                 var seeder = new EntityFrameworkSeeder<int>(
-                    parsedArguments.AppSettingsFilepath,
                     parsedArguments.OpenIdConnectConfigSectionName,
                     parsedArguments.DatabaseConnectionStringName);
                 return seeder.SeedAsync();
@@ -35,7 +34,6 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFramework
             if (parsedArguments.OpenIddictEntitiesKeyType == typeof(string))
             {
                 var seeder = new EntityFrameworkSeeder<string>(
-                    parsedArguments.AppSettingsFilepath,
                     parsedArguments.OpenIdConnectConfigSectionName,
                     parsedArguments.DatabaseConnectionStringName);
                 return seeder.SeedAsync();
@@ -44,7 +42,6 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFramework
             if (parsedArguments.OpenIddictEntitiesKeyType == typeof(Guid))
             {
                 var seeder = new EntityFrameworkSeeder<Guid>(
-                    parsedArguments.AppSettingsFilepath,
                     parsedArguments.OpenIdConnectConfigSectionName,
                     parsedArguments.DatabaseConnectionStringName);
                 return seeder.SeedAsync();
