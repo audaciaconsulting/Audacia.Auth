@@ -35,9 +35,9 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFrameworkSupport
                 throw new ArgumentNullException(nameof(rawArguments));
             }
 
-            if (rawArguments.Length != 4)
+            if (rawArguments.Length != 3)
             {
-                throw new ArgumentException("Exactly four arguments are expected.");
+                throw new ArgumentException("Exactly three arguments are expected.");
             }
 
             OpenIdConnectConfigSectionName = GetOpenIdConnectConfigSectionName(rawArguments);
