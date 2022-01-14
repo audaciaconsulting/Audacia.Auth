@@ -46,10 +46,10 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFrameworkSupport
         }
 
         private static string GetOpenIdConnectConfigSectionName(string[] rawArguments) =>
-            rawArguments[1];
+            rawArguments[0];
 
         private static Type GetOpenIddictEntitiesKeyType(string[] rawArguments) =>
-            rawArguments[2] switch
+            rawArguments[1] switch
             {
                 "int" => typeof(int),
                 "string" => typeof(string),
@@ -58,6 +58,6 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFrameworkSupport
             };
 
         private static string GetDatabaseConnectionStringName(string[] rawArguments) =>
-            rawArguments[3];
+            rawArguments[2];
     }
 }
