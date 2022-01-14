@@ -8,6 +8,11 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFrameworkSupport
     public class ParsedEntityFrameworkArguments
     {
         /// <summary>
+        /// Gets the path to the directory containing the appsettings.json file.
+        /// </summary>
+        public string AppSettingsBasePath { get; }
+
+        /// <summary>
         /// Gets the name of the configuration section that maps to an <see cref="Common.Configuration.OpenIdConnectConfig"/> object.
         /// </summary>
         public string OpenIdConnectConfigSectionName { get; }
@@ -35,21 +40,25 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFrameworkSupport
                 throw new ArgumentNullException(nameof(rawArguments));
             }
 
-            if (rawArguments.Length != 3)
+            if (rawArguments.Length != 4)
             {
-                throw new ArgumentException("Exactly three arguments are expected.");
+                throw new ArgumentException("Exactly four arguments are expected.");
             }
 
+            AppSettingsBasePath = GetAppSettingsFilepath(rawArguments);
             OpenIdConnectConfigSectionName = GetOpenIdConnectConfigSectionName(rawArguments);
             OpenIddictEntitiesKeyType = GetOpenIddictEntitiesKeyType(rawArguments);
             DatabaseConnectionStringName = GetDatabaseConnectionStringName(rawArguments);
         }
 
-        private static string GetOpenIdConnectConfigSectionName(string[] rawArguments) =>
+        private static string GetAppSettingsFilepath(string[] rawArguments) =>
             rawArguments[0];
 
+        private static string GetOpenIdConnectConfigSectionName(string[] rawArguments) =>
+            rawArguments[1];
+
         private static Type GetOpenIddictEntitiesKeyType(string[] rawArguments) =>
-            rawArguments[1] switch
+            rawArguments[2] switch
             {
                 "int" => typeof(int),
                 "string" => typeof(string),
@@ -58,6 +67,6 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFrameworkSupport
             };
 
         private static string GetDatabaseConnectionStringName(string[] rawArguments) =>
-            rawArguments[2];
+            rawArguments[3];
     }
 }

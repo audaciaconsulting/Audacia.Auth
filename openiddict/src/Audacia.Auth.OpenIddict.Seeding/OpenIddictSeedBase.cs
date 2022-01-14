@@ -12,14 +12,17 @@ namespace Audacia.Auth.OpenIddict.Seeding
     /// </summary>
     public abstract class OpenIddictSeedBase<TKey> where TKey : IEquatable<TKey>
     {
+        private readonly string _appSettingsBasePath;
         private readonly string _configSectionName;
 
         /// <summary>
         /// Initializes an instance of <see cref="OpenIddictSeedBase{TKey}"/>.
         /// </summary>
+        /// <param name="appSettingsBasePath">The base path to the appsettings.json file.</param>
         /// <param name="configSectionName">The name of the config section containing the OpenIdConnect config.</param>
-        protected OpenIddictSeedBase(string configSectionName)
+        protected OpenIddictSeedBase(string appSettingsBasePath, string configSectionName)
         {
+            _appSettingsBasePath = appSettingsBasePath;
             _configSectionName = configSectionName;
         }
 
@@ -52,8 +55,9 @@ namespace Audacia.Auth.OpenIddict.Seeding
             return services;
         }
 
-        private static IConfiguration LoadConfiguration() =>
+        private IConfiguration LoadConfiguration() =>
             new ConfigurationBuilder()
+                .SetBasePath(_appSettingsBasePath)
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .Build();
