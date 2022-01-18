@@ -273,7 +273,7 @@ steps:
 
 ### Mapping Config
 
-**IMPORTANT!!** You must implement the `IOpenIdConnectConfigMapper` interface in your Identity project so that the seeding tool can create an instance of `OpenIdConnectConfig`.
+**IMPORTANT!!** You must implement the `IOpenIdConnectConfigMapper` interface in your Identity project so that the seeding tool can create an instance of `OpenIdConnectConfig`. The implementing class must have a parameterless constructor (this is so the seeding tool can create an instance of it).
 
 If your appsettings already contains the config in the correct structure then this implementation can be:
 ```csharp

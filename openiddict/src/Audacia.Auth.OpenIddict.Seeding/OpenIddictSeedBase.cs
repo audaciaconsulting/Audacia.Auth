@@ -68,16 +68,19 @@ namespace Audacia.Auth.OpenIddict.Seeding
         private OpenIdConnectConfig GetOpenIdConnectConfig(IConfiguration configuration)
         {
             var identityProjectAssembly = Assembly.LoadFrom(Path.Combine(_identityProjectBasePath, $"{_identityProjectName}.dll"));
-            var mapperTypes = identityProjectAssembly.GetTypes().Where(type => type.IsAssignableFrom(typeof(IOpenIdConnectConfigMapper))).ToArray();
+            var mapperTypes = identityProjectAssembly
+                .GetTypes()
+                .Where(type => typeof(IOpenIdConnectConfigMapper).IsAssignableFrom(type))
+                .ToArray();
             if (!mapperTypes.Any())
             {
-                throw new InvalidOperationException($"The project {_identityProjectName} does not contain an implementation of {nameof(IOpenIdConnectConfigMapper)}");
+                throw new InvalidOperationException($"The project {_identityProjectName} does not contain an implementation of '{nameof(IOpenIdConnectConfigMapper)}'.");
             }
 
             var mapper = Activator.CreateInstance(mapperTypes.First()) as IOpenIdConnectConfigMapper;
             if (mapper == null)
             {
-                throw new InvalidOperationException($"The project {_identityProjectName} does not contain an implementation of {nameof(IOpenIdConnectConfigMapper)}");
+                throw new InvalidOperationException($"The project {_identityProjectName} does not contain an implementation of '{nameof(IOpenIdConnectConfigMapper)}' with a parameterless constructor.");
             }
 
             return mapper.Map(configuration);
