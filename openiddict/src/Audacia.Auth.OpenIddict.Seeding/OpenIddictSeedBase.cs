@@ -67,7 +67,7 @@ namespace Audacia.Auth.OpenIddict.Seeding
 
         private OpenIdConnectConfig GetOpenIdConnectConfig(IConfiguration configuration)
         {
-            var identityProjectAssembly = Assembly.LoadFile(Path.Combine(_identityProjectBasePath, $"{_identityProjectName}.dll"));
+            var identityProjectAssembly = Assembly.LoadFrom(Path.Combine(_identityProjectBasePath, $"{_identityProjectName}.dll"));
             var mapperTypes = identityProjectAssembly.GetTypes().Where(type => type.IsAssignableFrom(typeof(IOpenIdConnectConfigMapper))).ToArray();
             if (!mapperTypes.Any())
             {
