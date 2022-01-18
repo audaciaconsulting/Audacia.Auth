@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Audacia.Auth.OpenIddict.Common.Configuration;
 using Microsoft.Extensions.Configuration;
@@ -12,18 +15,18 @@ namespace Audacia.Auth.OpenIddict.Seeding
     /// </summary>
     public abstract class OpenIddictSeedBase<TKey> where TKey : IEquatable<TKey>
     {
-        private readonly string _appSettingsBasePath;
-        private readonly string _configSectionName;
+        private readonly string _identityProjectBasePath;
+        private readonly string _identityProjectName;
 
         /// <summary>
         /// Initializes an instance of <see cref="OpenIddictSeedBase{TKey}"/>.
         /// </summary>
-        /// <param name="appSettingsBasePath">The base path to the appsettings.json file.</param>
-        /// <param name="configSectionName">The name of the config section containing the OpenIdConnect config.</param>
-        protected OpenIddictSeedBase(string appSettingsBasePath, string configSectionName)
+        /// <param name="identityProjectBasePath">The base path to the Identity project containing the relevant appsettings.json file.</param>
+        /// <param name="identityProjectName">The name of the Identity project.</param>
+        protected OpenIddictSeedBase(string identityProjectBasePath, string identityProjectName)
         {
-            _appSettingsBasePath = appSettingsBasePath;
-            _configSectionName = configSectionName;
+            _identityProjectBasePath = identityProjectBasePath;
+            _identityProjectName = identityProjectName;
         }
 
         /// <summary>
@@ -57,14 +60,27 @@ namespace Audacia.Auth.OpenIddict.Seeding
 
         private IConfiguration LoadConfiguration() =>
             new ConfigurationBuilder()
-                .SetBasePath(_appSettingsBasePath)
+                .SetBasePath(_identityProjectBasePath)
                 .AddJsonFile("appsettings.json")
                 .AddEnvironmentVariables()
                 .Build();
 
         private OpenIdConnectConfig GetOpenIdConnectConfig(IConfiguration configuration)
         {
-            return configuration.GetSection(_configSectionName).Get<OpenIdConnectConfig>();
+            var identityProjectAssembly = Assembly.LoadFile(Path.Combine(_identityProjectBasePath, $"{_identityProjectName}.dll"));
+            var mapperTypes = identityProjectAssembly.GetTypes().Where(type => type.IsAssignableFrom(typeof(IOpenIdConnectConfigMapper))).ToArray();
+            if (!mapperTypes.Any())
+            {
+                throw new InvalidOperationException($"The project {_identityProjectName} does not contain an implementation of {nameof(IOpenIdConnectConfigMapper)}");
+            }
+
+            var mapper = Activator.CreateInstance(mapperTypes.First()) as IOpenIdConnectConfigMapper;
+            if (mapper == null)
+            {
+                throw new InvalidOperationException($"The project {_identityProjectName} does not contain an implementation of {nameof(IOpenIdConnectConfigMapper)}");
+            }
+
+            return mapper.Map(configuration);
         }
 
         /// <summary>

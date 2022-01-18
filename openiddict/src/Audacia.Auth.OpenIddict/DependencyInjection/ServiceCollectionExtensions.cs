@@ -10,6 +10,7 @@ using Audacia.Auth.OpenIddict.Token;
 using Audacia.Auth.OpenIddict.UserInfo;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using static OpenIddict.Abstractions.OpenIddictConstants;
@@ -66,25 +67,28 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
         /// <typeparam name="TId">The type of the user's primary key.</typeparam>
         /// <param name="services">The <see cref="IServiceCollection"/> object to which to add the services.</param>
         /// <param name="optionsBuilder">A delegate containing the additional OpenIddict configuration.</param>
+        /// <param name="configuration">An instance of <see cref="IConfiguration"/> representing the current configuration.</param>
         /// <param name="userIdGetter">A delegate that, when invoked, gets the ID for a given user.</param>
-        /// <param name="openIdConnectConfig">An <see cref="OpenIdConnectConfig"/> object, which represents the configuration of the authorization server.</param>
+        /// <param name="openIdConnectConfigMapper">An instance of <see cref="IOpenIdConnectConfigMapper"/> which can map to an <see cref="OpenIdConnectConfig"/> object.</param>
         /// <param name="hostingEnvironment">The current <see cref="IWebHostEnvironment"/>.</param>
         /// <returns>An instance of <see cref="OpenIddictBuilder"/> to which further configuration can be performed.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="openIdConnectConfig"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="openIdConnectConfigMapper"/> is <see langword="null"/>.</exception>
         [SuppressMessage("Maintainability", "ACL1003:Signature contains too many parameters", Justification = "Needs all parameters.")]
         public static OpenIddictBuilder AddOpenIddict<TUser, TId>(
             this IServiceCollection services,
             Action<OpenIddictCoreBuilder> optionsBuilder,
+            IConfiguration configuration,
             Func<TUser, TId> userIdGetter,
-            OpenIdConnectConfig openIdConnectConfig,
+            IOpenIdConnectConfigMapper openIdConnectConfigMapper,
             IWebHostEnvironment hostingEnvironment)
             where TUser : class
             where TId : IEquatable<TId>
         {
-            if (openIdConnectConfig == null) throw new ArgumentNullException(nameof(openIdConnectConfig));
+            if (openIdConnectConfigMapper == null) throw new ArgumentNullException(nameof(openIdConnectConfigMapper));
 
             UserWrapper<TUser, TId>.UserIdGetter = userIdGetter;
-            
+            var openIdConnectConfig = openIdConnectConfigMapper.Map(configuration);
+
             return services
                 .AddServices<TUser, TId>()
                 .AddSingleton(openIdConnectConfig)

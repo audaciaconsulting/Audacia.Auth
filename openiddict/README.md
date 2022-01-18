@@ -260,4 +260,30 @@ if (environment.IsDevelopment())
 }
 ```
 
-In a deployed environment the seeding should be done as part of the deployment pipeline.
+In a deployed environment the seeding should be done as part of the deployment pipeline. There are steps in the `Audacia.Build` repo to perform the seeding via a custom .NET tool. Provided you are using the standard OpenIddict entities and managers with either EF Core or EF 6, you can use the steps in either `openiddict-seeding-efcore.yaml` or `openiddict-seeding-ef6.yaml`. With the template functionality available in Azure Pipelines YAML, for EF Core the YAML could look something like this:
+```yaml
+steps:
+  - template: /steps/deploy/openiddict-seeding-efcore.yaml@templates
+    parameters:
+      identityAppName: 'MyApp.Identity'
+      openIdConnectConfigSectionName: 'OpenIdConnectConfig'
+      openIddictEntitiesKeyType: 'int'
+      databaseConnectionStringName: 'MyDatabaseContext'
+```
+
+### Mapping Config
+
+**IMPORTANT!!** You must implement the `IOpenIdConnectConfigMapper` interface in your Identity project so that the seeding tool can create an instance of `OpenIdConnectConfig`.
+
+If your appsettings already contains the config in the correct structure then this implementation can be:
+```csharp
+public class OpenIdConnectConfigMapper : IOpenIdConnectConfigMapper
+{
+    public OpenIdConnectConfig Map(IConfiguration configuration)
+    {
+        return configuration.GetSection("ConfigKey").Get<OpenIdConnectConfig>();
+    }
+}
+```
+
+However if your appsettings contains the config in a different structure then some custom mapping code will be needed.

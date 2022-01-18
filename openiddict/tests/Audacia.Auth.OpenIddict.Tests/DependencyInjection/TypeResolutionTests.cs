@@ -1,8 +1,10 @@
-﻿using Audacia.Auth.OpenIddict.DependencyInjection;
+﻿using Audacia.Auth.OpenIddict.Common.Configuration;
+using Audacia.Auth.OpenIddict.DependencyInjection;
 using Audacia.Auth.OpenIddict.UserInfo;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
@@ -19,6 +21,11 @@ namespace Audacia.Auth.OpenIddict.Tests.DependencyInjection
             var mockHostingEnvironment = new Mock<IWebHostEnvironment>();
             mockHostingEnvironment.SetupGet(env => env.EnvironmentName).Returns(Environments.Development);
 
+            var mockConfiguration = new Mock<IConfiguration>();
+
+            var mockOpenIdConnectConfigMapper = new Mock<IOpenIdConnectConfigMapper>();
+            mockOpenIdConnectConfigMapper.Setup(m => m.Map(mockConfiguration.Object)).Returns(new OpenIdConnectConfig());
+
             _services = new ServiceCollection();
             _services
                 .AddTransient(_ => new Mock<IRoleStore<DummyRole>>().Object)
@@ -27,8 +34,9 @@ namespace Audacia.Auth.OpenIddict.Tests.DependencyInjection
                 .AddUserManager<UserManager<DummyUser>>();
             _services.AddOpenIddict<DummyUser, int>(
                 _ => { },
+                mockConfiguration.Object,
                 user => user.Id,
-                new Common.Configuration.OpenIdConnectConfig(),
+                mockOpenIdConnectConfigMapper.Object,
                 mockHostingEnvironment.Object);
         }
 

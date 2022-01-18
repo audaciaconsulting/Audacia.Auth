@@ -5,7 +5,17 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <Version>0.2.0</Version>
+    <Authors>Audacia</Authors>
+    <PackageIcon>package-icon.png</PackageIcon>
+    <Description>Library for using a Quartz.NET background job to cleanup OpenIddict authorization tokens in the database.</Description>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\package-icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="OpenIddict.Quartz" Version="3.1.1" />
