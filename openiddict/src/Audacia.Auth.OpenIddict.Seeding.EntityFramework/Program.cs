@@ -8,11 +8,10 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFramework
     {
         public static async Task Main(string[] args)
         {
-            // Exec command: Start-Process -NoNewWindow -FilePath .\Audacia.Auth.OpenIddict.Seeding.EntityFramework.exe -ArgumentList "C:\Repos\Audacia.Templates\Audacia.Template\src\Audacia.Template.Identity", "OpenIdConnectConfig", "int", "DatabaseContext"
             /*
              * Expected args:
-             *  [0] App settings filepath
-             *  [1] OpenID Connect config section name
+             *  [0] Identity project filepath
+             *  [1] Identity project name
              *  [2] OpenIddict entities key type: should be "int", "string" or "Guid"
              *  [3] Database connection string name
              */
@@ -26,8 +25,8 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFramework
             if (parsedArguments.OpenIddictEntitiesKeyType == typeof(int))
             {
                 var seeder = new EntityFrameworkSeeder<int>(
-                    parsedArguments.AppSettingsBasePath,
-                    parsedArguments.OpenIdConnectConfigSectionName,
+                    parsedArguments.IdentityProjectBasePath,
+                    parsedArguments.IdentityProjectName,
                     parsedArguments.DatabaseConnectionStringName);
                 return seeder.SeedAsync();
             }
@@ -35,8 +34,8 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFramework
             if (parsedArguments.OpenIddictEntitiesKeyType == typeof(string))
             {
                 var seeder = new EntityFrameworkSeeder<string>(
-                    parsedArguments.AppSettingsBasePath,
-                    parsedArguments.OpenIdConnectConfigSectionName,
+                    parsedArguments.IdentityProjectBasePath,
+                    parsedArguments.IdentityProjectName,
                     parsedArguments.DatabaseConnectionStringName);
                 return seeder.SeedAsync();
             }
@@ -44,8 +43,8 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFramework
             if (parsedArguments.OpenIddictEntitiesKeyType == typeof(Guid))
             {
                 var seeder = new EntityFrameworkSeeder<Guid>(
-                    parsedArguments.AppSettingsBasePath,
-                    parsedArguments.OpenIdConnectConfigSectionName,
+                    parsedArguments.IdentityProjectBasePath,
+                    parsedArguments.IdentityProjectName,
                     parsedArguments.DatabaseConnectionStringName);
                 return seeder.SeedAsync();
             }

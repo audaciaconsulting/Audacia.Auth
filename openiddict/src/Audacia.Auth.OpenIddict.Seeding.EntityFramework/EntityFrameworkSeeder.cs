@@ -16,11 +16,11 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFramework
         /// <summary>
         /// Initializes an instance of <see cref="EntityFrameworkSeeder{TKey}"/>.
         /// </summary>
-        /// <param name="appSettingsBasePath">The base path to the appsettings.json file.</param>
-        /// <param name="configSectionName">The name of the config section containing the OpenIdConnect config.</param>
+        /// <param name="identityProjectBasePath">The base path to the Identity project containing the relevant appsettings.json file.</param>
+        /// <param name="identityProjectName">The name of the Identity project.</param>
         /// <param name="connectionStringName">The name of the connection string in config.</param>
-        public EntityFrameworkSeeder(string appSettingsBasePath, string configSectionName, string connectionStringName)
-            : base(appSettingsBasePath, configSectionName)
+        public EntityFrameworkSeeder(string identityProjectBasePath, string identityProjectName, string connectionStringName)
+            : base(identityProjectBasePath, identityProjectName)
         {
             _connectionStringName = connectionStringName;
         }
