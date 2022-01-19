@@ -265,8 +265,9 @@ In a deployed environment the seeding should be done as part of the deployment p
 steps:
   - template: /steps/deploy/openiddict-seeding-efcore.yaml@templates
     parameters:
-      identityAppName: 'MyApp.Identity'
-      openIdConnectConfigSectionName: 'OpenIdConnectConfig'
+      toolVersion: 'x.x.x.x' # Specify the version of Audacia.Auth.OpenIddict that you are targeting
+      identityProjectBasePath: '$(Pipeline.Workspace)/$(Build.DefinitionName)/MyApp.Identity' # The path to the identity app artifact
+      identityProjectName: 'MyApp.Identity'
       openIddictEntitiesKeyType: 'int'
       databaseConnectionStringName: 'MyDatabaseContext'
 ```
