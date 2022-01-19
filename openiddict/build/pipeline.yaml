@@ -4,7 +4,7 @@ trigger:
     include: [main]
   paths:
     include:
-      - 'openiddict/core/src/*'
+      - 'openiddict/*'
 pr: { branches: { include: [main] } }
 resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build } ] }
 pool: { vmImage: windows-2022 }

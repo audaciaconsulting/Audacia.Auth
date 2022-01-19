@@ -31,19 +31,19 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
         public Uri Url { get; set; } = null!;
 
         /// <summary>
-        /// Gets or sets the configuration to be used by API clients.
+        /// Gets or sets the configuration to be used by API clients with the Client Credentials flow.
         /// </summary>
-        public IReadOnlyCollection<ApiClient>? ApiClients { get; set; }
+        public IReadOnlyCollection<ClientCredentialsClient>? ClientCredentialsClients { get; set; }
 
         /// <summary>
-        /// Gets or sets the configuration to be used by UI clients.
+        /// Gets or sets the configuration to be used by UI clients with the Authorization Code + PKCE flow.
         /// </summary>
-        public IReadOnlyCollection<UiClient>? UiClients { get; set; }
+        public IReadOnlyCollection<AuthorizationCodeClient>? AuthorizationCodeClients { get; set; }
 
         /// <summary>
-        /// Gets or sets the configuration to be used by Test Automation clients.
+        /// Gets or sets the configuration to be used by Test Automation clients with the Resource Owner Password Credential (ROPC) flow.
         /// </summary>
-        public IReadOnlyCollection<TestAutomationClient>? TestAutomationClients { get; set; }
+        public IReadOnlyCollection<ResourceOwnerPasswordClient>? ResourceOwnerPasswordClients { get; set; }
 
         /// <summary>
         /// Gets or sets the scopes to be registered for the Open ID Connect server.
@@ -57,9 +57,9 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
         {
             get
             {
-                return _clients ??= ApiClients.EmptyIfNull().Cast<OpenIdConnectClientBase>()
-                                .Union(UiClients.EmptyIfNull().Cast<OpenIdConnectClientBase>())
-                                .Union(TestAutomationClients.EmptyIfNull().Cast<OpenIdConnectClientBase>())
+                return _clients ??= ClientCredentialsClients.EmptyIfNull().Cast<OpenIdConnectClientBase>()
+                                .Union(AuthorizationCodeClients.EmptyIfNull().Cast<OpenIdConnectClientBase>())
+                                .Union(ResourceOwnerPasswordClients.EmptyIfNull().Cast<OpenIdConnectClientBase>())
                                 .ToList();
             }
         }

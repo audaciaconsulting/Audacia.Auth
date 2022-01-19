@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 namespace Audacia.Auth.OpenIddict.Seeding
 {
     /// <summary>
-    /// Base type for 
+    /// Base type for seeding a database with OpenIddict application and scope entities.
     /// </summary>
     public abstract class OpenIddictSeedBase<TKey> where TKey : IEquatable<TKey>
     {
@@ -77,8 +77,7 @@ namespace Audacia.Auth.OpenIddict.Seeding
                 throw new InvalidOperationException($"The project {_identityProjectName} does not contain an implementation of '{nameof(IOpenIdConnectConfigMapper)}'.");
             }
 
-            var mapper = Activator.CreateInstance(mapperTypes.First()) as IOpenIdConnectConfigMapper;
-            if (mapper == null)
+            if (Activator.CreateInstance(mapperTypes.First()) is not IOpenIdConnectConfigMapper mapper)
             {
                 throw new InvalidOperationException($"The project {_identityProjectName} does not contain an implementation of '{nameof(IOpenIdConnectConfigMapper)}' with a parameterless constructor.");
             }

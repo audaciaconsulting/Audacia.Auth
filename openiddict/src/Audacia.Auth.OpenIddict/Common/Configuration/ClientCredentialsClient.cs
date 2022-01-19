@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents an OpenID Connect client that is an API, and will use the Client Credentials grant type.
     /// </summary>
-    public class ApiClient : OpenIdConnectClientBase
+    public class ClientCredentialsClient : OpenIdConnectClientBase
     {
         /// <summary>
         /// Gets or sets the client secret.

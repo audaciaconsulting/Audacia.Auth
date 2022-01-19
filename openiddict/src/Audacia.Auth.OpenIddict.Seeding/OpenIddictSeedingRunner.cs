@@ -51,27 +51,27 @@ namespace Audacia.Auth.OpenIddict.Seeding
 
         private async Task RegisterApplicationsAsync()
         {
-            await RegisterUiClientsAsync(_configuration.UiClients).ConfigureAwait(false);
-            await RegisterApiClientsAsync(_configuration.ApiClients).ConfigureAwait(false);
-            await RegisterTestAutomationClientsAsync(_configuration.TestAutomationClients).ConfigureAwait(false);
+            await RegisterAuthorizationCodeClientsAsync(_configuration.AuthorizationCodeClients).ConfigureAwait(false);
+            await RegisterClientCredentialsClientsAsync(_configuration.ClientCredentialsClients).ConfigureAwait(false);
+            await RegisterResourceOwnerPasswordClientsAsync(_configuration.ResourceOwnerPasswordClients).ConfigureAwait(false);
         }
 
-        private async Task RegisterUiClientsAsync(IEnumerable<UiClient>? clients)
+        private async Task RegisterAuthorizationCodeClientsAsync(IEnumerable<AuthorizationCodeClient>? clients)
         {
             if (clients is null)
             {
                 return;
             }
 
-            _logger.LogInformation("Registering UI clients.");
+            _logger.LogInformation("Registering authorization code clients.");
             foreach (var client in clients)
             {
-                var applicationDescriptor = CreateUiClient(client);
+                var applicationDescriptor = CreateAuthorizationCodeClient(client);
                 await SaveClientAsync(applicationDescriptor).ConfigureAwait(false);
             }
         }
 
-        private static OpenIddictApplicationDescriptor CreateUiClient(UiClient clientConfig)
+        private static OpenIddictApplicationDescriptor CreateAuthorizationCodeClient(AuthorizationCodeClient clientConfig)
         {
             var applicationClient = new OpenIddictApplicationDescriptor
             {
@@ -125,22 +125,22 @@ namespace Audacia.Auth.OpenIddict.Seeding
             return applicationClient;
         }
 
-        private async Task RegisterApiClientsAsync(IEnumerable<ApiClient>? clients)
+        private async Task RegisterClientCredentialsClientsAsync(IEnumerable<ClientCredentialsClient>? clients)
         {
             if (clients == null)
             {
                 return;
             }
 
-            _logger.LogInformation("Registering API clients.");
+            _logger.LogInformation("Registering client credentials clients.");
             foreach (var client in clients)
             {
-                var applicationDescriptor = CreateApiClient(client);
+                var applicationDescriptor = CreateClientCredentialsClient(client);
                 await SaveClientAsync(applicationDescriptor).ConfigureAwait(false);
             }
         }
 
-        private static OpenIddictApplicationDescriptor CreateApiClient(ApiClient clientConfig)
+        private static OpenIddictApplicationDescriptor CreateClientCredentialsClient(ClientCredentialsClient clientConfig)
         {
             var applicationClient = new OpenIddictApplicationDescriptor
             {
@@ -170,22 +170,22 @@ namespace Audacia.Auth.OpenIddict.Seeding
             return applicationClient;
         }
 
-        private async Task RegisterTestAutomationClientsAsync(IEnumerable<TestAutomationClient>? clients)
+        private async Task RegisterResourceOwnerPasswordClientsAsync(IEnumerable<ResourceOwnerPasswordClient>? clients)
         {
             if (clients == null)
             {
                 return;
             }
 
-            _logger.LogInformation("Registering Test Automation clients.");
+            _logger.LogInformation("Registering resource owner password clients.");
             foreach (var client in clients)
             {
-                var applicationDescriptor = CreateTestAutomationClient(client);
+                var applicationDescriptor = CreateResourceOwnerPasswordClient(client);
                 await SaveClientAsync(applicationDescriptor).ConfigureAwait(false);
             }
         }
 
-        private static OpenIddictApplicationDescriptor CreateTestAutomationClient(TestAutomationClient clientConfig)
+        private static OpenIddictApplicationDescriptor CreateResourceOwnerPasswordClient(ResourceOwnerPasswordClient clientConfig)
         {
             var applicationClient = new OpenIddictApplicationDescriptor
             {

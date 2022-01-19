@@ -6,7 +6,7 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
     /// <summary>
     /// Represents an OpenID Connect client that is a UI app, and will use the Authorization Code + PKCE grant type.
     /// </summary>
-    public class UiClient : OpenIdConnectClientBase
+    public class AuthorizationCodeClient : OpenIdConnectClientBase
     {
         /// <summary>
         /// Gets or sets the base URL that the client will be connecting from.

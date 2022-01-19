@@ -148,18 +148,18 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
 
         private static void AddFlows(OpenIddictServerBuilder options, OpenIdConnectConfig openIdConnectConfig)
         {
-            if (openIdConnectConfig.UiClients?.Any() == true)
+            if (openIdConnectConfig.AuthorizationCodeClients?.Any() == true)
             {
                 options.AllowAuthorizationCodeFlow()
                     .RequireProofKeyForCodeExchange();
             }
             
-            if (openIdConnectConfig.ApiClients?.Any() == true)
+            if (openIdConnectConfig.ClientCredentialsClients?.Any() == true)
             {
                 options.AllowClientCredentialsFlow();
             }
                 
-            if (openIdConnectConfig.TestAutomationClients?.Any() == true)
+            if (openIdConnectConfig.ResourceOwnerPasswordClients?.Any() == true)
             {
                 options.AllowPasswordFlow();
             }
@@ -186,8 +186,9 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
         private static void SetDefaultTokenLifetimes(OpenIddictServerBuilder options)
         {
             // Globally set the lifetime of your tokens, individual token lifetimes per application resource must be done in the AuthorisationController
-            options.SetAccessTokenLifetime(TimeSpan.FromMinutes(30));
-            options.SetRefreshTokenLifetime(TimeSpan.FromDays(7));
+            options
+                .SetAccessTokenLifetime(TimeSpan.FromMinutes(30))
+                .SetRefreshTokenLifetime(TimeSpan.FromDays(7));
         }
 
         private static void AddAspNetCore(OpenIddictServerBuilder builder, OpenIdConnectConfig openIdConnectConfig)

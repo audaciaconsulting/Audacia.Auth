@@ -9,12 +9,12 @@ namespace Audacia.Auth.OpenIddict.Tests
         private readonly OpenIdConnectConfig _config = new OpenIdConnectConfig();
 
         [Fact]
-        public void All_clients_contains_api_clients()
+        public void All_clients_contains_client_credentials_clients()
         {
             const string clientId = "api-client";
-            _config.ApiClients = new[]
+            _config.ClientCredentialsClients = new[]
             {
-                new ApiClient { ClientId = clientId }
+                new ClientCredentialsClient { ClientId = clientId }
             };
 
             var allClients = _config.AllClients;
@@ -23,12 +23,12 @@ namespace Audacia.Auth.OpenIddict.Tests
         }
 
         [Fact]
-        public void All_clients_contains_ui_clients()
+        public void All_clients_contains_authorization_code_clients()
         {
             const string clientId = "ui-client";
-            _config.UiClients = new[]
+            _config.AuthorizationCodeClients = new[]
             {
-                new UiClient { ClientId = clientId }
+                new AuthorizationCodeClient { ClientId = clientId }
             };
 
             var allClients = _config.AllClients;
@@ -37,12 +37,12 @@ namespace Audacia.Auth.OpenIddict.Tests
         }
 
         [Fact]
-        public void All_clients_contains_test_automation_clients()
+        public void All_clients_contains_resource_owner_password_clients()
         {
             const string clientId = "automation-client";
-            _config.TestAutomationClients = new[]
+            _config.ResourceOwnerPasswordClients = new[]
             {
-                new TestAutomationClient { ClientId = clientId }
+                new ResourceOwnerPasswordClient { ClientId = clientId }
             };
 
             var allClients = _config.AllClients;

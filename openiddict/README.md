@@ -27,11 +27,10 @@ For both new projects and IdentityServer4 replacement, here is a high-level chec
 - [ ] Install the following NuGet packages in your 'identity' project (whichever project acts as the authorization server):
    - `Audacia.Auth.OpenIddict`
    - `Audacia.Auth.OpenIddict.QuartzCleanup` (removes old authorization data)
+   - `Audacia.Auth.OpenIddict.Seeding` (seeds configuration data in the database when running locally)
    - For Entity Framework Core projects:
-      - `Audacia.Auth.OpenIddict.Seeding.EntityFrameworkCore` (seeds configuration data into the database)
       - `OpenIddict.EntityFrameworkCore`
    - For Entity Framework 6.x projects:
-      - `Audacia.Auth.OpenIddict.Seeding.EntityFramework` (seeds configuration data into the database)
       - `Audacia.Auth.OpenIddict.EntityFramework` (this is a thin wrapper around `OpenIddict.EntityFramework` that makes it easier to work with `int` or `Guid` primary keys for OpenIddict entities)
 - [ ] Install the `OpenIddict.EntityFrameworkCore` or `Audacia.Auth.OpenIddict.EntityFramework` package in your Entity Framework project
 - [ ] If you have a separate API project, install the `OpenIddict.AspNetCore` package there
@@ -43,10 +42,14 @@ For both new projects and IdentityServer4 replacement, here is a high-level chec
    - This must include adding scopes to the configuration so that they are registered in the database; this is an `OpenIdConnectScope` object that has 
 - [ ] Set some claim types in ASP.NET Core Identity setup (see [here](#aspnet-core-identity-configuration))
 - [ ] If a custom profile service and/or additional claims provider are required, implement using the information [here](#adding-additional-claims-to-tokens)
+- [ ] Generate a certificate to encrypt tokens (this is in addition to the certificate which should already be present to sign tokens)
+- [ ] Modify your deployment pipeline to seed the database with the necessary OpenIddict configuration (see [here](#seeding-clients-and-scopes-in-the-database))
 
 ## Configuration in appsettings.json
 
-The `Audacia.Auth.OpenIddict` library uses a configuration object of type `OpenIdConnectConfig` (defined in the `Audacia.Auth.OpenIddict.Common.Configuration` namespace). If you are adding authentication to a new project, the easiest way to provide this object is by defining it in the appsettings.json file (example below). However if you are replacing IdentityServer4 in an existing project then it is generally simpler to leave the configuration file as-is and to convert from the existing structure to `OpenIdConnectConfig` in code.
+The `Audacia.Auth.OpenIddict` library uses a configuration object of type `OpenIdConnectConfig` (defined in the `Audacia.Auth.OpenIddict.Common.Configuration` namespace).
+
+If you are adding authentication to a new project, the easiest way to provide this object is by defining it in the appsettings.json file (example below). However if you are replacing IdentityServer4 in an existing project then it is generally simpler to leave the configuration file as-is and to convert from the existing structure to `OpenIdConnectConfig` in code. If you are seeding configuration data in your deployment pipeline, as described [here](#seeding-clients-and-scopes-in-the-database), then you will need to provide an implementation of `IOpenIdConnectConfigMapper` which should contain the conversion code.
 
 ```json
 {
@@ -54,14 +57,14 @@ The `Audacia.Auth.OpenIddict` library uses a configuration object of type `OpenI
         "EncryptionCertificateThumbprint": "TBC",
         "SigningCertificateThumbprint": "TBC",
         "Url": "https://localhost:44374",
-        "ApiClients": [
+        "ClientCredentialsClients": [
             {
                 "ClientId": "ApiClient",
                 "ClientSecret": "xxx",
                 "ClientScopes": [ "api" ]
             }
         ],
-        "UiClients": [
+        "AuthorizationCodeClients": [
             {
                 "ClientScopes": [ "api" ],
                 "ClientId": "AngularClient",
@@ -86,7 +89,7 @@ The `Audacia.Auth.OpenIddict` library uses a configuration object of type `OpenI
                 ]
             }
         ],
-        "TestAutomationClients": [
+        "ResourceOwnerPasswordClients": [
             {
                 "ClientId": "TestAutomationClient",
                 "ClientScopes": [ "api" ],
@@ -115,7 +118,8 @@ For example, suppose your user type is `ApplicationUser` and the primary key of 
 ```csharp
 services.AddOpenIddictWithCleanup<ApplicationUser, int>(options =>
     {
-        options.UseEntityFrameworkCore()
+        options
+            .UseEntityFrameworkCore()
             .UseDbContext<MyDbContext>()
             .ReplaceDefaultEntities<int>();
     },
@@ -137,7 +141,8 @@ In Entity Framework Core the registration could look something like this:
 ```csharp
 services.AddDbContext<DatabaseContext>(options =>
 {
-    options.UseSqlServer()
+    options
+        .UseSqlServer()
         .UseOpenIddict<int>();
 });
 ```
@@ -185,7 +190,8 @@ The controllers that handle the OpenID Connect endpoints are generic (on the Use
 
 This can be achieved by calling an extension method on `IMvcBuilder`, providing the necessary generic parameters. This will usually be as a method call chained on the end of a call to `AddControllersWithViews()`. For example, suppose your user type is `ApplicationUser` and the primary key of `ApplicationUser` is an `int`:
 ```csharp
-services.AddControllersWithViews()
+services
+    .AddControllersWithViews()
     .ConfigureOpenIddict<ApplicationUser, int>();
 ```
 
@@ -203,7 +209,7 @@ The `IAdditionalClaimsProvider<TUser, TKey>` interface is designed to provide cl
 
 The `Audacia.Auth.OpenIddict` library also provides an `IProfileService<TUser, TKey>` interface, which performs essentially the same role as the `IProfileService` interface that is part of IdentityServer4. If you need to perform logic or make calls to a database or external API, the `GetClaimsAsync` method of `IProfileService<TUser, TKey>` is the appropriate place for this.
 
-The provided implementation of `IProfileService<TUser, TKey>`, `DefaultProfileService<TUser, TKey>`, adds the claims from `IAdditionalClaimsProvider<TUser, TKey>` so you can derive from this base class rather than implement the interface directly.
+The provided implementation of `IProfileService<TUser, TKey>`, `DefaultProfileService<TUser, TKey>`, already adds the claims from `IAdditionalClaimsProvider<TUser, TKey>` so you can derive from this base class rather than implement the interface directly.
 
 An example implementation might be:
 ```csharp
@@ -239,7 +245,8 @@ services
         options.AddAudiences(/*Client ID of the API*/);
 
         // DON'T INCLUDE THIS SECTION IF OPENIDDICT IS HOSTED IN THE SAME WEB APP AS THE API
-        options.UseIntrospection()
+        options
+            .UseIntrospection()
             .SetClientId(/*Client ID of the API*/)
             .SetClientSecret(/*Client secret of the API*/);
 
@@ -271,6 +278,8 @@ steps:
       openIddictEntitiesKeyType: 'int'
       databaseConnectionStringName: 'MyDatabaseContext'
 ```
+
+For non-YAML pipelines, the code from the respective steps can be copied into tasks in a classic pipeline.
 
 ### Mapping Config
 

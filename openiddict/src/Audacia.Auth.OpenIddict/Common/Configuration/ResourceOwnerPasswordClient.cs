@@ -3,7 +3,7 @@
     /// <summary>
     /// Represents an OpenID Connect client that is a test automation client, and will use the Resource Owner Password Credential grant type.
     /// </summary>
-    public class TestAutomationClient : OpenIdConnectClientBase
+    public class ResourceOwnerPasswordClient : OpenIdConnectClientBase
     {
         /// <summary>
         /// Gets or sets the client secret.
