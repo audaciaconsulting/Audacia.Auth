@@ -13,10 +13,10 @@ stages:
 - stage: Build
   displayName: Build
   jobs:
-    - template: pipelines/build/nuget-package.job.yaml@templates
+    - template: pipelines/build/signed-nuget-package.job.yaml@templates
       parameters:
         projects: 'openiddict/src/**/*.csproj'
-        tests: 'openiddict/tests/Audacia.Auth.OpenIddict.Tests/Audacia.Auth.OpenIddict.Tests.csproj'
+        testPath: 'openiddict/tests/Audacia.Auth.OpenIddict.Tests/Audacia.Auth.OpenIddict.Tests.csproj'
         skipDependencyChecks: true
 
 - stage: Release
