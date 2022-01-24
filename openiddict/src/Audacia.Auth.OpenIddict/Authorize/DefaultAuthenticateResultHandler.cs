@@ -235,8 +235,7 @@ namespace Audacia.Auth.OpenIddict.Authorize
                 IdentityConstants.ApplicationScheme,
                 new AuthenticationProperties
                 {
-                    RedirectUri = httpRequest.PathBase + httpRequest.Path + QueryString.Create(
-                        httpRequest.HasFormContentType ? httpRequest.Form.ToList() : httpRequest.Query.ToList())
+                    RedirectUri = httpRequest.CreateRedirectUri()
                 });
         }
 
@@ -287,8 +286,7 @@ namespace Audacia.Auth.OpenIddict.Authorize
                 IdentityConstants.ApplicationScheme,
                 new AuthenticationProperties
                 {
-                    RedirectUri = httpRequest.PathBase + httpRequest.Path + QueryString.Create(
-                        httpRequest.HasFormContentType ? httpRequest.Form.ToList() : httpRequest.Query.ToList())
+                    RedirectUri = httpRequest.CreateRedirectUri()
                 });
         }
     }
