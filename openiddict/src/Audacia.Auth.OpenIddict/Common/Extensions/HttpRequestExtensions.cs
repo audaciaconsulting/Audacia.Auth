@@ -21,6 +21,6 @@ namespace Audacia.Auth.OpenIddict.Common.Extensions
             httpRequest.PathBase + httpRequest.Path + httpRequest.CreateQueryString();
 
         private static QueryString CreateQueryString(this HttpRequest httpRequest) =>
-            QueryString.Create(httpRequest.HasFormContentType ? httpRequest.Form.ToList() : httpRequest.Query.ToList()));
+            QueryString.Create(httpRequest.HasFormContentType ? httpRequest.Form.ToList() : httpRequest.Query.ToList());
     }
 }
