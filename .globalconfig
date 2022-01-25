@@ -1,0 +1,8 @@
+is_global = true
+
+# Build with the highest warning level
+# Must be suppressed in .globalconfig rather than .editorconfig
+# See https://github.com/bkoelman/CSharpGuidelinesAnalyzer/issues/115
+# Suppressed in the first place as the rule enforcing a WarningLevel of 9999
+# is not picked up when the target framework is netcoreapp3.1
+dotnet_diagnostic.AV2210.severity = suggestion

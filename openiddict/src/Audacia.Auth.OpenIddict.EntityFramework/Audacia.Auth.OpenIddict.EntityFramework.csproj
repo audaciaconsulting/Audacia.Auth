@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Version>1.0.0</Version>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <Authors>Audacia</Authors>
+    <PackageIcon>package-icon.png</PackageIcon>
+    <Description>Helper library for using OpenIddict as an authorization server with Entity Framework 6.x as an ORM.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\package-icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenIddict.EntityFramework" Version="3.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Audacia.Auth.OpenIddict\Audacia.Auth.OpenIddict.csproj" />
+  </ItemGroup>
+
+</Project>
