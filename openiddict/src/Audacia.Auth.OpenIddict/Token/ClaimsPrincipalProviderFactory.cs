@@ -42,8 +42,8 @@ namespace Audacia.Auth.OpenIddict.Token
             }
 
             if (openIddictRequest.IsAuthorizationCodeGrantType() ||
-                     openIddictRequest.IsDeviceCodeGrantType() ||
-                     openIddictRequest.IsRefreshTokenGrantType())
+                openIddictRequest.IsDeviceCodeGrantType() ||
+                openIddictRequest.IsRefreshTokenGrantType())
             {
                 return _codeExchangeClaimsPrincipalProvider;
             }
