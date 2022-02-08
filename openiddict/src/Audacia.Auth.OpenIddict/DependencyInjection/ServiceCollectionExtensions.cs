@@ -7,6 +7,7 @@ using Audacia.Auth.OpenIddict.Common;
 using Audacia.Auth.OpenIddict.Common.Configuration;
 using Audacia.Auth.OpenIddict.Common.Extensions;
 using Audacia.Auth.OpenIddict.Token;
+using Audacia.Auth.OpenIddict.Token.Custom;
 using Audacia.Auth.OpenIddict.UserInfo;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,6 +60,16 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
             where TId : IEquatable<TId> => services.AddTransient<IPostAuthenticateHandler<TUser, TId>, THandler>();
 
         /// <summary>
+        /// Adds the given <typeparamref name="T"/> to the dependency injection container
+        /// as an implementation of <see cref="ICustomGrantTypeClaimsPrincipalProvider"/>.
+        /// </summary>
+        /// <typeparam name="T">Type of the <see cref="ICustomGrantTypeClaimsPrincipalProvider"/> implementation.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/> instance to which to add the <typeparamref name="T"/>.</param>
+        /// <returns>The given <paramref name="services"/>.</returns>
+        public static IServiceCollection AddCustomGrantTypeProvider<T>(this IServiceCollection services)
+            where T : class, ICustomGrantTypeClaimsPrincipalProvider => services.AddTransient<ICustomGrantTypeClaimsPrincipalProvider, T>();
+
+        /// <summary>
         /// Adds OpenIddict services to the given <paramref name="services"/>.
         /// </summary>
         /// <typeparam name="TUser">The user type.</typeparam>
@@ -104,7 +115,10 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
                 .AddTransient<IClaimsPrincipalProviderFactory, ClaimsPrincipalProviderFactory<TUser, TId>>()
                 .AddTransient<ClientCredentialsClaimPrincipalProvider>()
                 .AddTransient<PasswordClaimsPrincipalProvider<TUser, TId>>()
-                .AddTransient<CodeExchangeClaimsPrincipalProvider<TUser>>();
+                .AddTransient<CodeExchangeClaimsPrincipalProvider<TUser>>()
+                .AddTransient<CustomGrantTypeClaimsPrincipalProvider>()
+                .AddTransient<ISigningCredentialsProvider, DefaultCredentialsProvider>()
+                .AddTransient<IEncryptionCredentialsProvider, DefaultCredentialsProvider>();
         }
 
         private static OpenIddictBuilder ConfigureOpenIddict(
@@ -165,6 +179,14 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
             }
 
             options.AllowRefreshTokenFlow();
+
+            if (openIdConnectConfig.CustomGrantTypes?.Any() == true)
+            {
+                foreach (var grantType in openIdConnectConfig.CustomGrantTypes)
+                {
+                    options.AllowCustomFlow(grantType);
+                }
+            }
         }
 
         private static void AddScopes(OpenIdConnectConfig openIdConnectConfig, OpenIddictServerBuilder options)

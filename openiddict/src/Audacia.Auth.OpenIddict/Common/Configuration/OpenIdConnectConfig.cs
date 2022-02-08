@@ -51,6 +51,11 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
         public IReadOnlyCollection<OpenIdConnectScope>? Scopes { get; set; }
 
         /// <summary>
+        /// Gets or sets the custom grant types supported by the Open ID Connect server.
+        /// </summary>
+        public IReadOnlyCollection<string>? CustomGrantTypes { get; set; }
+
+        /// <summary>
         /// Gets all configured clients.
         /// </summary>
         public IEnumerable<OpenIdConnectClientBase> AllClients

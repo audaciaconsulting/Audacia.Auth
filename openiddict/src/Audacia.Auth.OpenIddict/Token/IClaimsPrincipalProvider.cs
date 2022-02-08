@@ -11,6 +11,7 @@ namespace Audacia.Auth.OpenIddict.Token
     {
         /// <summary>
         /// Asynchronously gets a <see cref="ClaimsPrincipal"/> object from the given <paramref name="openIddictRequest"/>.
+        /// If a principal cannot be created then an <see cref="InvalidGrantException"/> should be thrown.
         /// </summary>
         /// <param name="openIddictRequest">The <see cref="OpenIddictRequest"/> from which to obtain the <see cref="ClaimsPrincipal"/>.</param>
         /// <returns>A <see cref="Task{TResult}"/> that, when completed, contains a <see cref="ClaimsPrincipal"/> object.</returns>

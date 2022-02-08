@@ -42,7 +42,10 @@ For both new projects and IdentityServer4 replacement, here is a high-level chec
    - This must include adding scopes to the configuration so that they are registered in the database; this is an `OpenIdConnectScope` object that has 
 - [ ] Set some claim types in ASP.NET Core Identity setup (see [here](#aspnet-core-identity-configuration))
 - [ ] If a custom profile service and/or additional claims provider are required, implement using the information [here](#adding-additional-claims-to-tokens)
-- [ ] Generate a certificate to encrypt tokens (this is in addition to the certificate which should already be present to sign tokens)
+- [ ] If support for custom grant types (e.g. SAML) is required, see [here](#custom-grant-type-support)
+- [ ] If access to the credentials used to the sign or encrypt the tokens is needed then the interfaces `ISigningCredentialsProvider` and `IEncryptionCredentialsProvider` respectively can be used
+- [ ] Generate a self-signed certificate to encrypt tokens (this is in addition to the certificate which should already be present to sign tokens)
+   - This can be done by executing the [CreateTokenSigningCert.sh](https://dev.azure.com/audacia/Audacia/_git/Audacia.Build?path=/tools/security/certificates/CreateTokenSigningCert.sh) and [ConvertTokenSigningCertToPfx.sh](https://dev.azure.com/audacia/Audacia/_git/Audacia.Build?path=/tools/security/certificates/ConvertTokenSigningCertToPfx.sh) bash scripts
 - [ ] Modify your deployment pipeline to seed the database with the necessary OpenIddict configuration (see [here](#seeding-clients-and-scopes-in-the-database))
 
 ## Configuration in appsettings.json
@@ -110,7 +113,7 @@ If you are adding authentication to a new project, the easiest way to provide th
 
 You must register the necessary OpenIddict services with the ASP.NET Core dependency injection system. Because a lot of the types defined by `Audacia.Auth.OpenIddict` are generic on the User type and the User's primary key type (this is because both `UserManager` and `SignInManager` from ASP.NET Core Identity are generic), when registering the services you must provide the necessary generic parameters.
 
-This can be achieved by calling an extension method on `IServiceCollection` provided by `Audacia.Auth.OpenIddict`. As well as taking the generic parameters, this method also takes a delegate which can be used to further configure `OpenIddict`. This delegate is of type `Action<OpenIddictCoreBuilder>`, so core configuration can be provided, such as the ORM provider to use for data persistence.
+This can be achieved by calling an extension method on `IServiceCollection` provided by `Audacia.Auth.OpenIddict`. As well as taking the generic parameters, this method also takes a delegate which can be used to further configure `OpenIddict`. This delegate is of type `Action<OpenIddictCoreBuilder>`, so core configuration can be provided, such as the ORM provider to use for data persistence. Alongside registering all necessary OpenIddict services, this method also adds token signing and encryption credentials (using developer credentials locally and certificates in a deployed environment) therefore this does not need to be done in application code.
 
 OpenIddict saves issued tokens to the database, so to avoid that data building up over time, it is important to remove old data periodically. OpenIddict comes with built-in support for doing this cleanup in a background job using Quartz. This is implemented in the `Audacia.Auth.OpenIddict.QuartzCleanup` NuGet package. Unless you have another mechanism for cleaning up this data (such as a scheduled Azure Function) then you should use Quartz cleanup.
 
@@ -123,11 +126,13 @@ services.AddOpenIddictWithCleanup<ApplicationUser, int>(options =>
             .UseDbContext<MyDbContext>()
             .ReplaceDefaultEntities<int>();
     },
+    user => user.Id,
     openIdConnectConfig,
     hostingEnvironment);
 ```
 
 The additional parameters are:
+- The lambda expression `user => user.Id` is the `userIdGetter`, and just needs to be any delegate that returns the user Id
 - `openIdConnectConfig` is an instance of `OpenIdConnectConfig` (see appsettings.json section above)
 - `hostingEnvironment` is an instance of `IWebHostEnvironment`
 
@@ -229,6 +234,26 @@ public class CustomProfileService : DefaultProfileService<ApplicationUser, int>
         // Custom logic here
     }
 }
+```
+
+## Custom Grant Type Support
+
+Additional grant types can be processed by specifying them in the `CustomGrantTypes` property of `OpenIdConnectConfig`, and then by providing an appropriate implementation of `ICustomGrantTypeClaimsPrincipalProvider`. For example, if the grant type of `"saml"` needs to be supported then the implementation would be something like this:
+```csharp
+public class SamlClaimsPrincipalProvider : ICustomGrantTypeClaimsPrincipalProvider
+{
+    public string GrantType { get; } = "saml";
+
+    public Task<ClaimsPrincipal> GetPrincipalAsync(OpenIddictRequest openIddictRequest)
+    {
+        // Custom implementation here
+    }
+}
+```
+
+The implementing class must also be registered with the dependency injection system as follows (where `services` is an instance of `IServiceCollection`):
+```csharp
+services.AddCustomGrantTypeProvider<SamlClaimsPrincipalProvider>();
 ```
 
 ## API Authentication
