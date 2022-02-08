@@ -42,7 +42,10 @@ For both new projects and IdentityServer4 replacement, here is a high-level chec
    - This must include adding scopes to the configuration so that they are registered in the database; this is an `OpenIdConnectScope` object that has 
 - [ ] Set some claim types in ASP.NET Core Identity setup (see [here](#aspnet-core-identity-configuration))
 - [ ] If a custom profile service and/or additional claims provider are required, implement using the information [here](#adding-additional-claims-to-tokens)
-- [ ] Generate a certificate to encrypt tokens (this is in addition to the certificate which should already be present to sign tokens)
+- [ ] If support for custom grant types (e.g. SAML) is required, see [here](#custom-grant-type-support)
+- [ ] If access to the credentials used to the sign or encrypt the tokens is needed then the interfaces `ISigningCredentialsProvider` and `IEncryptionCredentialsProvider` respectively can be used
+- [ ] Generate a self-signed certificate to encrypt tokens (this is in addition to the certificate which should already be present to sign tokens)
+   - This can be done by executing the [CreateTokenSigningCert.sh](https://dev.azure.com/audacia/Audacia/_git/Audacia.Build?path=/tools/security/certificates/CreateTokenSigningCert.sh) and [ConvertTokenSigningCertToPfx.sh](https://dev.azure.com/audacia/Audacia/_git/Audacia.Build?path=/tools/security/certificates/ConvertTokenSigningCertToPfx.sh) bash scripts
 - [ ] Modify your deployment pipeline to seed the database with the necessary OpenIddict configuration (see [here](#seeding-clients-and-scopes-in-the-database))
 
 ## Configuration in appsettings.json
@@ -229,6 +232,26 @@ public class CustomProfileService : DefaultProfileService<ApplicationUser, int>
         // Custom logic here
     }
 }
+```
+
+## Custom Grant Type Support
+
+Additional grant types can be processed by specifying them in the `CustomGrantTypes` property of `OpenIdConnectConfig`, and then by providing an appropriate implementation of `ICustomGrantTypeClaimsPrincipalProvider`. For example, if the grant type of `"saml"` needs to be supported then the implementation would be something like this:
+```csharp
+public class SamlClaimsPrincipalProvider : ICustomGrantTypeClaimsPrincipalProvider
+{
+    public string GrantType { get; } = "saml";
+
+    public Task<ClaimsPrincipal> GetPrincipalAsync(OpenIddictRequest openIddictRequest)
+    {
+        // Custom implementation here
+    }
+}
+```
+
+The implementing class must also be registered with the dependency injection system as follows (where `services` is an instance of `IServiceCollection`):
+```csharp
+services.AddCustomGrantTypeProvider<SamlClaimsPrincipalProvider>();
 ```
 
 ## API Authentication
