@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -9,6 +10,7 @@ namespace Audacia.Auth.OpenIddict.Common
     /// <summary>
     /// Default implementation of <see cref="ISigningCredentialsProvider"/> and <see cref="IEncryptionCredentialsProvider"/> that gets credentials from configuration.
     /// </summary>
+    [SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Registered in dependency injection.")]
     internal class DefaultCredentialsProvider : ISigningCredentialsProvider, IEncryptionCredentialsProvider
     {
         private readonly OpenIddictServerOptions _serverOptions;
