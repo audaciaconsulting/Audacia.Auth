@@ -113,7 +113,7 @@ If you are adding authentication to a new project, the easiest way to provide th
 
 You must register the necessary OpenIddict services with the ASP.NET Core dependency injection system. Because a lot of the types defined by `Audacia.Auth.OpenIddict` are generic on the User type and the User's primary key type (this is because both `UserManager` and `SignInManager` from ASP.NET Core Identity are generic), when registering the services you must provide the necessary generic parameters.
 
-This can be achieved by calling an extension method on `IServiceCollection` provided by `Audacia.Auth.OpenIddict`. As well as taking the generic parameters, this method also takes a delegate which can be used to further configure `OpenIddict`. This delegate is of type `Action<OpenIddictCoreBuilder>`, so core configuration can be provided, such as the ORM provider to use for data persistence.
+This can be achieved by calling an extension method on `IServiceCollection` provided by `Audacia.Auth.OpenIddict`. As well as taking the generic parameters, this method also takes a delegate which can be used to further configure `OpenIddict`. This delegate is of type `Action<OpenIddictCoreBuilder>`, so core configuration can be provided, such as the ORM provider to use for data persistence. Alongside registering all necessary OpenIddict services, this method also adds token signing and encryption credentials (using developer credentials locally and certificates in a deployed environment) therefore this does not need to be done in application code.
 
 OpenIddict saves issued tokens to the database, so to avoid that data building up over time, it is important to remove old data periodically. OpenIddict comes with built-in support for doing this cleanup in a background job using Quartz. This is implemented in the `Audacia.Auth.OpenIddict.QuartzCleanup` NuGet package. Unless you have another mechanism for cleaning up this data (such as a scheduled Azure Function) then you should use Quartz cleanup.
 
@@ -126,11 +126,13 @@ services.AddOpenIddictWithCleanup<ApplicationUser, int>(options =>
             .UseDbContext<MyDbContext>()
             .ReplaceDefaultEntities<int>();
     },
+    user => user.Id,
     openIdConnectConfig,
     hostingEnvironment);
 ```
 
 The additional parameters are:
+- The lambda expression `user => user.Id` is the `userIdGetter`, and just needs to be any delegate that returns the user Id
 - `openIdConnectConfig` is an instance of `OpenIdConnectConfig` (see appsettings.json section above)
 - `hostingEnvironment` is an instance of `IWebHostEnvironment`
 
