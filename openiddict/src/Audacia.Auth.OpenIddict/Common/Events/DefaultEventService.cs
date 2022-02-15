@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -9,8 +8,7 @@ namespace Audacia.Auth.OpenIddict.Common.Events
     /// <summary>
     /// Default implementation of <see cref="IEventService"/>.
     /// </summary>
-    [SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Registered in dependency injection.")]
-    internal class DefaultEventService : IEventService
+    public class DefaultEventService : IEventService
     {
         private readonly IEventSink _eventSink;
         private readonly IHttpContextAccessor _contextAccessor;
@@ -32,12 +30,23 @@ namespace Audacia.Auth.OpenIddict.Common.Events
         /// <inheritdoc />
         public async Task RaiseAsync(AuthEvent authEvent)
         {
+            if (authEvent == null) throw new ArgumentNullException(nameof(authEvent));
+
             await PrepareEventAsync(authEvent).ConfigureAwait(false);
             await _eventSink.PersistAsync(authEvent).ConfigureAwait(false);
         }
 
-        private Task PrepareEventAsync(AuthEvent authEvent)
+        /// <summary>
+        /// Prepares the given <paramref name="authEvent"/> for persistence by setting various properties.
+        /// </summary>
+        /// <param name="authEvent">The <see cref="AuthEvent"/> to prepare.</param>
+        /// <returns>A <see cref="Task"/> representing the operation.</returns>
+        /// <exception cref="ArgumentNullException">The given <paramref name="authEvent"/> is <see langword="null"/>.</exception>
+        /// <exception cref="InvalidOperationException">The current <see cref="HttpContext"/> is <see langword="null"/>.</exception>
+        protected virtual Task PrepareEventAsync(AuthEvent authEvent)
         {
+            if (authEvent == null) throw new ArgumentNullException(nameof(authEvent));
+
             var httpContext = _contextAccessor.HttpContext;
             if (httpContext == null)
             {
