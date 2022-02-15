@@ -42,6 +42,7 @@ For both new projects and IdentityServer4 replacement, here is a high-level chec
    - This must include adding scopes to the configuration so that they are registered in the database; this is an `OpenIdConnectScope` object that has 
 - [ ] Set some claim types in ASP.NET Core Identity setup (see [here](#aspnet-core-identity-configuration))
 - [ ] If a custom profile service and/or additional claims provider are required, implement using the information [here](#adding-additional-claims-to-tokens)
+- [ ] If raising or subscribing to events such as 'token issued' or 'user logged in' is required, see [here](#events)
 - [ ] If support for custom grant types (e.g. SAML) is required, see [here](#custom-grant-type-support)
 - [ ] If access to the credentials used to the sign or encrypt the tokens is needed then the interfaces `ISigningCredentialsProvider` and `IEncryptionCredentialsProvider` respectively can be used
 - [ ] Generate a self-signed certificate to encrypt tokens (this is in addition to the certificate which should already be present to sign tokens)
@@ -234,6 +235,51 @@ public class CustomProfileService : DefaultProfileService<ApplicationUser, int>
         // Custom logic here
     }
 }
+```
+
+## Events
+
+The `Audacia.Auth.OpenIddict` library implements the same event functionality that IdentityServer supports, where events are raised to an `IEventService`, which persists them to an `IEventSink`. `Audacia.Auth.OpenIddict` raises the following events:
+- `TokenIssuedSuccessEvent`
+- `TokenIssuedFailureEvent`
+
+You can intercept these events and add custom behaviour by implementing `IEventSink` (see [below](#event-sinks)).
+
+In addition, the following events are provided which can be raised in user code:
+- `UserLoginSuccessEvent`
+- `UserLoginFailureEvent`
+- `UserLogoutSuccessEvent`
+
+### Event Sinks
+
+Events are persisted using an implementation of `IEventSink`. The default implementation uses `ILogger` to log the event, but a custom implementation can be provided by registering it with the dependency injection container. For example:
+```csharp
+services.AddEventSink<CustomEventSink>();
+```
+
+If you still want all events to be logged using the default behaviour then you can inherit from `DefaultEventSink` to utilise the existing behaviour. For example:
+```csharp
+public class CustomEventSink : DefaultEventSink
+{
+    public CustomEventSink(ILogger<DefaultEventSink> logger, IEventSerializer eventSerializer)
+        : base(logger, eventSerializer)
+    {
+    }
+
+    public override virtual Task PersistAsync(AuthEvent authEvent)
+    {
+        // Custom behaviour here
+
+        return base.PersistAsync(authEvent);
+    }
+}
+```
+
+### Event Serialization
+
+Events are serialized using an implementation of `IEventSerializer`. The default implementation uses `System.Text.Json`, but a custom implementation can be provided by registering it with the dependency injection container. For example:
+```csharp
+services.AddEventSerializer<CustomEventSerializer>();
 ```
 
 ## Custom Grant Type Support

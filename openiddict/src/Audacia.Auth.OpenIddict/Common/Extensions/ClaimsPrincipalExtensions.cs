@@ -92,5 +92,17 @@ namespace Audacia.Auth.OpenIddict.Common.Extensions
                 identity.AddClaims(claims);
             }
         }
+
+        /// <summary>
+        /// Gets the subject Id claim from the given <paramref name="claimsPrincipal"/>.
+        /// </summary>
+        /// <param name="claimsPrincipal">The <see cref="ClaimsPrincipal"/> in which to find the subject Id.</param>
+        /// <returns>The subject Id if one is found, otherwise returns <see langword="null"/>.</returns>
+        internal static string? GetSubjectId(this ClaimsPrincipal claimsPrincipal)
+        {
+            var claim = claimsPrincipal.FindFirst(Claims.Subject);
+
+            return claim?.Value;
+        }
     }
 }

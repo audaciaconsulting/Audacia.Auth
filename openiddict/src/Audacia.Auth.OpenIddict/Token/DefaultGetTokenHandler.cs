@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Audacia.Auth.OpenIddict.Common;
 using Audacia.Auth.OpenIddict.Common.Configuration;
+using Audacia.Auth.OpenIddict.Common.Events;
 using Audacia.Auth.OpenIddict.Common.Extensions;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
@@ -21,18 +23,22 @@ namespace Audacia.Auth.OpenIddict.Token
     {
         private readonly OpenIdConnectConfig _openIdConnectConfig;
         private readonly IClaimsPrincipalProviderFactory _claimsPrincipalProviderFactory;
+        private readonly IEventService _eventService;
 
         /// <summary>
         /// Initializes an instance of <see cref="DefaultGetTokenHandler"/>.
         /// </summary>
         /// <param name="openIdConnectConfig">The configuration.</param>
         /// <param name="claimsPrincipalProviderFactory">An instance of <see cref="IClaimsPrincipalProviderFactory"/>.</param>
+        /// <param name="eventService">An instance of <see cref="IEventService"/> that can be used to write events.</param>
         public DefaultGetTokenHandler(
             OpenIdConnectConfig openIdConnectConfig,
-            IClaimsPrincipalProviderFactory claimsPrincipalProviderFactory)
+            IClaimsPrincipalProviderFactory claimsPrincipalProviderFactory,
+            IEventService eventService)
         {
             _openIdConnectConfig = openIdConnectConfig;
             _claimsPrincipalProviderFactory = claimsPrincipalProviderFactory;
+            _eventService = eventService;
         }
 
         /// <summary>
@@ -53,11 +59,14 @@ namespace Audacia.Auth.OpenIddict.Token
             }
             catch (InvalidGrantException invalidGrantException)
             {
+                await _eventService.RaiseAsync(new TokenIssuedFailureEvent(openIddictRequest, invalidGrantException.Message)).ConfigureAwait(false);
+
                 return InvalidGrantResult(invalidGrantException);
             }
 
             principal.SetDestinations();
             AdjustAccessTokenLifetime(openIddictRequest, principal);
+            await _eventService.RaiseAsync(new TokenIssuedSuccessEvent(EndpointNames.Token, principal, openIddictRequest)).ConfigureAwait(false);
 
             // Returning a SignInResult will ask OpenIddict to issue the appropriate access/identity tokens.
             return new SignInResult(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme, principal);

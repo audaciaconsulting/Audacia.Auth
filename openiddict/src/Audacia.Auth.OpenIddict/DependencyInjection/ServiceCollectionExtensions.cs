@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using Audacia.Auth.OpenIddict.Authorize;
 using Audacia.Auth.OpenIddict.Common;
 using Audacia.Auth.OpenIddict.Common.Configuration;
+using Audacia.Auth.OpenIddict.Common.Events;
 using Audacia.Auth.OpenIddict.Common.Extensions;
 using Audacia.Auth.OpenIddict.Token;
 using Audacia.Auth.OpenIddict.Token.Custom;
@@ -70,6 +71,36 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
             where T : class, ICustomGrantTypeClaimsPrincipalProvider => services.AddTransient<ICustomGrantTypeClaimsPrincipalProvider, T>();
 
         /// <summary>
+        /// Adds the given <typeparamref name="T"/> to the dependency injection container
+        /// as an implementation of <see cref="IEventService"/>.
+        /// </summary>
+        /// <typeparam name="T">Type of the <see cref="IEventService"/> implementation.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/> instance to which to add the <typeparamref name="T"/>.</param>
+        /// <returns>The given <paramref name="services"/>.</returns>
+        public static IServiceCollection AddEventService<T>(this IServiceCollection services)
+            where T : class, IEventService => services.AddTransient<IEventService, T>();
+
+        /// <summary>
+        /// Adds the given <typeparamref name="T"/> to the dependency injection container
+        /// as an implementation of <see cref="IEventSink"/>.
+        /// </summary>
+        /// <typeparam name="T">Type of the <see cref="IEventSink"/> implementation.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/> instance to which to add the <typeparamref name="T"/>.</param>
+        /// <returns>The given <paramref name="services"/>.</returns>
+        public static IServiceCollection AddEventSink<T>(this IServiceCollection services)
+            where T : class, IEventSink => services.AddTransient<IEventSink, T>();
+
+        /// <summary>
+        /// Adds the given <typeparamref name="T"/> to the dependency injection container
+        /// as an implementation of <see cref="IEventSerializer"/>.
+        /// </summary>
+        /// <typeparam name="T">Type of the <see cref="IEventSerializer"/> implementation.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/> instance to which to add the <typeparamref name="T"/>.</param>
+        /// <returns>The given <paramref name="services"/>.</returns>
+        public static IServiceCollection AddEventSerializer<T>(this IServiceCollection services)
+            where T : class, IEventSerializer => services.AddTransient<IEventSerializer, T>();
+
+        /// <summary>
         /// Adds OpenIddict services to the given <paramref name="services"/>.
         /// </summary>
         /// <typeparam name="TUser">The user type.</typeparam>
@@ -118,7 +149,10 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
                 .AddTransient<CodeExchangeClaimsPrincipalProvider<TUser>>()
                 .AddTransient<CustomGrantTypeClaimsPrincipalProvider>()
                 .AddTransient<ISigningCredentialsProvider, DefaultCredentialsProvider>()
-                .AddTransient<IEncryptionCredentialsProvider, DefaultCredentialsProvider>();
+                .AddTransient<IEncryptionCredentialsProvider, DefaultCredentialsProvider>()
+                .AddEventService<DefaultEventService>()
+                .AddEventSink<DefaultEventSink>()
+                .AddEventSerializer<DefaultJsonEventSerializer>();
         }
 
         private static OpenIddictBuilder ConfigureOpenIddict(
