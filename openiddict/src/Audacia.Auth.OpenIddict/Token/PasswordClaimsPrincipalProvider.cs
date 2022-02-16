@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Audacia.Auth.OpenIddict.Common;
+using Audacia.Auth.OpenIddict.Common.Events;
 using Audacia.Auth.OpenIddict.Common.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -23,6 +24,7 @@ namespace Audacia.Auth.OpenIddict.Token
         private readonly SignInManager<TUser> _signInManager;
         private readonly IOpenIddictScopeManager _scopeManager;
         private readonly IProfileService<TUser> _profileService;
+        private readonly IEventService _eventService;
         private readonly ILogger<PasswordClaimsPrincipalProvider<TUser, TId>> _logger;
 
         /// <summary>
@@ -32,19 +34,22 @@ namespace Audacia.Auth.OpenIddict.Token
         /// <param name="signInManager">An instance of <see cref="SignInManager{TUser}"/>.</param>
         /// <param name="scopeManager">An instance of <see cref="IOpenIddictScopeManager"/>.</param>
         /// <param name="profileService">An instance of <see cref="IProfileService{TUser}"/>.</param>
+        /// <param name="eventService">An instance of <see cref="IEventService"/>.</param>
         /// <param name="logger">An instance of <see cref="ILogger"/>.</param>
-        [SuppressMessage("Maintainability", "ACL1003:Signature contains too many parameters", Justification = "Needs five parameters.")]
+        [SuppressMessage("Maintainability", "ACL1003:Signature contains too many parameters", Justification = "Needs six parameters.")]
         public PasswordClaimsPrincipalProvider(
             UserManager<TUser> userManager,
             SignInManager<TUser> signInManager,
             IOpenIddictScopeManager scopeManager,
             IProfileService<TUser> profileService,
+            IEventService eventService,
             ILogger<PasswordClaimsPrincipalProvider<TUser, TId>> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _scopeManager = scopeManager;
             _profileService = profileService;
+            _eventService = eventService;
             _logger = logger;
         }
 
@@ -64,25 +69,29 @@ namespace Audacia.Auth.OpenIddict.Token
             var result = await _signInManager.CheckPasswordSignInAsync(user, openIddictRequest.Password, lockoutOnFailure: true).ConfigureAwait(false);
             if (!result.Succeeded)
             {
-                HandleFailedSignIn(result, userProxy);
+                await HandleFailedSignInAsync(result, userProxy, openIddictRequest).ConfigureAwait(false);
             }
 
             return await CreatePrincipalForPasswordFlowAsync(openIddictRequest, userProxy).ConfigureAwait(false);
         }
 
-        private void HandleFailedSignIn(SignInResult result, UserWrapper<TUser, TId> user)
+        private async Task HandleFailedSignInAsync(SignInResult result, UserWrapper<TUser, TId> user, OpenIddictRequest request)
         {
+            var userId = user.GetId().ToString();
             if (result.IsLockedOut)
             {
-                _logger.LogInformation("User {UserId} is locked out.", user.GetId());
+                _logger.LogInformation("User {UserId} is locked out.", userId);
+                await _eventService.RaiseAsync(new UserLoginFailureEvent(request.Username ?? "Unknown user", userId, "User locked out.", clientId: request.ClientId)).ConfigureAwait(false);
             }
             else if (result.IsNotAllowed)
             {
-                _logger.LogInformation("User {UserId} is not allowed to sign in.", user.GetId());
+                _logger.LogInformation("User {UserId} is not allowed to sign in.", userId);
+                await _eventService.RaiseAsync(new UserLoginFailureEvent(request.Username ?? "Unknown user", userId, "User is not allowed to sign in.", clientId: request.ClientId)).ConfigureAwait(false);
             }
             else
             {
-                _logger.LogInformation("Invalid credentials for user {UserId}.", user.GetId());
+                _logger.LogInformation("Invalid credentials for user {UserId}.", userId);
+                await _eventService.RaiseAsync(new UserLoginFailureEvent(request.Username ?? "Unknown user", userId, "Invalid credentials.", clientId: request.ClientId)).ConfigureAwait(false);
             }
 
             throw new InvalidGrantException("The username/password couple is invalid.");

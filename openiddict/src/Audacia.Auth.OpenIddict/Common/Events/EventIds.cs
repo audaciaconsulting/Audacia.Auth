@@ -49,20 +49,5 @@
         /// Unhandled exception.
         /// </summary>
         public const int UnhandledException = ErrorEventsStart + 0;
-
-        /*
-        // Grants related events
-        */
-        private const int GrantsEventsStart = 4000;
-
-        /// <summary>
-        /// Consent granted.
-        /// </summary>
-        public const int ConsentGranted = GrantsEventsStart + 0;
-        
-        /// <summary>
-        /// Consent denied.
-        /// </summary>
-        public const int ConsentDenied = GrantsEventsStart + 1;
     }
 }
