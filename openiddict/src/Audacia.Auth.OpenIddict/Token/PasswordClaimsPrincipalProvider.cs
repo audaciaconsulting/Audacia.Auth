@@ -81,21 +81,24 @@ namespace Audacia.Auth.OpenIddict.Token
             if (result.IsLockedOut)
             {
                 _logger.LogInformation("User {UserId} is locked out.", userId);
-                await _eventService.RaiseAsync(new UserLoginFailureEvent(request.Username ?? "Unknown user", userId, "User locked out.", clientId: request.ClientId)).ConfigureAwait(false);
+                await RaiseLoginFailureEventAsync(request, userId, "User locked out.").ConfigureAwait(false);
             }
             else if (result.IsNotAllowed)
             {
                 _logger.LogInformation("User {UserId} is not allowed to sign in.", userId);
-                await _eventService.RaiseAsync(new UserLoginFailureEvent(request.Username ?? "Unknown user", userId, "User is not allowed to sign in.", clientId: request.ClientId)).ConfigureAwait(false);
+                await RaiseLoginFailureEventAsync(request, userId, "User is not allowed to sign in.").ConfigureAwait(false);
             }
             else
             {
                 _logger.LogInformation("Invalid credentials for user {UserId}.", userId);
-                await _eventService.RaiseAsync(new UserLoginFailureEvent(request.Username ?? "Unknown user", userId, "Invalid credentials.", clientId: request.ClientId)).ConfigureAwait(false);
+                await RaiseLoginFailureEventAsync(request, userId, "Invalid credentials.").ConfigureAwait(false);
             }
 
             throw new InvalidGrantException("The username/password couple is invalid.");
         }
+
+        private Task RaiseLoginFailureEventAsync(OpenIddictRequest request, string? userId, string error) =>
+            _eventService.RaiseAsync(new UserLoginFailureEvent(request.Username ?? "Unknown user", userId, error, clientId: request.ClientId));
 
         private async Task<ClaimsPrincipal> CreatePrincipalForPasswordFlowAsync(OpenIddictRequest openIddictRequest, UserWrapper<TUser, TId> user)
         {
