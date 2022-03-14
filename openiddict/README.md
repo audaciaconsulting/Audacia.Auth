@@ -47,6 +47,7 @@ For both new projects and IdentityServer4 replacement, here is a high-level chec
 - [ ] If access to the credentials used to the sign or encrypt the tokens is needed then the interfaces `ISigningCredentialsProvider` and `IEncryptionCredentialsProvider` respectively can be used
 - [ ] Generate a self-signed certificate to encrypt tokens (this is in addition to the certificate which should already be present to sign tokens)
    - This can be done by executing the [CreateTokenSigningCert.sh](https://dev.azure.com/audacia/Audacia/_git/Audacia.Build?path=/tools/security/certificates/CreateTokenSigningCert.sh) and [ConvertTokenSigningCertToPfx.sh](https://dev.azure.com/audacia/Audacia/_git/Audacia.Build?path=/tools/security/certificates/ConvertTokenSigningCertToPfx.sh) bash scripts
+   - The location of the certificates defaults to "CurrentUser", but this can also be set to "LocalMachine" using configuration (see [below](#configuration-in-appsettingsjson))
 - [ ] Modify your deployment pipeline to seed the database with the necessary OpenIddict configuration (see [here](#seeding-clients-and-scopes-in-the-database))
 
 ## Configuration in appsettings.json
@@ -60,6 +61,7 @@ If you are adding authentication to a new project, the easiest way to provide th
     "OpenIdConnectConfig": {
         "EncryptionCertificateThumbprint": "TBC",
         "SigningCertificateThumbprint": "TBC",
+        "CertificateStoreLocation": "", // Optional, defaults to "CurrentUser"; the other valid value is "LocalMachine"
         "Url": "https://localhost:44374",
         "ClientCredentialsClients": [
             {

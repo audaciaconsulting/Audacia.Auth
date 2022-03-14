@@ -26,6 +26,13 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
         public string? SigningCertificateThumbprint { get; set; }
 
         /// <summary>
+        /// Gets or sets the store location of the token signing and encryption certificates.
+        /// If set, must be one of the following values: "CurrentUser", "LocalMachine".
+        /// If not set, defaults to "CurrentUser".
+        /// </summary>
+        public string? CertificateStoreLocation { get; set; }
+
+        /// <summary>
         /// Gets or sets the base url for the OpenID Connect server.
         /// </summary>
         public Uri Url { get; set; } = null!;
