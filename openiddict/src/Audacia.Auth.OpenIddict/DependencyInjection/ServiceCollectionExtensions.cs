@@ -277,7 +277,7 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
 #pragma warning disable ACL1002 // Member or local function contains too many statements
         private static OpenIddictServerBuilder ConfigureSigningCredential(
             OpenIddictServerBuilder openIddictServerBuilder,
-            OpenIdConnectConfig identityServerConfig,
+            OpenIdConnectConfig openIdConnectConfig,
             IWebHostEnvironment hostingEnvironment)
 #pragma warning restore ACL1002 // Member or local function contains too many statements
         {
@@ -291,18 +291,18 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
                     .DisableAccessTokenEncryption();
             }
 
-            if (identityServerConfig.EncryptionCertificateThumbprint == identityServerConfig.SigningCertificateThumbprint)
+            if (openIdConnectConfig.EncryptionCertificateThumbprint == openIdConnectConfig.SigningCertificateThumbprint)
             {
                 throw new OpenIddictConfigurationException("The certificates used for token encryption and token signing should not be the same.");
             }
 
-            var encryptionCertificate = FindCertificate(identityServerConfig.EncryptionCertificateThumbprint);
+            var encryptionCertificate = FindCertificate(openIdConnectConfig.EncryptionCertificateThumbprint, openIdConnectConfig.CertificateStoreLocation);
             if (encryptionCertificate == null)
             {
                 throw new OpenIddictConfigurationException("Unable to load token encryption certificate");
             }
 
-            var signingCertificate = FindCertificate(identityServerConfig.SigningCertificateThumbprint);
+            var signingCertificate = FindCertificate(openIdConnectConfig.SigningCertificateThumbprint, openIdConnectConfig.CertificateStoreLocation);
             if (signingCertificate == null)
             {
                 throw new OpenIddictConfigurationException("Unable to load token signing certificate");
@@ -313,7 +313,7 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
                 .AddSigningCertificate(signingCertificate);
         }
 
-        private static X509Certificate2? FindCertificate(string? certificateThumbprint)
+        private static X509Certificate2? FindCertificate(string? certificateThumbprint, string? certificateStoreLocation)
         {
             if (certificateThumbprint == null)
             {
@@ -321,7 +321,7 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
             }
 
             X509Certificate2? certificate = null;
-            using (var certificateStore = new X509Store(StoreName.My, StoreLocation.CurrentUser))
+            using (var certificateStore = new X509Store(StoreName.My, certificateStoreLocation.ParseStoreLocation()))
             {
                 certificateStore.Open(OpenFlags.ReadOnly);
                 var certificateCollection = certificateStore.Certificates.Find(
