@@ -214,9 +214,9 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
 
             options.AllowRefreshTokenFlow();
 
-            if (openIdConnectConfig.CustomGrantTypes?.Any() == true)
+            if (openIdConnectConfig.CustomGrantTypeClients?.Any() == true)
             {
-                foreach (var grantType in openIdConnectConfig.CustomGrantTypes)
+                foreach (var grantType in openIdConnectConfig.CustomGrantTypeClients.Select(client => client.GrantType).Distinct())
                 {
                     options.AllowCustomFlow(grantType);
                 }
