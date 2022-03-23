@@ -54,6 +54,7 @@ namespace Audacia.Auth.OpenIddict.Seeding
             await RegisterAuthorizationCodeClientsAsync(_configuration.AuthorizationCodeClients).ConfigureAwait(false);
             await RegisterClientCredentialsClientsAsync(_configuration.ClientCredentialsClients).ConfigureAwait(false);
             await RegisterResourceOwnerPasswordClientsAsync(_configuration.ResourceOwnerPasswordClients).ConfigureAwait(false);
+            await RegisterCustomGrantTypeClientsAsync(_configuration.CustomGrantTypeClients).ConfigureAwait(false);
         }
 
         private async Task RegisterAuthorizationCodeClientsAsync(IEnumerable<AuthorizationCodeClient>? clients)
@@ -210,6 +211,61 @@ namespace Audacia.Auth.OpenIddict.Seeding
                 foreach (var scope in clientConfig.ClientScopes)
                 {
                     applicationClient.Permissions.Add(Permissions.Prefixes.Scope + scope);
+                }
+            }
+
+            return applicationClient;
+        }
+
+        private async Task RegisterCustomGrantTypeClientsAsync(IEnumerable<CustomGrantTypeClient>? clients)
+        {
+            if (clients == null)
+            {
+                return;
+            }
+
+            _logger.LogInformation("Registering custom grant type clients.");
+            foreach (var client in clients)
+            {
+                var applicationDescriptor = CreateCustomGrantTypeClient(client);
+                await SaveClientAsync(applicationDescriptor).ConfigureAwait(false);
+            }
+        }
+
+        private static OpenIddictApplicationDescriptor CreateCustomGrantTypeClient(CustomGrantTypeClient clientConfig)
+        {
+            var applicationClient = new OpenIddictApplicationDescriptor
+            {
+                ClientId = clientConfig.ClientId,
+                ClientSecret = clientConfig.ClientSecret,
+                ConsentType = ConsentTypes.Implicit,
+                Type = ClientTypes.Confidential,
+                Permissions =
+                {
+                    // Minimum requirement for a resource server
+                    Permissions.Endpoints.Introspection,
+                    // Required for resources that also interact with the identity server
+                    Permissions.Endpoints.Token,
+                    Permissions.Endpoints.Logout,
+                    Permissions.GrantTypes.RefreshToken,
+                    Permissions.Scopes.Profile
+                }
+            };
+
+            // Attach what client scopes can be inspected by this resource client, i.e. booking-api, finance-api
+            if (clientConfig.ClientScopes != null)
+            {
+                foreach (var scope in clientConfig.ClientScopes)
+                {
+                    applicationClient.Permissions.Add(Permissions.Prefixes.Scope + scope);
+                }
+            }
+
+            if (clientConfig.ClientUris != null)
+            {
+                foreach (var uri in clientConfig.ClientUris)
+                {
+                    applicationClient.RedirectUris.Add(uri);
                 }
             }
 

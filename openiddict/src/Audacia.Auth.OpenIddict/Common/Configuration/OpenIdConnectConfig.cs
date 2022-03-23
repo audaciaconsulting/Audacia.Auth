@@ -53,14 +53,14 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
         public IReadOnlyCollection<ResourceOwnerPasswordClient>? ResourceOwnerPasswordClients { get; set; }
 
         /// <summary>
+        /// Gets or sets the clients using a custom grant type supported by the Open ID Connect server.
+        /// </summary>
+        public IReadOnlyCollection<CustomGrantTypeClient>? CustomGrantTypeClients { get; set; }
+
+        /// <summary>
         /// Gets or sets the scopes to be registered for the Open ID Connect server.
         /// </summary>
         public IReadOnlyCollection<OpenIdConnectScope>? Scopes { get; set; }
-
-        /// <summary>
-        /// Gets or sets the custom grant types supported by the Open ID Connect server.
-        /// </summary>
-        public IReadOnlyCollection<string>? CustomGrantTypes { get; set; }
 
         /// <summary>
         /// Gets all configured clients.
