@@ -72,6 +72,7 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
                 return _clients ??= ClientCredentialsClients.EmptyIfNull().Cast<OpenIdConnectClientBase>()
                                 .Union(AuthorizationCodeClients.EmptyIfNull().Cast<OpenIdConnectClientBase>())
                                 .Union(ResourceOwnerPasswordClients.EmptyIfNull().Cast<OpenIdConnectClientBase>())
+                                .Union(CustomGrantTypeClients.EmptyIfNull().Cast<OpenIdConnectClientBase>())
                                 .ToList();
             }
         }
