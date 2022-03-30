@@ -12,7 +12,7 @@ namespace Audacia.Auth.OpenIddict.Token
         private readonly ClientCredentialsClaimPrincipalProvider _clientCredentialsClaimPrincipalProvider;
         private readonly PasswordClaimsPrincipalProvider<TUser, TId> _passwordClaimsPrincipalProvider;
         private readonly CodeExchangeClaimsPrincipalProvider<TUser> _codeExchangeClaimsPrincipalProvider;
-        private readonly CustomGrantTypeClaimsPrincipalProvider _customGrantTypeClaimsPrincipalProvider;
+        private readonly CustomGrantTypeClaimsPrincipalProvider<TUser> _customGrantTypeClaimsPrincipalProvider;
 
         /// <summary>
         /// Initializes an instance of <see cref="ClaimsPrincipalProviderFactory{TUser, TId}"/>.
@@ -25,7 +25,7 @@ namespace Audacia.Auth.OpenIddict.Token
             ClientCredentialsClaimPrincipalProvider clientCredentialsClaimPrincipalProvider,
             PasswordClaimsPrincipalProvider<TUser, TId> passwordClaimsPrincipalProvider,
             CodeExchangeClaimsPrincipalProvider<TUser> codeExchangeClaimsPrincipalProvider,
-            CustomGrantTypeClaimsPrincipalProvider customGrantTypeClaimsPrincipalProvider)
+            CustomGrantTypeClaimsPrincipalProvider<TUser> customGrantTypeClaimsPrincipalProvider)
         {
             _clientCredentialsClaimPrincipalProvider = clientCredentialsClaimPrincipalProvider;
             _passwordClaimsPrincipalProvider = passwordClaimsPrincipalProvider;

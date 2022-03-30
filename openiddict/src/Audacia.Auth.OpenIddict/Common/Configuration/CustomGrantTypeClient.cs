@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Audacia.Auth.OpenIddict.Common.Configuration
 {
@@ -22,5 +23,11 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
         /// Gets or sets the URLs that the client will be connecting from.
         /// </summary>
         public IReadOnlyCollection<Uri>? ClientUris { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type of client, i.e. "public" or "confidential"; default value is "confidential".
+        /// If the client is "confidential" then a <see cref="ClientSecret"/> must be set.
+        /// </summary>
+        public string ClientType { get; set; } = ClientTypes.Confidential;
     }
 }

@@ -61,14 +61,16 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
             where TId : IEquatable<TId> => services.AddTransient<IPostAuthenticateHandler<TUser, TId>, THandler>();
 
         /// <summary>
-        /// Adds the given <typeparamref name="T"/> to the dependency injection container
-        /// as an implementation of <see cref="ICustomGrantTypeClaimsPrincipalProvider"/>.
+        /// Adds the given <typeparamref name="TValidator"/> to the dependency injection container
+        /// as an implementation of <see cref="ICustomGrantTypeValidator{TUser}"/>.
         /// </summary>
-        /// <typeparam name="T">Type of the <see cref="ICustomGrantTypeClaimsPrincipalProvider"/> implementation.</typeparam>
-        /// <param name="services">The <see cref="IServiceCollection"/> instance to which to add the <typeparamref name="T"/>.</param>
+        /// <typeparam name="TValidator">Type of the <see cref="ICustomGrantTypeValidator{TUser}"/> implementation.</typeparam>
+        /// <typeparam name="TUser">The type of user.</typeparam>
+        /// <param name="services">The <see cref="IServiceCollection"/> instance to which to add the <typeparamref name="TValidator"/>.</param>
         /// <returns>The given <paramref name="services"/>.</returns>
-        public static IServiceCollection AddCustomGrantTypeProvider<T>(this IServiceCollection services)
-            where T : class, ICustomGrantTypeClaimsPrincipalProvider => services.AddTransient<ICustomGrantTypeClaimsPrincipalProvider, T>();
+        public static IServiceCollection AddCustomGrantTypeValidator<TValidator, TUser>(this IServiceCollection services)
+            where TValidator : class, ICustomGrantTypeValidator<TUser>
+            where TUser : class => services.AddTransient<ICustomGrantTypeValidator<TUser>, TValidator>();
 
         /// <summary>
         /// Adds the given <typeparamref name="T"/> to the dependency injection container
@@ -147,7 +149,7 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
                 .AddTransient<ClientCredentialsClaimPrincipalProvider>()
                 .AddTransient<PasswordClaimsPrincipalProvider<TUser, TId>>()
                 .AddTransient<CodeExchangeClaimsPrincipalProvider<TUser>>()
-                .AddTransient<CustomGrantTypeClaimsPrincipalProvider>()
+                .AddTransient<CustomGrantTypeClaimsPrincipalProvider<TUser>>()
                 .AddTransient<ISigningCredentialsProvider, DefaultCredentialsProvider>()
                 .AddTransient<IEncryptionCredentialsProvider, DefaultCredentialsProvider>()
                 .AddEventService<DefaultEventService>()

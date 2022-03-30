@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Audacia.Auth.OpenIddict.Common;
 using Audacia.Auth.OpenIddict.Common.Configuration;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
@@ -239,7 +240,7 @@ namespace Audacia.Auth.OpenIddict.Seeding
                 ClientId = clientConfig.ClientId,
                 ClientSecret = clientConfig.ClientSecret,
                 ConsentType = ConsentTypes.Implicit,
-                Type = ClientTypes.Confidential,
+                Type = clientConfig.ClientType,
                 Permissions =
                 {
                     // Minimum requirement for a resource server
@@ -248,7 +249,8 @@ namespace Audacia.Auth.OpenIddict.Seeding
                     Permissions.Endpoints.Token,
                     Permissions.Endpoints.Logout,
                     Permissions.GrantTypes.RefreshToken,
-                    Permissions.Scopes.Profile
+                    Permissions.Scopes.Profile,
+                    CustomPermissions.GrantType(clientConfig.GrantType)
                 }
             };
 

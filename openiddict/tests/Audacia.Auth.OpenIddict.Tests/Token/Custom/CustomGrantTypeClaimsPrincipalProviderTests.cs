@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Audacia.Auth.OpenIddict.Common;
 using Audacia.Auth.OpenIddict.Token;
 using Audacia.Auth.OpenIddict.Token.Custom;
 using FluentAssertions;
@@ -12,12 +13,19 @@ namespace Audacia.Auth.OpenIddict.Tests.Token.Custom
 {
     public class CustomGrantTypeClaimsPrincipalProviderTests
     {
+        private readonly Mock<IProfileService<DummyUser>> _profileServiceMock;
+
+        public CustomGrantTypeClaimsPrincipalProviderTests()
+        {
+            _profileServiceMock = new Mock<IProfileService<DummyUser>>();
+        }
+
         [Fact]
         public async Task Exception_when_no_grant_type()
         {
             var request = new OpenIddictRequest();
             request.GrantType = null;
-            var factory = new CustomGrantTypeClaimsPrincipalProvider(Enumerable.Empty<ICustomGrantTypeClaimsPrincipalProvider>());
+            var factory = new CustomGrantTypeClaimsPrincipalProvider<DummyUser>(Enumerable.Empty<ICustomGrantTypeValidator<DummyUser>>(), _profileServiceMock.Object);
 
             var action = async () => await factory.GetPrincipalAsync(request);
 
@@ -30,7 +38,7 @@ namespace Audacia.Auth.OpenIddict.Tests.Token.Custom
         {
             var request = new OpenIddictRequest();
             request.GrantType = "saml";
-            var factory = new CustomGrantTypeClaimsPrincipalProvider(Enumerable.Empty<ICustomGrantTypeClaimsPrincipalProvider>());
+            var factory = new CustomGrantTypeClaimsPrincipalProvider<DummyUser>(Enumerable.Empty<ICustomGrantTypeValidator<DummyUser>>(), _profileServiceMock.Object);
 
             var action = async () => await factory.GetPrincipalAsync(request);
 
@@ -45,14 +53,18 @@ namespace Audacia.Auth.OpenIddict.Tests.Token.Custom
             request.GrantType = "saml";
 
             var expectedPrincipal = new ClaimsPrincipal();
-            var mockProvider = new Mock<ICustomGrantTypeClaimsPrincipalProvider>();
+            var mockProvider = new Mock<ICustomGrantTypeValidator<DummyUser>>();
             mockProvider.SetupGet(provider => provider.GrantType).Returns(request.GrantType);
-            mockProvider.Setup(provider => provider.GetPrincipalAsync(request)).ReturnsAsync(expectedPrincipal);
-            var factory = new CustomGrantTypeClaimsPrincipalProvider(new[] { mockProvider.Object });
+            mockProvider.Setup(provider => provider.ValidateAsync(request)).ReturnsAsync(new CustomGrantTypeValidationResponse<DummyUser>(expectedPrincipal, new DummyUser()));
+            var factory = new CustomGrantTypeClaimsPrincipalProvider<DummyUser>(new[] { mockProvider.Object }, _profileServiceMock.Object);
 
             var actualPrincipal = await factory.GetPrincipalAsync(request);
 
             actualPrincipal.Should().Be(expectedPrincipal);
+        }
+
+        public class DummyUser
+        {
         }
     }
 }
