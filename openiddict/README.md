@@ -34,12 +34,13 @@ For both new projects and IdentityServer4 replacement, here is a high-level chec
       - `Audacia.Auth.OpenIddict.EntityFramework` (this is a thin wrapper around `OpenIddict.EntityFramework` that makes it easier to work with `int` or `Guid` primary keys for OpenIddict entities)
 - [ ] Install the `OpenIddict.EntityFrameworkCore` or `Audacia.Auth.OpenIddict.EntityFramework` package in your Entity Framework project
 - [ ] If you have a separate API project, install the `OpenIddict.AspNetCore` package there
-- [ ] Add Entity Framework (Core) setup (see [here](#entity-framework-and-entity-framework-core))
+- [ ] Specifying configuration in your `appsettings.json` file
+   - [ ] If replacing IdentityServer4, write code to convert existing IdentityServer configuration to an `OpenIdConnectConfig` object (see [here](#configuration-in-appsettingsjson))
+      - This must include adding scopes to the configuration so that they are registered in the database; this is an `OpenIdConnectScope` object that has
 - [ ] Add OpenIddict services (see [here](#register-openiddict-services))
+- [ ] Add Entity Framework (Core) setup (see [here](#entity-framework-and-entity-framework-core))
 - [ ] Register the OpenIddict controllers (see [here](#configure-mvc-controllers))
-- [ ] Change API authentication to use OpenIddict (see [here](#api-authentication))
-- [ ] If replacing IdentityServer4, write code to convert existing IdentityServer configuration to an `OpenIdConnectConfig` object (see [here](#configuration-in-appsettingsjson))
-   - This must include adding scopes to the configuration so that they are registered in the database; this is an `OpenIdConnectScope` object that has 
+- [ ] Change API authentication to use OpenIddict (see [here](#api-authentication)) 
 - [ ] Set some claim types in ASP.NET Core Identity setup (see [here](#aspnet-core-identity-configuration))
 - [ ] If a custom profile service and/or additional claims provider are required, implement using the information [here](#adding-additional-claims-to-tokens)
 - [ ] If raising or subscribing to events such as 'token issued' or 'user logged in' is required, see [here](#events)
@@ -176,6 +177,8 @@ protected override void OnModelCreating(DbModelBuilder builder)
     base.OnModelCreating(builder);
 }
 ```
+
+Note you will also need the using statement: `using Audacia.Auth.OpenIddict.EntityFramework.
 
 ## ASP.NET Core Identity Configuration
 
