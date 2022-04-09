@@ -123,7 +123,7 @@ OpenIddict saves issued tokens to the database, so to avoid that data building u
 
 For example, suppose your user type is `ApplicationUser` and the primary key of `ApplicationUser` is an `int`, and you are using `EntityFrameworkCore` as your ORM. If you are also using the built-in Quartz cleanup, registering the services would look something like this (without the Quartz cleanup the code would be identical, it would just call the `AddOpenIddict` method rather than `AddOpenIddictWithCleanup`):
 ```csharp
-services.AddOpenIddictWithCleanup<ApplicationUser, int>(options =>
+var openIddictBuilder = services.AddOpenIddictWithCleanup<ApplicationUser, int>(options =>
     {
         options
             .UseEntityFrameworkCore()
@@ -139,6 +139,11 @@ The additional parameters are:
 - The lambda expression `user => user.Id` is the `userIdGetter`, and just needs to be any delegate that returns the user Id
 - `openIdConnectConfig` is an instance of `OpenIdConnectConfig` (see appsettings.json section above)
 - `hostingEnvironment` is an instance of `IWebHostEnvironment`
+
+**IMPORTANT:** If you need to inspect the access token that OpenIddict issues in a client application (e.g. an Angular app) then you must disable access token encryption. This can be done by adding the following line of code after the call to `AddOpenIddict`/`AddOpenIddictWithCleanup`:
+```csharp
+openIddictBuilder.AddServer(options => options.DisableAccessTokenEncryption());
+```
 
 ## Entity Framework and Entity Framework Core
 
@@ -320,11 +325,14 @@ services
 
         options.AddAudiences(/*Client ID of the API*/);
 
-        // DON'T INCLUDE THIS SECTION IF OPENIDDICT IS HOSTED IN THE SAME WEB APP AS THE API
+        // IF OPENIDDICT IS HOSTED IN A SEPARATE 'IDENTITY' APP
         options
             .UseIntrospection()
+            // To allow the below, the API will need to be registered as a 'client credentials' client with OpenIddict if it isn't already
             .SetClientId(/*Client ID of the API*/)
             .SetClientSecret(/*Client secret of the API*/);
+        // ELSE IF OPENIDDICT IS HOSTED IN THE SAME WEB APP AS THE API
+        options.UseLocalServer();
 
         options.UseSystemNetHttp();
         options.UseAspNetCore();
