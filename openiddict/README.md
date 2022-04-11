@@ -34,12 +34,13 @@ For both new projects and IdentityServer4 replacement, here is a high-level chec
       - `Audacia.Auth.OpenIddict.EntityFramework` (this is a thin wrapper around `OpenIddict.EntityFramework` that makes it easier to work with `int` or `Guid` primary keys for OpenIddict entities)
 - [ ] Install the `OpenIddict.EntityFrameworkCore` or `Audacia.Auth.OpenIddict.EntityFramework` package in your Entity Framework project
 - [ ] If you have a separate API project, install the `OpenIddict.AspNetCore` package there
-- [ ] Add Entity Framework (Core) setup (see [here](#entity-framework-and-entity-framework-core))
+- [ ] Specifying configuration in your `appsettings.json` file
+   - [ ] If replacing IdentityServer4, write code to convert existing IdentityServer configuration to an `OpenIdConnectConfig` object (see [here](#configuration-in-appsettingsjson))
+      - This must include adding scopes to the configuration so that they are registered in the database; this is an `OpenIdConnectScope` object that has
 - [ ] Add OpenIddict services (see [here](#register-openiddict-services))
+- [ ] Add Entity Framework (Core) setup (see [here](#entity-framework-and-entity-framework-core))
 - [ ] Register the OpenIddict controllers (see [here](#configure-mvc-controllers))
-- [ ] Change API authentication to use OpenIddict (see [here](#api-authentication))
-- [ ] If replacing IdentityServer4, write code to convert existing IdentityServer configuration to an `OpenIdConnectConfig` object (see [here](#configuration-in-appsettingsjson))
-   - This must include adding scopes to the configuration so that they are registered in the database; this is an `OpenIdConnectScope` object that has 
+- [ ] Change API authentication to use OpenIddict (see [here](#api-authentication)) 
 - [ ] Set some claim types in ASP.NET Core Identity setup (see [here](#aspnet-core-identity-configuration))
 - [ ] If a custom profile service and/or additional claims provider are required, implement using the information [here](#adding-additional-claims-to-tokens)
 - [ ] If raising or subscribing to events such as 'token issued' or 'user logged in' is required, see [here](#events)
@@ -122,7 +123,7 @@ OpenIddict saves issued tokens to the database, so to avoid that data building u
 
 For example, suppose your user type is `ApplicationUser` and the primary key of `ApplicationUser` is an `int`, and you are using `EntityFrameworkCore` as your ORM. If you are also using the built-in Quartz cleanup, registering the services would look something like this (without the Quartz cleanup the code would be identical, it would just call the `AddOpenIddict` method rather than `AddOpenIddictWithCleanup`):
 ```csharp
-services.AddOpenIddictWithCleanup<ApplicationUser, int>(options =>
+var openIddictBuilder = services.AddOpenIddictWithCleanup<ApplicationUser, int>(options =>
     {
         options
             .UseEntityFrameworkCore()
@@ -138,6 +139,11 @@ The additional parameters are:
 - The lambda expression `user => user.Id` is the `userIdGetter`, and just needs to be any delegate that returns the user Id
 - `openIdConnectConfig` is an instance of `OpenIdConnectConfig` (see appsettings.json section above)
 - `hostingEnvironment` is an instance of `IWebHostEnvironment`
+
+**IMPORTANT:** If you need to inspect the access token that OpenIddict issues in a client application (e.g. an Angular app) then you must disable access token encryption. This can be done by adding the following line of code after the call to `AddOpenIddict`/`AddOpenIddictWithCleanup`:
+```csharp
+openIddictBuilder.AddServer(options => options.DisableAccessTokenEncryption());
+```
 
 ## Entity Framework and Entity Framework Core
 
@@ -176,6 +182,8 @@ protected override void OnModelCreating(DbModelBuilder builder)
     base.OnModelCreating(builder);
 }
 ```
+
+Note you will also need the using statement: `using Audacia.Auth.OpenIddict.EntityFramework.
 
 ## ASP.NET Core Identity Configuration
 
@@ -317,11 +325,14 @@ services
 
         options.AddAudiences(/*Client ID of the API*/);
 
-        // DON'T INCLUDE THIS SECTION IF OPENIDDICT IS HOSTED IN THE SAME WEB APP AS THE API
+        // IF OPENIDDICT IS HOSTED IN A SEPARATE 'IDENTITY' APP
         options
             .UseIntrospection()
+            // To allow the below, the API will need to be registered as a 'client credentials' client with OpenIddict if it isn't already
             .SetClientId(/*Client ID of the API*/)
             .SetClientSecret(/*Client secret of the API*/);
+        // ELSE IF OPENIDDICT IS HOSTED IN THE SAME WEB APP AS THE API
+        options.UseLocalServer();
 
         options.UseSystemNetHttp();
         options.UseAspNetCore();
