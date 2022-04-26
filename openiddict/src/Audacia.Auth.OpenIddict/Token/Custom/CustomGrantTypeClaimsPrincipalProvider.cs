@@ -55,9 +55,15 @@ namespace Audacia.Auth.OpenIddict.Token.Custom
                 throw new InvalidGrantException($"No principal could be created for the grant type '{openIddictRequest.GrantType}'.");
             }
 
-            validationResponse.Principal.AddClaims(await _profileService.GetClaimsAsync(validationResponse.User, validationResponse.Principal).ConfigureAwait(false));
+            await SetAdditionalClaimsPrincipalPropertiesAsync(openIddictRequest, validationResponse).ConfigureAwait(false);
 
             return validationResponse.Principal;
+        }
+
+        private async Task SetAdditionalClaimsPrincipalPropertiesAsync(OpenIddictRequest openIddictRequest, CustomGrantTypeValidationResponse<TUser> validationResponse)
+        {
+            validationResponse.Principal.SetScopes(openIddictRequest.GetScopes());
+            validationResponse.Principal.AddClaims(await _profileService.GetClaimsAsync(validationResponse.User, validationResponse.Principal).ConfigureAwait(false));
         }
     }
 }
