@@ -48,6 +48,7 @@ namespace Audacia.Auth.OpenIddict.Seeding
             await RegisterApplicationsAsync().ConfigureAwait(false);
             await RegisterScopesAsync().ConfigureAwait(false);
             await CheckForDeletedApplicationsAsync().ConfigureAwait(false);
+            await CheckForDeletedScopesAsync().ConfigureAwait(false);
         }
 
         private async Task RegisterApplicationsAsync()
@@ -365,6 +366,33 @@ namespace Audacia.Auth.OpenIddict.Seeding
             }
 
             return deletedApplications;
+        }
+
+        private async ValueTask CheckForDeletedScopesAsync()
+        {
+            _logger.LogInformation("Checking for deleted scopes.");
+            var deletedScopes = await GetDeletedScopesAsync().ConfigureAwait(false);
+            foreach (var scope in deletedScopes)
+            {
+                _logger.LogInformation("Deleting scope '{Scope}'.", scope);
+                await _scopeManager.DeleteAsync(scope).ConfigureAwait(false);
+            }
+        }
+
+        private async Task<IEnumerable<object>> GetDeletedScopesAsync()
+        {
+            var deletedScopes = new List<object>();
+            await foreach (var scope in _scopeManager.ListAsync())
+            {
+                var scopeDescriptor = new OpenIddictScopeDescriptor();
+                await _scopeManager.PopulateAsync(scopeDescriptor, scope).ConfigureAwait(false);
+                if (_configuration.Scopes?.All(configScope => configScope.Name != scopeDescriptor.Name) == true)
+                {
+                    deletedScopes.Add(scope);
+                }
+            }
+
+            return deletedScopes;
         }
     }
 }
