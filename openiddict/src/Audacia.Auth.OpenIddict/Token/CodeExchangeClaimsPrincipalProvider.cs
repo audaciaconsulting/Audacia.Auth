@@ -67,7 +67,12 @@ namespace Audacia.Auth.OpenIddict.Token
                 throw new InvalidGrantException("The user is no longer allowed to sign in.");
             }
 
-            principal.AddClaims(await _profileService.GetClaimsAsync(user, principal).ConfigureAwait(false));
+            // When refreshing a token, the additional claims from the profile service are already in the ClaimsPrincipal
+            // Presumably they have come via the refresh token, but regardless they don't need to be added again
+            if (!openIddictRequest.IsRefreshTokenGrantType())
+            {
+                principal.AddClaims(await _profileService.GetClaimsAsync(user, principal).ConfigureAwait(false));
+            }
 
             return principal;
         }
