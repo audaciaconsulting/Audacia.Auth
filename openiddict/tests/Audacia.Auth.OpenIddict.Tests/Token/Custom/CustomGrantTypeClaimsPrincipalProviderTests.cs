@@ -52,7 +52,7 @@ namespace Audacia.Auth.OpenIddict.Tests.Token.Custom
             var request = new OpenIddictRequest();
             request.GrantType = "saml";
 
-            var expectedPrincipal = new ClaimsPrincipal();
+            var expectedPrincipal = new ClaimsPrincipal(new ClaimsIdentity());
             var mockProvider = new Mock<ICustomGrantTypeValidator<DummyUser>>();
             mockProvider.SetupGet(provider => provider.GrantType).Returns(request.GrantType);
             mockProvider.Setup(provider => provider.ValidateAsync(request)).ReturnsAsync(new CustomGrantTypeValidationResponse<DummyUser>(expectedPrincipal, new DummyUser()));
