@@ -190,6 +190,44 @@ protected override void OnModelCreating(DbModelBuilder builder)
 
 Note you will also need the using statement: `using Audacia.Auth.OpenIddict.EntityFramework`.
 
+## Configure MVC Controllers
+
+The controllers that handle the OpenID Connect endpoints are generic (on the User type and the User's primary key type), which means they must be specifically registered with ASP.NET Core in order to be discovered.
+
+This can be achieved by calling an extension method on `IMvcBuilder`, providing the necessary generic parameters. This will usually be as a method call chained on the end of a call to `AddControllersWithViews()`. For example, suppose your user type is `ApplicationUser` and the primary key of `ApplicationUser` is an `int`:
+```csharp
+services
+    .AddControllersWithViews()
+    .ConfigureOpenIddict<ApplicationUser, int>();
+```
+
+## API Authentication
+
+Any API must use OpenIddict to validate access tokens. This can be achieved using the code below (where `services` is an instance of `IServiceCollection`). If you are replacing `IdentityServer4` then this will likely replace a call to `AddIdentityServerAuthentication`.
+
+```csharp
+services
+    .AddOpenIddict()
+    .AddValidation(options =>
+    {
+        options.SetIssuer(/*Identity app url*/);
+
+        options.AddAudiences(/*Client ID of the API*/);
+
+        // IF OPENIDDICT IS HOSTED IN A SEPARATE 'IDENTITY' APP
+        options
+            .UseIntrospection()
+            // To allow the below, the API will need to be registered as a 'client credentials' client with OpenIddict if it isn't already
+            .SetClientId(/*Client ID of the API*/)
+            .SetClientSecret(/*Client secret of the API*/);
+        // ELSE IF OPENIDDICT IS HOSTED IN THE SAME WEB APP AS THE API
+        options.UseLocalServer();
+
+        options.UseSystemNetHttp();
+        options.UseAspNetCore();
+    });
+```
+
 ## ASP.NET Core Identity Configuration
 
 Some claim types must be set in the ASP.NET Core Identity configuration as follows:
@@ -203,17 +241,6 @@ services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
     options.ClaimsIdentity.RoleClaimType = "role";
     // More code here....
 });
-```
-
-## Configure MVC Controllers
-
-The controllers that handle the OpenID Connect endpoints are generic (on the User type and the User's primary key type), which means they must be specifically registered with ASP.NET Core in order to be discovered.
-
-This can be achieved by calling an extension method on `IMvcBuilder`, providing the necessary generic parameters. This will usually be as a method call chained on the end of a call to `AddControllersWithViews()`. For example, suppose your user type is `ApplicationUser` and the primary key of `ApplicationUser` is an `int`:
-```csharp
-services
-    .AddControllersWithViews()
-    .ConfigureOpenIddict<ApplicationUser, int>();
 ```
 
 ## Adding Additional Claims to Tokens
@@ -315,33 +342,6 @@ public class SamlClaimsPrincipalProvider : ICustomGrantTypeClaimsPrincipalProvid
 The implementing class must also be registered with the dependency injection system as follows (where `services` is an instance of `IServiceCollection`):
 ```csharp
 services.AddCustomGrantTypeProvider<SamlClaimsPrincipalProvider>();
-```
-
-## API Authentication
-
-Any API must use OpenIddict to validate access tokens. This can be achieved using the code below (where `services` is an instance of `IServiceCollection`). If you are replacing `IdentityServer4` then this will likely replace a call to `AddIdentityServerAuthentication`.
-
-```csharp
-services
-    .AddOpenIddict()
-    .AddValidation(options =>
-    {
-        options.SetIssuer(/*Identity app url*/);
-
-        options.AddAudiences(/*Client ID of the API*/);
-
-        // IF OPENIDDICT IS HOSTED IN A SEPARATE 'IDENTITY' APP
-        options
-            .UseIntrospection()
-            // To allow the below, the API will need to be registered as a 'client credentials' client with OpenIddict if it isn't already
-            .SetClientId(/*Client ID of the API*/)
-            .SetClientSecret(/*Client secret of the API*/);
-        // ELSE IF OPENIDDICT IS HOSTED IN THE SAME WEB APP AS THE API
-        options.UseLocalServer();
-
-        options.UseSystemNetHttp();
-        options.UseAspNetCore();
-    });
 ```
 
 ## Seeding Clients and Scopes in the Database
