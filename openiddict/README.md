@@ -41,14 +41,15 @@ For both new projects and IdentityServer4 replacement, here is a high-level chec
 - [ ] Add Entity Framework (Core) setup (see [here](#entity-framework-and-entity-framework-core))
 - [ ] Register the OpenIddict controllers (see [here](#configure-mvc-controllers))
 - [ ] Change API authentication to use OpenIddict (see [here](#api-authentication)) 
-- [ ] Set some claim types in ASP.NET Core Identity setup (see [here](#aspnet-core-identity-configuration))
+- [ ] Set some claim types in ASP.NET Core Identity setup (see [here](#asp.net-core-identity-configuration))
 - [ ] If a custom profile service and/or additional claims provider are required, implement using the information [here](#adding-additional-claims-to-tokens)
 - [ ] If raising or subscribing to events such as 'token issued' or 'user logged in' is required, see [here](#events)
 - [ ] If support for custom grant types (e.g. SAML) is required, see [here](#custom-grant-type-support)
 - [ ] If access to the credentials used to the sign or encrypt the tokens is needed then the interfaces `ISigningCredentialsProvider` and `IEncryptionCredentialsProvider` respectively can be used
 - [ ] Generate a self-signed certificate to encrypt tokens (this is in addition to the certificate which should already be present to sign tokens)
    - This can be done by executing the [CreateTokenSigningCert.sh](https://dev.azure.com/audacia/Audacia/_git/Audacia.Build?path=/tools/security/certificates/CreateTokenSigningCert.sh) and [ConvertTokenSigningCertToPfx.sh](https://dev.azure.com/audacia/Audacia/_git/Audacia.Build?path=/tools/security/certificates/ConvertTokenSigningCertToPfx.sh) bash scripts
-   - The location of the certificates defaults to "CurrentUser", but this can also be set to "LocalMachine" using configuration (see [below](#configuration-in-appsettingsjson))
+   - The location of the certificates defaults to "CurrentUser", but this can also be set to "LocalMachine" using configuration (see [below](#configuration-in-appsettings.json))
+   - Use the thumbprints of these certificates in the configuration (see [below](#configuration-in-appsettings.json)).
 - [ ] Modify your deployment pipeline to seed the database with the necessary OpenIddict configuration (see [here](#seeding-clients-and-scopes-in-the-database))
 
 ## Configuration in appsettings.json
@@ -60,8 +61,8 @@ If you are adding authentication to a new project, the easiest way to provide th
 ```json
 {
     "OpenIdConnectConfig": {
-        "EncryptionCertificateThumbprint": "TBC",
-        "SigningCertificateThumbprint": "TBC",
+        "EncryptionCertificateThumbprint": "TBC", // use thumbprint from self-signed certificate you generated
+        "SigningCertificateThumbprint": "TBC", // use thumbprint from self-signed certificate you generated
         "CertificateStoreLocation": "", // Optional, defaults to "CurrentUser"; the other valid value is "LocalMachine"
         "Url": "https://localhost:44374",
         "ClientCredentialsClients": [
@@ -140,6 +141,10 @@ The additional parameters are:
 - `openIdConnectConfig` is an instance of `OpenIdConnectConfig` (see appsettings.json section above)
 - `hostingEnvironment` is an instance of `IWebHostEnvironment`
 
+This should replace `services.AddIdentityServer` if you are replacing Identity Server.
+
+If using EF6, the call to `ReplaceDefaultEntities()` should not have a type parameter. Instead, include `using Audacia.Auth.OpenIddict.EntityFramework.IntKey;` or `using Audacia.Auth.OpenIddict.EntityFramework.GuidKey;` to control the type of the primary key.
+
 **IMPORTANT:** If you need to inspect the access token that OpenIddict issues in a client application (e.g. an Angular app) then you must disable access token encryption. This can be done by adding the following line of code after the call to `AddOpenIddict`/`AddOpenIddictWithCleanup`:
 ```csharp
 openIddictBuilder.AddServer(options => options.DisableAccessTokenEncryption());
@@ -183,7 +188,7 @@ protected override void OnModelCreating(DbModelBuilder builder)
 }
 ```
 
-Note you will also need the using statement: `using Audacia.Auth.OpenIddict.EntityFramework.
+Note you will also need the using statement: `using Audacia.Auth.OpenIddict.EntityFramework`.
 
 ## ASP.NET Core Identity Configuration
 
@@ -217,19 +222,19 @@ If you require any custom claims beyond the standard ones issued there are two m
 
 ### Additional Claims Provider
 
-The `IAdditionalClaimsProvider<TUser, TKey>` interface is designed to provide claims that should be added to tokens based on the information present in the authenticated user (i.e. in the `TUser` instance). This can be done by either:
-- Deriving from the `DefaultAdditionalClaimsProvider<TUser, TKey>` base class and overriding the `CustomClaimFactories` property
-- Implementing the `IAdditionalClaimsProvider<TUser, TKey>` interface (if you don't want the claims that `DefaultAdditionalClaimsProvider<TUser, TKey>` adds, which is currently just `email`)
+The `IAdditionalClaimsProvider<TUser>` interface is designed to provide claims that should be added to tokens based on the information present in the authenticated user (i.e. in the `TUser` instance). This can be done by either:
+- Deriving from the `DefaultAdditionalClaimsProvider<TUser>` base class and overriding the `CustomClaimFactories` property
+- Implementing the `IAdditionalClaimsProvider<TUser>` interface (if you don't want the claims that `DefaultAdditionalClaimsProvider<TUser>` adds, which is currently just `email`)
 
 ### Profile Service
 
-The `Audacia.Auth.OpenIddict` library also provides an `IProfileService<TUser, TKey>` interface, which performs essentially the same role as the `IProfileService` interface that is part of IdentityServer4. If you need to perform logic or make calls to a database or external API, the `GetClaimsAsync` method of `IProfileService<TUser, TKey>` is the appropriate place for this.
+The `Audacia.Auth.OpenIddict` library also provides an `IProfileService<TUser>` interface, which performs essentially the same role as the `IProfileService` interface that is part of IdentityServer4. If you need to perform logic or make calls to a database or external API, the `GetClaimsAsync` method of `IProfileService<TUser>` is the appropriate place for this.
 
-The provided implementation of `IProfileService<TUser, TKey>`, `DefaultProfileService<TUser, TKey>`, already adds the claims from `IAdditionalClaimsProvider<TUser, TKey>` so you can derive from this base class rather than implement the interface directly.
+The provided implementation of `IProfileService<TUser>`, `DefaultProfileService<TUser>`, already adds the claims from `IAdditionalClaimsProvider<TUser>` so you can derive from this base class rather than implement the interface directly.
 
 An example implementation might be:
 ```csharp
-public class CustomProfileService : DefaultProfileService<ApplicationUser, int>
+public class CustomProfileService : DefaultProfileService<ApplicationUser>
 {
     public override async Task<IEnumerable<Claim>> GetClaimsAsync(ApplicationUser user, ClaimsPrincipal claimsPrincipal)
     {
