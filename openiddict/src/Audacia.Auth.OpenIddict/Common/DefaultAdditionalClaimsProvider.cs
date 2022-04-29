@@ -11,7 +11,7 @@ namespace Audacia.Auth.OpenIddict.Common
     /// </summary>
     /// <typeparam name="TUser">The user type.</typeparam>
     [SuppressMessage("Performance", "CA1812:Avoid uninstantiated internal classes", Justification = "Registered in dependency injection.")]
-    internal class DefaultAdditionalClaimsProvider<TUser> : IAdditionalClaimsProvider<TUser>
+    public class DefaultAdditionalClaimsProvider<TUser> : IAdditionalClaimsProvider<TUser>
         where TUser : class
     {
         /// <inheritdoc />
