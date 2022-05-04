@@ -249,9 +249,7 @@ If you require any custom claims beyond the standard ones issued there are two m
 
 ### Additional Claims Provider
 
-The `IAdditionalClaimsProvider<TUser>` interface is designed to provide claims that should be added to tokens based on the information present in the authenticated user (i.e. in the `TUser` instance). This can be done by either:
-- Deriving from the `DefaultAdditionalClaimsProvider<TUser>` base class and overriding the `CustomClaimFactories` property
-- Implementing the `IAdditionalClaimsProvider<TUser>` interface (if you don't want the claims that `DefaultAdditionalClaimsProvider<TUser>` adds, which is currently just `email`)
+The `IAdditionalClaimsProvider<TUser>` interface is designed to provide claims that should be added to tokens based on the information present in the authenticated user (i.e. in the `TUser` instance). This can be done by implementing the `IAdditionalClaimsProvider<TUser>` interface.
 
 ### Profile Service
 
