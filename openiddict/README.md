@@ -357,7 +357,7 @@ if (environment.IsDevelopment())
 In a deployed environment the seeding should be done as part of the deployment pipeline. There are steps in the `Audacia.Build` repo to perform the seeding via a custom .NET tool. Provided you are using the standard OpenIddict entities and managers with either EF Core or EF 6, you can use the steps in either `openiddict-seeding-efcore.yaml` or `openiddict-seeding-ef6.yaml`. With the template functionality available in Azure Pipelines YAML, for EF Core the YAML could look something like this:
 ```yaml
 steps:
-  - template: /steps/deploy/openiddict-seeding-efcore.yaml@templates
+  - template: /src/deployment/openiddict/tasks/openiddict-seeding-efcore.yaml@templates
     parameters:
       toolVersion: 'x.x.x.x' # Specify the version of Audacia.Auth.OpenIddict that you are targeting
       identityProjectBasePath: '$(Pipeline.Workspace)/$(Build.DefinitionName)/MyApp.Identity' # The path to the identity app artifact
