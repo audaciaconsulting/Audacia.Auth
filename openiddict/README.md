@@ -34,9 +34,8 @@ For both new projects and IdentityServer4 replacement, here is a high-level chec
       - `Audacia.Auth.OpenIddict.EntityFramework` (this is a thin wrapper around `OpenIddict.EntityFramework` that makes it easier to work with `int` or `Guid` primary keys for OpenIddict entities)
 - [ ] Install the `OpenIddict.EntityFrameworkCore` or `Audacia.Auth.OpenIddict.EntityFramework` package in your Entity Framework project
 - [ ] If you have a separate API project, install the `OpenIddict.AspNetCore` package there
-- [ ] Specifying configuration in your `appsettings.json` file
-   - [ ] If replacing IdentityServer4, write code to convert existing IdentityServer configuration to an `OpenIdConnectConfig` object (see [here](#configuration-in-appsettingsjson))
-      - This must include adding scopes to the configuration so that they are registered in the database; this is an `OpenIdConnectScope` object that has
+- [ ] Specifying configuration in your `appsettings.json` file (see [here](#configuration-in-appsettings.json))
+   - [ ] If replacing IdentityServer4, write code to convert existing IdentityServer configuration to an `OpenIdConnectConfig` object (see [here](#configuration-in-appsettings.json))
 - [ ] Add OpenIddict services (see [here](#register-openiddict-services))
 - [ ] Add Entity Framework (Core) setup (see [here](#entity-framework-and-entity-framework-core))
 - [ ] Register the OpenIddict controllers (see [here](#configure-mvc-controllers))
@@ -56,14 +55,37 @@ For both new projects and IdentityServer4 replacement, here is a high-level chec
 
 The `Audacia.Auth.OpenIddict` library uses a configuration object of type `OpenIdConnectConfig` (defined in the `Audacia.Auth.OpenIddict.Common.Configuration` namespace).
 
-If you are adding authentication to a new project, the easiest way to provide this object is by defining it in the appsettings.json file (example below). However if you are replacing IdentityServer4 in an existing project then it is generally simpler to leave the configuration file as-is and to convert from the existing structure to `OpenIdConnectConfig` in code. If you are seeding configuration data in your deployment pipeline, as described [here](#seeding-clients-and-scopes-in-the-database), then you will need to provide an implementation of `IOpenIdConnectConfigMapper` which should contain the conversion code.
+If you are adding authentication to a new project, the easiest way to provide this object is by defining it in the appsettings.json file (example below). However if you are replacing IdentityServer4 in an existing project then it is generally simpler to leave the configuration file as-is and to convert from the existing structure to `OpenIdConnectConfig` in code. If you are seeding configuration data in your deployment pipeline, as described [here](#seeding-clients-and-scopes-in-the-database), and are converting the config from an existing structure, then you will need to provide an implementation of `IOpenIdConnectConfigMapper` which should contain the conversion code.
 
+The structure of the config is as follows:
+- `EncryptionCertificateThumbprint`: The thumbprint of the self-signed certificate that will be used to encrypt tokens; note this is not required when developing locally, and when set it must be a different certificate to the one used for signing.
+- `SigningCertificateThumbprint`: The thumbprint of the self-signed certificate that will be used to sign tokens; note this is not required when developing locally, and when set it must be a different certificate to the one used for encryption.
+- `CertificateStoreLocation`: Optional, defaults to "CurrentUser"; the other valid value is "LocalMachine":
+    - Generally speaking you should use "CurrentUser" (or omit entirely) if deploying to Azure App Services, and use "LocalMachine" if deploying to IIS.
+- `Url`: The base url of the Identity app.
+- `ClientCredentialsClients`: Clients that will use the Client Credentials flow; this is typically APIs and other back-end applications that don't need to obtain tokens on behalf of a user.
+- `AuthorizationCodeClients`: Clients that will use the Authorization Code (with PKCE) flow; this will generally be any UI-based application (e.g. web app, mobile app).
+- `ResourceOwnerPasswordClients`: Clients that will use the Resource Owner Password Credentials flow; this should be restricted to test automation clients (e.g. API testing or security testing).
+- `Scopes`: Scopes define the resources (usually APIs) that can be authenticated with tokens issued by the OpenIddict service:
+    - Each scope has a `Name` and a collection of `Resources`
+    - The `Name` is just a unique identifier for the scope
+    - The `Resources` are a set of clients that the scope grants access to; the values themselves should be the `ClientId` of the client to be accessed
+
+Within each client configuration object, the following properties can be set:
+- `ClientId`: A unique identifier for the client.
+- `ClientSecret`: This is effectively the password for the client; it is only required for Client Credentials and Resource Owner Password Credentials clients.
+- `ClientScopes`: The scopes to which the client has access; each scope should match the `Name` of an item in the `Scopes` collection.
+- `AccessTokenLifetime`: Optionally sets a custom access token lifetime.
+- `BaseUrl`: The base url of the client app _(applies to Authorization Code Clients only)_.
+- `RedirectUris`: The set of urls within the client app to which OpenIddict is allowed to redirect _(applies to Authorization Code Clients only)_.
+
+An example config section is:
 ```json
 {
     "OpenIdConnectConfig": {
-        "EncryptionCertificateThumbprint": "TBC", // use thumbprint from self-signed certificate you generated
-        "SigningCertificateThumbprint": "TBC", // use thumbprint from self-signed certificate you generated
-        "CertificateStoreLocation": "", // Optional, defaults to "CurrentUser"; the other valid value is "LocalMachine"
+        "EncryptionCertificateThumbprint": "TBC",
+        "SigningCertificateThumbprint": "TBC",
+        "CertificateStoreLocation": "",
         "Url": "https://localhost:44374",
         "ClientCredentialsClients": [
             {
@@ -153,6 +175,8 @@ openIddictBuilder.AddServer(options => options.DisableAccessTokenEncryption());
 ## Entity Framework and Entity Framework Core
 
 OpenIddict must be registered with both Entity Framework and Entity Framework Core. The relevant methods are from OpenIddict libraries: `OpenIddict.EntityFrameworkCore` and `OpenIddict.EntityFramework`.
+
+**It is _strongly_ recommended that you create a separate database context for the OpenIddict entities.**
 
 ### Entity Framework Core
 
