@@ -386,7 +386,7 @@ services.AddCustomGrantTypeProvider<SamlClaimsPrincipalProvider>();
 
 ### Accessing Signing and Encryption Credentials - ___optional___
 
-If access to the credentials, e.g. certificates, used to the sign and/or encrypt the tokens is needed then the interfaces `ISigningCredentialsProvider` and `IEncryptionCredentialsProvider` respectively can be used. They are automatically registered with the dependency injection systemso will be injected anywhere they are declared as a dependency.
+If access to the credentials, e.g. certificates, used to the sign and/or encrypt the tokens is needed then the interfaces `ISigningCredentialsProvider` and `IEncryptionCredentialsProvider` respectively can be used. They are automatically registered with the dependency injection system so will be injected anywhere they are declared as a dependency.
 
 ### EF Migrations
 
