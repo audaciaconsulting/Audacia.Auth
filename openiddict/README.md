@@ -216,7 +216,7 @@ This should replace `services.AddIdentityServer()` if you are replacing Identity
 
 If using EF6, the call to `ReplaceDefaultEntities()` should not have a type parameter. Instead, include `using Audacia.Auth.OpenIddict.EntityFramework.IntKey;` or `using Audacia.Auth.OpenIddict.EntityFramework.GuidKey;` to control the type of the primary key. Without either of these `using` statements, a `string` primary key is assumed.
 
-**IMPORTANT:** If you need to inspect the access token that OpenIddict issues in a client application (e.g. an Angular app) then you must disable access token encryption. This can be done by adding the following line of code after the call to `AddOpenIddict`/`AddOpenIddictWithCleanup`:
+**IMPORTANT:** If you need to inspect the access token that OpenIddict issues in a client application (e.g. an Angular app) then you must disable access token encryption. You would typically only need to do this if you need access to the claims within the token in the UI, and there is no other way of obtaining this information (e.g. by calling an authenticated 'permissions' endpoint). If you do need to disable access token encryption this can be done by adding the following line of code after the call to `AddOpenIddict`/`AddOpenIddictWithCleanup`:
 ```csharp
 openIddictBuilder.AddServer(options => options.DisableAccessTokenEncryption());
 ```
