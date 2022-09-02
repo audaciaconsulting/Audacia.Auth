@@ -269,11 +269,15 @@ If you require any custom claims beyond the standard ones issued there are two m
 
 The `IAdditionalClaimsProvider<TUser>` interface is designed to provide claims that should be added to tokens based on the information present in the authenticated user (i.e. in the `TUser` instance). This can be done by implementing the `IAdditionalClaimsProvider<TUser>` interface.
 
+You can register your `IAdditionalClaimsProvider<TUser>` implementation with the dependency injection system by calling the `IServiceCollection` extension method `AddAdditionalClaimsProvider<TProvider, TUser>()`. **Note that a custom additional claims provider must be added after the call to `AddOpenIddict`/`AddOpenIddictWithCleanup` otherwise it will get overwritten with a default implementation.**
+
 #### Profile Service
 
 The `Audacia.Auth.OpenIddict` library also provides an `IProfileService<TUser>` interface, which performs essentially the same role as the `IProfileService` interface that is part of IdentityServer4. If you need to perform logic or make calls to a database or external API, the `GetClaimsAsync` method of `IProfileService<TUser>` is the appropriate place for this.
 
 The provided implementation of `IProfileService<TUser>`, `DefaultProfileService<TUser>`, already adds the claims from `IAdditionalClaimsProvider<TUser>` so you can derive from this base class rather than implement the interface directly.
+
+You can register your `IProfileService<TUser>` implementation with the dependency injection system by calling the `IServiceCollection` extension method `AddProfileService<TService, TUser>()`. **Note that a custom profile service must be added after the call to `AddOpenIddict`/`AddOpenIddictWithCleanup` otherwise it will get overwritten with the default implementation.**
 
 An example implementation might be:
 ```csharp
