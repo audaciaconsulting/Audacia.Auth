@@ -156,7 +156,7 @@ In Entity Framework Core the registration could look something like this (where 
 services.AddDbContext<DatabaseContext>(options =>
 {
     options
-        .UseSqlServer()
+        .UseSqlServer(/* Add connection string here */)
         .UseOpenIddict<int>();
 });
 ```
@@ -446,12 +446,12 @@ Install the following NuGet packages in each API project:
 Any API must use OpenIddict to validate access tokens. This can be achieved using the code below (where `services` is an instance of `IServiceCollection`). This code should replace any existing call to `AddAuthentication()`, and if you are replacing `IdentityServer4`, `AddIdentityServerAuthentication()`. Note the slight difference below depending on whether the Identity app is hosted alongside the API or as a standalone application.
 
 ```csharp
+services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+});
 services
-    .AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
-    })
     .AddOpenIddict()
     .AddValidation(options =>
     {
