@@ -80,7 +80,7 @@ The structure of the config is as follows:
 
 Within each client configuration object, the following properties can be set:
 - `ClientId`: A unique identifier for the client.
-- `ClientSecret`: This is effectively the password for the client; it is only required for Client Credentials and Resource Owner Password Credentials clients.
+- `ClientSecret`: This is effectively the password for the client; it is only required for Client Credentials and Resource Owner Password Credentials clients. Note: This is not the value that gets stored in the ClientSecret column in the database. The ClientSecret stored in the database is a hashed version of the password which is pulled from `appsettings.json` from either the local seeding method (`.AddLocalSeeding()`) or the pipeline step outlined [here](#seeding-the-database-in-a-pipeline) and updates the database.
 - `ClientScopes`: The scopes to which the client has access; each scope should match the `Name` of an item in the `Scopes` collection.
 - `AccessTokenLifetime`: Optionally sets a custom access token lifetime.
 - `BaseUrl`: The base url of the client app _(applies to Authorization Code Clients only)_.
