@@ -80,7 +80,7 @@ The structure of the config is as follows:
 
 Within each client configuration object, the following properties can be set:
 - `ClientId`: A unique identifier for the client.
-- `ClientSecret`: This is effectively the password for the client; it is only required for Client Credentials and Resource Owner Password Credentials clients. Note: This is not the value that gets stored in the ClientSecret column in the database. The ClientSecret stored in the database is a hashed version of the password which is pulled from `appsettings.json` from either the local seeding method (`.AddLocalSeeding()`) or the pipeline step outlined [here](#seeding-the-database-in-a-pipeline) and updates the database.
+- `ClientSecret`: This is effectively the password for the client; it is only required for Client Credentials and Resource Owner Password Credentials clients. Note: The value that gets stored in the ClientSecret column in the database is a hashed version of the password which is pulled from `appsettings.json` or `secret.json` which either the [local seeding](###seeding-clients-and-scopes-in-the-database) or the [pipeline seeding](#seeding-the-database-in-a-pipeline) takes, hashes and then updates the secret in the database.
 - `ClientScopes`: The scopes to which the client has access; each scope should match the `Name` of an item in the `Scopes` collection.
 - `AccessTokenLifetime`: Optionally sets a custom access token lifetime.
 - `BaseUrl`: The base url of the client app _(applies to Authorization Code Clients only)_.
@@ -528,3 +528,94 @@ For non-YAML pipelines, the code from the respective steps can be copied into ta
 ### Testing the Changes
 
 You should now be able to deploy all the changes made and successfully perform all of the previous testing in a deployed environment.
+
+# Swagger
+Using `Audacia.Auth` as the way of implementing OpenId Connect and OAuth for your Identity provider, you will most likely need to configure Swagger so that users can authenticate and call protected endpoints.
+
+## SwaggerGen configuration
+Using the `AddSwaggerGen()` method on a `IServiceCollection` variable allows you to configure your the swagger generation from your application. 
+
+You will need to add the following options to allow Swagger to pick up how it will authenticate and provide the authentication cookie/ token to be parsed by the API to allow access to protected resources.
+
+### Security Definition
+`AddSecurityDefinition()` - this method tells Swagger how your API is protected.
+
+ The first parameter is the name of the security definition. This is **important** as this must match the [SecurityRequirement](###security-requirement) which will be configured later.
+
+ The second parameter is the type of Authorization which is protecting your API. Here are some of the required properties for an `OpenApiSecurityScheme`:
+    - `Type` - The type of authorization which is protecting your API.
+    - `In` - Where in the HTTP request the token or cookie is going to be located.
+    - `Name` - The HTTP header where the Bearer token/ cookie will be located.
+    - `Scheme` - The authentication mechanism which will be stored where based on `In` and `Name` configuration above.
+    - `Flows` - These are the different `flows` which the API can use to authenticate with the Identity provider. 
+      - Implicit - 
+      - Password - Test Automation client
+      - Client Credentials - API's
+      - Authorization Code - UI apps and Swagger documentation
+    - `OpenIdConnectUrl` - The URL where the OpenId configuration is located. 
+
+### Security Requirement
+`AddSecurityRequirement()` - this methods links with the above configuration by telling Swagger when to add a `Authorization` HTTP header with the bearer token for example.
+
+The important part here is, for the `Reference` of `OpenApiSecurityScheme` the `Id` of `OpenApiReference` must be same as the first parameter configured [here](###security-definition).
+
+### Example
+
+```csharp
+private const string SecurityDefinitionName = "<application-name>-api";
+
+internal static IServiceCollection AddSwagger(this IServiceCollection services, IConfiguration configuration)
+{
+    var endpointConfig = configuration.GetSection(EndpointConfig.Location).Get<EndpointConfig>();
+    if (endpointConfig?.Identity is null)
+    {
+        throw new MissingConfigurationException(
+            "The 'Identity' property could be read from the 'EndpointConfig' configuration section.");
+    }
+
+    return services.AddSwaggerGen(options =>
+    {
+        options.UseInlineDefinitionsForEnums();
+        options.AddSecurityDefinition(SecurityDefinitionName, new OpenApiSecurityScheme
+        {
+            Type = SecuritySchemeType.OAuth2,
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Scheme = "Bearer",
+            Flows = new OpenApiOAuthFlows
+            {
+                AuthorizationCode = new OpenApiOAuthFlow
+                {
+                    AuthorizationUrl = new Uri($"{endpointConfig.Identity}connect/authorize"),
+                    TokenUrl = new Uri($"{endpointConfig.Identity}connect/token"),
+                    Scopes = new Dictionary<string, string>
+                    {
+                        {
+                            "api", "api"
+                        }
+                    }
+                }
+            },
+            OpenIdConnectUrl = new Uri($"{endpointConfig.Identity}.well-known/openid-configuration")
+        });
+
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = SecurityDefinitionName
+                    }
+                },
+                new List<string> { "api" }
+            }
+        });
+    });
+}
+```
+
+## SwaggerUI configuration
+
