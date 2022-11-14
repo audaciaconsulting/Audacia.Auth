@@ -413,7 +413,7 @@ services.AddCustomGrantTypeProvider<SamlClaimsPrincipalProvider>();
 
 ### Configuring Application Cookie
 
-When the authentication coookie is issued this contains information such as what URL the frontend client will use to login/ logout with. This is important as this sets the configuration for `openid-configuration` which is request by the `oidc` client used in the front-end framework.
+When the authentication coookie is issued this contains information such as what URL the frontend client will use to login/ logout with. This is important as this sets the configuration for `openid-configuration` which is requested by the OAuth library used in the front-end framework.
 
 You can check what `openid-configuration` is getting set by looking at the config which is located at the this endpoint `https://<identity-url>/.well-known/openid-configuration` to make the approirate changes. This can be extremely useful when implementing the client to handle the OAuth process as apart of the [UI changes](#ui-changes).
 
@@ -422,7 +422,7 @@ The `.ConfigureApplicationCookie()` method **must** be called after you are call
 ```csharp
 serviceCollection.ConfigureApplicationCookie(options =>
     {
-        // These might need to be updated in the login, logout are in different area's etc.
+        // These might need to be updated if the login, logout are in different area's etc.
         options.LoginPath = new PathString("/Identity/Account/Login");
         options.AccessDeniedPath = new PathString("/Identity/Account/AccessDenied");
         options.LogoutPath = new PathString("/Identity/Account/Logout");
