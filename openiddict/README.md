@@ -3,14 +3,16 @@
 # Introduction
 
 The `Audacia.Auth.OpenIddict` library is designed to make it easier for apps to use OpenIddict as an OpenID Connect and OAuth provider. It uses ASP.NET Core Identity for the underlying user login and provides the following functionality:
+
 - Implements the `/connect/authorize`, `/connect/token` and `/connect/userinfo` endpoints.
 - Handles the issuing of access tokens and id tokens using the following flows:
-    - Authorization Code + PKCE (for UI clients).
-    - Client Credentials (for server-side/API clients).
-    - Resource Owner Password Credentials (for test automation clients).
+  - Authorization Code + PKCE (for UI clients).
+  - Client Credentials (for server-side/API clients).
+  - Resource Owner Password Credentials (for test automation clients).
 - Provides a means for additional claims to be added to tokens via an implementation of `IAdditionalClaimsProvider`.
 
 There are two use cases for this library:
+
 - Adding authentication to a new project.
 - Replacing IdentityServer4 with OpenIddict in an existing project.
 
@@ -29,6 +31,7 @@ Steps 1-7 in the [Audacia.Training OpenIddict process](https://dev.azure.com/aud
 ### Replacing IdentityServer
 
 If you are replacing IdentityServer4 with OpenIddict, you'll need to uninstall all IdentityServer4 NuGet packages and remove any references to IdentityServer4 code, such as:
+
 - `ApiResources`.
 - `IdentityResources`.
 - `Clients`.
@@ -40,12 +43,14 @@ If you are replacing IdentityServer4 with OpenIddict, you'll need to uninstall a
 The biggest changes are needed in the 'Identity' app (this is the application that handles the login process using ASP.NET Core Identity, which is usually the app that has the login page). This may be a standalone project, or it may be hosted in the same project as the API. Also included in this section are changes related to Entity Framework.
 
 On completion of this section you should test that you can:
+
 - Login and logout successfully.
 - Obtain an access token via the 'client credentials' and 'resource owner password credentials' flows.
 
 ### Install NuGet Packages
 
 Install the following NuGet packages in your Identity project:
+
 - `Audacia.Auth.OpenIddict`.
 - `Audacia.Auth.OpenIddict.QuartzCleanup` (removes old authorization data).
 - `Audacia.Auth.OpenIddict.Seeding` (seeds configuration data in the database when running locally).
@@ -53,6 +58,7 @@ Install the following NuGet packages in your Identity project:
 - For Entity Framework 6.x, `Audacia.Auth.OpenIddict.EntityFramework` (this is a thin wrapper around `OpenIddict.EntityFramework` that makes it easier to work with `int` or `Guid` primary keys for OpenIddict entities).
 
 Install one of the following NuGet packages in your Data/Entity Framework project:
+
 - For Entity Framework Core, `OpenIddict.EntityFrameworkCore`.
 - For Entity Framework 6.x, `Audacia.Auth.OpenIddict.EntityFramework`.
 
@@ -65,20 +71,22 @@ If you are adding authentication to a new project, the easiest way to provide th
 However if you are replacing IdentityServer4 in an existing project then it is generally simpler to leave the configuration file as-is and to convert from the existing structure to `OpenIdConnectConfig` in code. If you are seeding configuration data in your deployment pipeline, as described [here](#seeding-the-database-in-a-pipeline), and are converting the config from an existing structure, then you will need to provide an implementation of `IOpenIdConnectConfigMapper` which should contain the conversion code. However as long as your configuration section is named `"OpenIdConnectConfig"` and can be mapped directly to an `OpenIdConnectConfig` object then you don't need to provide an `IOpenIdConnectConfigMapper` implementation, and the seeding process with automatically pull the configuration in.
 
 The structure of the config is as follows:
+
 - `EncryptionCertificateThumbprint`: The thumbprint of the self-signed certificate that will be used to encrypt tokens; note this is not required when developing locally, so no certificates need to be generated for local development and this setting can be left blank; when set for deployed environments it must be a different certificate to the one used for signing (see [here](#token-signing-and-encryption-certificates) for more information).
 - `SigningCertificateThumbprint`: The thumbprint of the self-signed certificate that will be used to sign tokens; note this is not required when developing locally, so no certificates need to be generated for local development and this setting can be left blank; when set for deployed environments it must be a different certificate to the one used for encryption (see [here](#token-signing-and-encryption-certificates) for more information).
 - `CertificateStoreLocation`: Optional, defaults to `"CurrentUser"`; the other valid value is `"LocalMachine"`:
-    - Generally speaking you should use `"CurrentUser"` (or omit entirely) if deploying to Azure App Services, and use `"LocalMachine"` if deploying to IIS.
+  - Generally speaking you should use `"CurrentUser"` (or omit entirely) if deploying to Azure App Services, and use `"LocalMachine"` if deploying to IIS.
 - `Url`: The base url of the Identity app.
 - `ClientCredentialsClients`: Clients that will use the Client Credentials flow; this is typically APIs and other back-end applications that don't need to obtain tokens on behalf of a user.
 - `AuthorizationCodeClients`: Clients that will use the Authorization Code (with PKCE) flow; this will generally be any UI-based application (e.g. web app, mobile app).
 - `ResourceOwnerPasswordClients`: Clients that will use the Resource Owner Password Credentials flow; this should be restricted to test automation clients (e.g. API testing or security testing).
 - `Scopes`: Scopes define the resources (usually APIs) that can be authenticated with tokens issued by the OpenIddict service:
-    - Each scope has a `Name` and a collection of `Resources`.
-    - The `Name` is just a unique identifier for the scope.
-    - The `Resources` are a set of clients that the scope grants access to; the values themselves should be the `ClientId` of the client to be accessed.
+  - Each scope has a `Name` and a collection of `Resources`.
+  - The `Name` is just a unique identifier for the scope.
+  - The `Resources` are a set of clients that the scope grants access to; the values themselves should be the `ClientId` of the client to be accessed.
 
 Within each client configuration object, the following properties can be set:
+
 - `ClientId`: A unique identifier for the client.
 - `ClientSecret`: This is effectively the password for the client; it is only required for Client Credentials and Resource Owner Password Credentials clients. Note: The value that gets stored in the ClientSecret column in the database is a hashed version of the password which is pulled from `appsettings.json` or `secret.json` which either the [local seeding](###seeding-clients-and-scopes-in-the-database) or the [pipeline seeding](#seeding-the-database-in-a-pipeline) takes, hashes and then updates the secret in the database.
 - `ClientScopes`: The scopes to which the client has access; each scope should match the `Name` of an item in the `Scopes` collection.
@@ -87,59 +95,60 @@ Within each client configuration object, the following properties can be set:
 - `RedirectUris`: The set of urls within the client app to which OpenIddict is allowed to redirect _(applies to Authorization Code Clients only)_.
 
 An example config section is as follow; **note you should replace values as appropriate, particularly urls and client ids/secrets**:
+
 ```json
 {
-    "OpenIdConnectConfig": {
-        "EncryptionCertificateThumbprint": "TBC",
-        "SigningCertificateThumbprint": "TBC",
-        "CertificateStoreLocation": "",
-        "Url": "https://localhost:44374",
-        "ClientCredentialsClients": [
-            {
-                "ClientId": "ApiClient",
-                "ClientSecret": "xxx",
-                "ClientScopes": [ "api" ]
-            }
+  "OpenIdConnectConfig": {
+    "EncryptionCertificateThumbprint": "TBC",
+    "SigningCertificateThumbprint": "TBC",
+    "CertificateStoreLocation": "",
+    "Url": "https://localhost:44374",
+    "ClientCredentialsClients": [
+      {
+        "ClientId": "ApiClient",
+        "ClientSecret": "xxx",
+        "ClientScopes": ["api"]
+      }
+    ],
+    "AuthorizationCodeClients": [
+      {
+        "ClientScopes": ["api"],
+        "ClientId": "AngularClient",
+        "BaseUrl": "https://localhost:44351",
+        "RedirectUris": [
+          "https://localhost:44351",
+          "https://localhost:44351/auth-callback",
+          "https://localhost:44351/assets/silent-renew.html"
         ],
-        "AuthorizationCodeClients": [
-            {
-                "ClientScopes": [ "api" ],
-                "ClientId": "AngularClient",
-                "BaseUrl": "https://localhost:44351",
-                "RedirectUris": [
-                    "https://localhost:44351",
-                    "https://localhost:44351/auth-callback",
-                    "https://localhost:44351/assets/silent-renew.html"
-                ],
-                "AccessTokenLifetime": {
-                    "Value": "30",
-                    "Type": "Minutes"
-                }
-            },
-            {
-                "ClientId": "SwaggerClient",
-                "BaseUrl": "https://localhost:44397",
-                "ClientScopes": [ "api" ],
-                "RedirectUris": [
-                    "https://localhost:44397",
-                    "https://localhost:44397/swagger/oauth2-redirect.html"
-                ]
-            }
-        ],
-        "ResourceOwnerPasswordClients": [
-            {
-                "ClientId": "TestAutomationClient",
-                "ClientScopes": [ "api" ],
-                "ClientSecret": "xxx"
-            }       
-        ],
-        "Scopes": [
-            {
-                "Name": "api",
-                "Resources": [ "ApiClient" ]
-            }
+        "AccessTokenLifetime": {
+          "Value": "30",
+          "Type": "Minutes"
+        }
+      },
+      {
+        "ClientId": "SwaggerClient",
+        "BaseUrl": "https://localhost:44397",
+        "ClientScopes": ["api"],
+        "RedirectUris": [
+          "https://localhost:44397",
+          "https://localhost:44397/swagger/oauth2-redirect.html"
         ]
-    }
+      }
+    ],
+    "ResourceOwnerPasswordClients": [
+      {
+        "ClientId": "TestAutomationClient",
+        "ClientScopes": ["api"],
+        "ClientSecret": "xxx"
+      }
+    ],
+    "Scopes": [
+      {
+        "Name": "api",
+        "Resources": ["ApiClient"]
+      }
+    ]
+  }
 }
 ```
 
@@ -152,6 +161,7 @@ OpenIddict must be registered with both Entity Framework and Entity Framework Co
 #### Entity Framework Core
 
 In Entity Framework Core the registration could look something like this (where `services` is an instance of `IServiceCollection`):
+
 ```csharp
 services.AddDbContext<DatabaseContext>(options =>
 {
@@ -162,6 +172,7 @@ services.AddDbContext<DatabaseContext>(options =>
 ```
 
 You will also need to run a database migration to add the necessary OpenIddict tables to the database, and this may require some additional code to tell the EF model about OpenIddict. For example in Entity Framework Core you will need something like this:
+
 ```csharp
 protected override void OnModelCreating(ModelBuilder builder)
 {
@@ -174,6 +185,7 @@ protected override void OnModelCreating(ModelBuilder builder)
 #### Entity Framework 6.x
 
 In Entity Framework 6.x you just need to call the appropriate method when creating the model. The `Audacia.Auth.OpenIddict.EntityFramework` package has the same extension method that OpenIddict provides out of the box for EF Core, so your `OnModelCreating` method will look something like this:
+
 ```csharp
 protected override void OnModelCreating(DbModelBuilder builder)
 {
@@ -194,6 +206,7 @@ This can be achieved by calling an extension method on `IServiceCollection` prov
 OpenIddict saves issued tokens to the database, so to avoid that data building up over time, it is important to remove old data periodically. OpenIddict comes with built-in support for doing this cleanup in a background job using Quartz. This is implemented in the `Audacia.Auth.OpenIddict.QuartzCleanup` NuGet package. Unless you have another mechanism for cleaning up this data (such as a scheduled Azure Function) then you should use Quartz cleanup.
 
 For example, suppose your user type is `ApplicationUser` and the primary key of `ApplicationUser` is an `int`, and you are using `EntityFrameworkCore` as your ORM with a database context `OpenIddictDbContext`. If you are also using the built-in Quartz cleanup, registering the services would look something like this (without the Quartz cleanup the code would be identical, it would just call the `AddOpenIddict` method rather than `AddOpenIddictWithCleanup`):
+
 ```csharp
 var openIddictBuilder = services.AddOpenIddictWithCleanup<ApplicationUser, int>(options =>
     {
@@ -208,8 +221,9 @@ var openIddictBuilder = services.AddOpenIddictWithCleanup<ApplicationUser, int>(
 ```
 
 The additional parameters are:
+
 - The lambda expression `user => user.Id` is the `userIdGetter`, and just needs to be a delegate that returns the user Id.
-- `openIdConnectConfig` is an instance of `OpenIdConnectConfig` (see [appsettings.json section above](#configuration-in-appsettings.json)).
+- `openIdConnectConfig` is an instance of `OpenIdConnectConfig` (see [appsettings.json section above](#configuration-in-appsettingsjson)).
 - `hostingEnvironment` is an instance of `IWebHostEnvironment`.
 
 This should replace `services.AddIdentityServer()` if you are replacing Identity Server.
@@ -217,6 +231,7 @@ This should replace `services.AddIdentityServer()` if you are replacing Identity
 If using EF6, the call to `ReplaceDefaultEntities()` should not have a type parameter. Instead, include `using Audacia.Auth.OpenIddict.EntityFramework.IntKey;` or `using Audacia.Auth.OpenIddict.EntityFramework.GuidKey;` to control the type of the primary key. Without either of these `using` statements, a `string` primary key is assumed.
 
 **IMPORTANT:** If you need to inspect the access token that OpenIddict issues in a client application (e.g. an Angular app) then you must disable access token encryption. You would typically only need to do this if you need access to the claims within the token in the UI, and there is no other way of obtaining this information (e.g. by calling an authenticated 'permissions' endpoint). If you do need to disable access token encryption this can be done by adding the following line of code after the call to `AddOpenIddict`/`AddOpenIddictWithCleanup`:
+
 ```csharp
 openIddictBuilder.AddServer(options => options.DisableAccessTokenEncryption());
 ```
@@ -226,6 +241,7 @@ openIddictBuilder.AddServer(options => options.DisableAccessTokenEncryption());
 The controllers that handle the OpenID Connect endpoints are generic (on the User type and the User's primary key type), which means they must be specifically registered with ASP.NET Core in order to be discovered.
 
 This can be achieved by calling an extension method on `IMvcBuilder`, providing the necessary generic arguments. This will usually be as a method call chained on the end of a call to `AddControllersWithViews()`. For example, suppose your user type is `ApplicationUser` and the primary key of `ApplicationUser` is an `int`:
+
 ```csharp
 services
     .AddControllersWithViews()
@@ -237,6 +253,7 @@ services
 OpenIddict requires a database in which to store clients (which it calls 'applications') and scopes. Generally speaking client and scope data comes from configuration, therefore there needs to be a mechanism to get the data from configuration into the database in each environment.
 
 When running the app locally, a hosted service can be used to do this on app startup. The necessary worker service is provided in the `Audacia.Auth.OpenIddict.Seeding` package, and should be called as follows (where `services` is an instance of `IServiceCollection` and `environment` is an instance of `IWebHostEnvironment`):
+
 ```csharp
 if (environment.IsDevelopment())
 {
@@ -249,6 +266,7 @@ See [here](#seeding-the-database-in-a-pipeline) for information on setting up da
 ### ASP.NET Core Identity Configuration
 
 Some claim types must be set in the ASP.NET Core Identity configuration as follows:
+
 ```csharp
 services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 {
@@ -261,7 +279,7 @@ services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
 });
 ```
 
-### Adding Additional Claims to Tokens - ___optional___
+### Adding Additional Claims to Tokens - **_optional_**
 
 If you require any custom claims beyond the standard ones issued there are two main mechanisms by which this can be achieved.
 
@@ -280,6 +298,7 @@ The provided implementation of `IProfileService<TUser>`, `DefaultProfileService<
 You can register your `IProfileService<TUser>` implementation with the dependency injection system by calling the `IServiceCollection` extension method `AddProfileService<TService, TUser>()`. **Note that a custom profile service must be added after the call to `AddOpenIddict`/`AddOpenIddictWithCleanup` otherwise it will get overwritten with the default implementation.**
 
 An example implementation might be:
+
 ```csharp
 public class CustomProfileService : DefaultProfileService<ApplicationUser>
 {
@@ -299,15 +318,17 @@ public class CustomProfileService : DefaultProfileService<ApplicationUser>
 }
 ```
 
-### Events - ___optional___
+### Events - **_optional_**
 
 The `Audacia.Auth.OpenIddict` library implements the same event functionality that IdentityServer supports, where events are raised to an `IEventService`, which persists them to an `IEventSink`. `Audacia.Auth.OpenIddict` raises the following events:
+
 - `TokenIssuedSuccessEvent`
 - `TokenIssuedFailureEvent`
 
 You can intercept these events and add custom behaviour by implementing `IEventSink` (see [below](#event-sinks)).
 
 In addition, the following events are provided which can be raised in user code:
+
 - `UserLoginSuccessEvent`.
 - `UserLoginFailureEvent`.
 - `UserLogoutSuccessEvent`.
@@ -315,11 +336,13 @@ In addition, the following events are provided which can be raised in user code:
 #### Event Sinks
 
 Events are persisted using an implementation of `IEventSink`. The default implementation uses `Microsoft.Extensions.Logging.ILogger` to log the event, but a custom implementation can be provided by registering it with the dependency injection container. For example:
+
 ```csharp
 services.AddEventSink<CustomEventSink>();
 ```
 
 If you still want all events to be logged using the default behaviour then you can inherit from `DefaultEventSink` to utilise the existing behaviour. For example:
+
 ```csharp
 public class CustomEventSink : DefaultEventSink
 {
@@ -340,37 +363,36 @@ public class CustomEventSink : DefaultEventSink
 #### Event Serialization
 
 Events are serialized using an implementation of `IEventSerializer`. The default implementation uses `System.Text.Json`, but a custom implementation can be provided by registering it with the dependency injection container. For example:
+
 ```csharp
 services.AddEventSerializer<CustomEventSerializer>();
 ```
 
-### Custom Grant Type Support - ___optional___
+### Custom Grant Type Support - **_optional_**
 
 Additional grant types can be processed by specifying them in the `CustomGrantTypeClients` property of `OpenIdConnectConfig`, and then by providing an appropriate implementation of `ICustomGrantTypeClaimsPrincipalProvider`. For example, if the grant type of `"saml"` needs to be supported then the configuration and `ICustomGrantTypeClaimsPrincipalProvider` implementation would be something like this:
+
 ```json
 {
-    // ...more config
-    "CustomGrantTypeClients": [
-        {
-            "GrantType": "saml",
-            "ClientId": "CustomClient",
-            "ClientSecret": "xxxx",
-            "ClientScopes": [
-                "api"
-            ],
-            "AccessTokenLifetime": {
-                "Value": "60",
-                "Type": "Minutes"
-            },
-            "ClientUris": [
-                "https://localhost:1234"
-            ],
-            "ClientType": "Confidential" // If set to "Confidential", a "ClientSecret" must be provided; the other acceptable value is "Public"
-        }
-    ]
-    // more config...
+  // ...more config
+  "CustomGrantTypeClients": [
+    {
+      "GrantType": "saml",
+      "ClientId": "CustomClient",
+      "ClientSecret": "xxxx",
+      "ClientScopes": ["api"],
+      "AccessTokenLifetime": {
+        "Value": "60",
+        "Type": "Minutes"
+      },
+      "ClientUris": ["https://localhost:1234"],
+      "ClientType": "Confidential" // If set to "Confidential", a "ClientSecret" must be provided; the other acceptable value is "Public"
+    }
+  ]
+  // more config...
 }
 ```
+
 ```csharp
 public class SamlClaimsPrincipalProvider : ICustomGrantTypeClaimsPrincipalProvider
 {
@@ -384,11 +406,30 @@ public class SamlClaimsPrincipalProvider : ICustomGrantTypeClaimsPrincipalProvid
 ```
 
 The implementing class must also be registered with the dependency injection system as follows (where `services` is an instance of `IServiceCollection`):
+
 ```csharp
 services.AddCustomGrantTypeProvider<SamlClaimsPrincipalProvider>();
 ```
 
-### Accessing Signing and Encryption Credentials - ___optional___
+### Configuring Application Cookie
+
+When the authentication coookie is issued this contains information such as what URL the frontend client will use to login/ logout with. This is important as this sets the configuration for `openid-configuration` which is request by the `oidc` client used in the front-end framework.
+
+You can check what `openid-configuration` is getting set by looking at the config which is located at the this endpoint `https://<identity-url>/.well-known/openid-configuration` to make the approirate changes. This can be extremely useful when implementing the client to handle the OAuth process as apart of the [UI changes](#ui-changes).
+
+The `.ConfigureApplicationCookie()` method **must** be called after you are calling `.AddIdentity()` or `.AddDefaultIdentity()` in your Identity app depending of what identity configuration you have used.
+
+```csharp
+serviceCollection.ConfigureApplicationCookie(options =>
+    {
+        // These might need to be updated in the login, logout are in different area's etc.
+        options.LoginPath = new PathString("/Identity/Account/Login");
+        options.AccessDeniedPath = new PathString("/Identity/Account/AccessDenied");
+        options.LogoutPath = new PathString("/Identity/Account/Logout");
+    });
+```
+
+### Accessing Signing and Encryption Credentials - **_optional_**
 
 If access to the credentials, e.g. certificates, used to the sign and/or encrypt the tokens is needed then the interfaces `ISigningCredentialsProvider` and `IEncryptionCredentialsProvider` respectively can be used. They are automatically registered with the dependency injection system so will be injected anywhere they are declared as a dependency.
 
@@ -412,33 +453,35 @@ It is important to test the Identity app in isolation at this point as it will t
 Assuming the `OpenIdConnectConfig` has a Client credentials client called `ApiClient`, an access token can be obtained by sending a `POST` request to the `/connect/token` endpoint with the following `x-www-form-urlencoded` parameters:
 | Key | Value |
 | --- | --- |
-| grant_type | client_credentials |
-| scope | _{name of the scope granted to the client}_ |
+| grant*type | client_credentials |
+| scope | *{name of the scope granted to the client}_ |
 | client_id | ApiClient |
-| client_secret | _{client secret value}_ |
+| client_secret | _{client secret value}\_ |
 
 #### Resource Owner Password Credentials Flow
 
 Assuming the `OpenIdConnectConfig` has a Resource Owner Password Credentials client called `TestAutomationClient`, an access token can be obtained by sending a `POST` request to the `/connect/token` endpoint with the following `x-www-form-urlencoded` parameters:
 | Key | Value |
 | --- | --- |
-| grant_type | password |
-| scope | _{name of the scope granted to the client}_ |
+| grant*type | password |
+| scope | *{name of the scope granted to the client}_ |
 | username | _{username of the seeded user}_ |
 | password | _{password of the seeded user}_ |
 | client_id | TestAutomationClient |
-| client_secret | _{client secret value}_ |
+| client_secret | _{client secret value}\_ |
 
 ## API Changes
 
 Assuming the Identity app can successfully issue tokens, you should now change any API in the system to accept these tokens.
 
 On completion of this section you should test that you can:
+
 - Use the tokens obtained above to make authenticated API calls.
 
 ### Install NuGet Packages
 
 Install the following NuGet packages in each API project:
+
 - `OpenIddict.AspNetCore`.
 
 ### API Authentication
@@ -482,18 +525,20 @@ It is important to test API authentication at this point as it will tell you whe
 ## UI Changes
 
 The UI implementation will vary depending on the front-end framework used (e.g. Angular, Vue) and also on the client library being used to handle the OAuth process on the client (e.g. [oidc-client-ts](https://github.com/authts/oidc-client-ts), [angular-auth-oidc-client](https://github.com/damienbod/angular-auth-oidc-client)). You should therefore follow the guidance of your chosen library, however the high-level approach is likely to involve:
+
 - Implementing an `auth-service`, providing functions like `signin`, `signout`, `signin-silent` and `get-token`.
-   - The `auth-service` is likely also where the client library is configured with things like the scopes to request when signing in and the client ID of the app.
+  - The `auth-service` is likely also where the client library is configured with things like the scopes to request when signing in and the client ID of the app.
 - Implementing a route (e.g. `signin-callback`) to which the user should be returned after a successful login.
 - Adding a static HTML page to which the user should be returned as part of the silent renew process.
 
 ### Testing the Changes
 
 Once the UI is configured you should make sure that the following actions work:
+
 - Interactive login via the UI, e.g.
-   1. Try and access a route in the UI that requires an authenticated user.
-   1. Ensure the user is redirected to the Identity app using the Authorization Code + PKCE flow.
-   1. Login and check that the user is successfully redirected back to the UI with an access token.
+  1.  Try and access a route in the UI that requires an authenticated user.
+  1.  Ensure the user is redirected to the Identity app using the Authorization Code + PKCE flow.
+  1.  Login and check that the user is successfully redirected back to the UI with an access token.
 - Silent renew of an expired token; this can most easily be tested by setting the access token lifetime for the UI client to 2 minutes and checking in the browser's dev tools that a new token is obtained.
 
 ## DevOps Pipeline Changes
@@ -503,24 +548,26 @@ Once the UI is configured you should make sure that the following actions work:
 In all deployed environments you must provide two certificates: one for signing tokens and one for encrypting tokens. The easiest way to do this is to generate self-signed certificates, which can done by executing the [CreateTokenSigningCert.sh](https://dev.azure.com/audacia/Audacia/_git/Audacia.Build?path=/tools/security/certificates/CreateTokenSigningCert.sh) and [ConvertTokenSigningCertToPfx.sh](https://dev.azure.com/audacia/Audacia/_git/Audacia.Build?path=/tools/security/certificates/ConvertTokenSigningCertToPfx.sh) bash scripts.
 
 Once you have two certificates per environment you must:
+
 - Upload the certificates to the appropriate location (see [here](https://dev.azure.com/audacia/Audacia/_wiki/wikis/Audacia.wiki/4317/Adding-Token-Signing-or-Encryption-Certificates) for instructions).
 - Specify the location of the certificates in configuration, if required; they default to `"CurrentUser"`, but this can also be set to `"LocalMachine"`.
-- Specify the thumbprints of the certificates in configuration (see [here](#configuration-in-appsettings.json) for more information).
+- Specify the thumbprints of the certificates in configuration (see [here](#configuration-in-appsettingsjson) for more information).
 
 ### Seeding the Database in a Pipeline
 
 Your deployment pipeline will have to be modified to seed the database with the necessary OpenIddict configuration (see [here](#seeding-clients-and-scopes-in-the-database))
 
 There are steps in the `Audacia.Build` repo to perform the seeding via a custom .NET tool. Provided you are using the standard OpenIddict entities and managers with either EF Core or EF 6, you can use the steps in either `openiddict-seeding-efcore.yaml` or `openiddict-seeding-ef6.yaml`. With the template functionality available in Azure Pipelines YAML, for EF Core the YAML could look something like this:
+
 ```yaml
 steps:
   - template: /src/deployment/openiddict/tasks/openiddict-seeding-efcore.yaml@templates
     parameters:
-      toolVersion: 'x.x.x' # Specify the version of Audacia.Auth.OpenIddict that you are targeting
-      identityProjectBasePath: '$(Pipeline.Workspace)/$(Build.DefinitionName)/MyApp.Identity' # The path to the identity app artifact
-      identityProjectName: 'MyApp.Identity'
-      openIddictEntitiesKeyType: 'int'
-      databaseConnectionStringName: 'MyDatabaseContext'
+      toolVersion: "x.x.x" # Specify the version of Audacia.Auth.OpenIddict that you are targeting
+      identityProjectBasePath: "$(Pipeline.Workspace)/$(Build.DefinitionName)/MyApp.Identity" # The path to the identity app artifact
+      identityProjectName: "MyApp.Identity"
+      openIddictEntitiesKeyType: "int"
+      databaseConnectionStringName: "MyDatabaseContext"
 ```
 
 For non-YAML pipelines, the code from the respective steps can be copied into tasks in a classic pipeline.
@@ -529,35 +576,29 @@ For non-YAML pipelines, the code from the respective steps can be copied into ta
 
 You should now be able to deploy all the changes made and successfully perform all of the previous testing in a deployed environment.
 
-# Swagger
+## Swagger
+
 Using `Audacia.Auth` as the way of implementing OpenId Connect and OAuth for your Identity provider, you will most likely need to configure Swagger so that users can authenticate and call protected endpoints.
 
-## SwaggerGen configuration
-Using the `AddSwaggerGen()` method on a `IServiceCollection` variable allows you to configure your the swagger generation from your application. 
+### SwaggerGen configuration
+
+Using the `AddSwaggerGen()` method on a `IServiceCollection` variable allows you to configure your the swagger generation from your application.
 
 You will need to add the following options to allow Swagger to pick up how it will authenticate and provide the authentication cookie/ token to be parsed by the API to allow access to protected resources.
 
 ### Security Definition
+
 `AddSecurityDefinition()` - this method tells Swagger how your API is protected.
 
- The first parameter is the name of the security definition. This is **important** as this must match the [SecurityRequirement](###security-requirement) which will be configured later.
+The first parameter is the name of the security definition. This is **important** as this must match the [Security Requirement](#security-requirement) which will be configured later.
 
- The second parameter is the type of Authorization which is protecting your API. Here are some of the required properties for an `OpenApiSecurityScheme`:
-    - `Type` - The type of authorization which is protecting your API.
-    - `In` - Where in the HTTP request the token or cookie is going to be located.
-    - `Name` - The HTTP header where the Bearer token/ cookie will be located.
-    - `Scheme` - The authentication mechanism which will be stored where based on `In` and `Name` configuration above.
-    - `Flows` - These are the different `flows` which the API can use to authenticate with the Identity provider. 
-      - Implicit - 
-      - Password - Test Automation client
-      - Client Credentials - API's
-      - Authorization Code - UI apps and Swagger documentation
-    - `OpenIdConnectUrl` - The URL where the OpenId configuration is located. 
+The second parameter is the type of Authorization which is protecting your API. Here are some of the required properties for an `OpenApiSecurityScheme`: - `Type` - The type of authorization which is protecting your API. - `In` - Where in the HTTP request the token or cookie is going to be located. - `Name` - The HTTP header where the Bearer token/ cookie will be located. - `Scheme` - The authentication mechanism which will be stored where based on `In` and `Name` configuration above. - `Flows` - These are the different `flows` which the API can use to authenticate with the Identity provider. - Implicit - - Password - Test Automation client - Client Credentials - API's - Authorization Code - UI apps and Swagger documentation - `OpenIdConnectUrl` - The URL where the OpenId configuration is located.
 
 ### Security Requirement
+
 `AddSecurityRequirement()` - this methods links with the above configuration by telling Swagger when to add a `Authorization` HTTP header with the bearer token for example.
 
-The important part here is, for the `Reference` of `OpenApiSecurityScheme` the `Id` of `OpenApiReference` must be same as the first parameter configured [here](###security-definition).
+The important part here is, for the `Reference` of `OpenApiSecurityScheme` the `Id` of `OpenApiReference` must be same as the first parameter configured [here](#security-definition).
 
 ### Example
 
@@ -617,5 +658,16 @@ internal static IServiceCollection AddSwagger(this IServiceCollection services, 
 }
 ```
 
-## SwaggerUI configuration
+### SwaggerUI configuration
 
+To display the swagger documentation at `<api-url>/swagger/index.html` within your API you will need to use `.UseSwaggerUI()` to configure the client and scopes set up within `OpenIdConnectConfig`, see [appsettings.json section](#configuration-in-appsettingsjson).
+
+```csharp
+app.UseSwaggerUI(options =>
+    {
+        options.OAuthClientId("SwaggerClient"); // FROM appsettings.json
+        options.OAuthScopes("api"); // FROM appsettings.json
+        options.OAuthUsePkce(); // Needed if the Swagger client is set up to use Authorization Code
+        options.EnablePersistAuthorization(); // Makes the token persist on refresh/ browser closing
+    });
+```
