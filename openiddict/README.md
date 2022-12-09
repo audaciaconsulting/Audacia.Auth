@@ -152,6 +152,10 @@ An example config section is as follow; **note you should replace values as appr
 }
 ```
 
+#### Checking OpenID Configuration
+
+You can check what `openid-configuration` is getting set and pulled by the client by looking at the config which is located at the following endpoint `https://<identity-url>/.well-known/openid-configuration` to make the appropriate changes. This can be extremely useful when implementing the client to handle the OAuth process as apart of the [UI changes](#ui-changes).
+
 ### Entity Framework and Entity Framework Core
 
 OpenIddict must be registered with both Entity Framework and Entity Framework Core. The relevant methods are from OpenIddict libraries: `OpenIddict.EntityFrameworkCore` and `OpenIddict.EntityFramework`.
@@ -223,7 +227,7 @@ var openIddictBuilder = services.AddOpenIddictWithCleanup<ApplicationUser, int>(
 The additional parameters are:
 
 - The lambda expression `user => user.Id` is the `userIdGetter`, and just needs to be a delegate that returns the user Id.
-- `openIdConnectConfig` is an instance of `OpenIdConnectConfig` (see [appsettings.json section above](#configuration-in-appsettingsjson)).
+- `openIdConnectConfig` is an instance of `OpenIdConnectConfig` (see [appsettings.json section above](#configuration-in-appsettings.json)).
 - `hostingEnvironment` is an instance of `IWebHostEnvironment`.
 
 This should replace `services.AddIdentityServer()` if you are replacing Identity Server.
@@ -413,9 +417,9 @@ services.AddCustomGrantTypeProvider<SamlClaimsPrincipalProvider>();
 
 ### Configuring Application Cookie
 
-When the authentication coookie is issued this contains information such as what URL the frontend client will use to login/ logout with. This is important as this sets the configuration for `openid-configuration` which is requested by the OAuth library used in the front-end framework.
+When an authentication cookie is issued, the authentication handler executes and can determine if a user is no longer authenticated, is denied access or where to log the user our. 
 
-You can check what `openid-configuration` is getting set by looking at the config which is located at the this endpoint `https://<identity-url>/.well-known/openid-configuration` to make the approirate changes. This can be extremely useful when implementing the client to handle the OAuth process as apart of the [UI changes](#ui-changes).
+It's important that we set where the user will be redirected too for these scenarios so the authentication handler knows where.
 
 The `.ConfigureApplicationCookie()` method **must** be called after you are calling `.AddIdentity()` or `.AddDefaultIdentity()` in your Identity app depending of what identity configuration you have used.
 
@@ -453,22 +457,22 @@ It is important to test the Identity app in isolation at this point as it will t
 Assuming the `OpenIdConnectConfig` has a Client credentials client called `ApiClient`, an access token can be obtained by sending a `POST` request to the `/connect/token` endpoint with the following `x-www-form-urlencoded` parameters:
 | Key | Value |
 | --- | --- |
-| grant*type | client_credentials |
-| scope | *{name of the scope granted to the client}_ |
+| grant_type | client_credentials |
+| scope | _{name of the scope granted to the client}_ |
 | client_id | ApiClient |
-| client_secret | _{client secret value}\_ |
+| client_secret | _{client secret value}_ |
 
 #### Resource Owner Password Credentials Flow
 
 Assuming the `OpenIdConnectConfig` has a Resource Owner Password Credentials client called `TestAutomationClient`, an access token can be obtained by sending a `POST` request to the `/connect/token` endpoint with the following `x-www-form-urlencoded` parameters:
 | Key | Value |
 | --- | --- |
-| grant*type | password |
-| scope | *{name of the scope granted to the client}_ |
+| grant_type | password |
+| scope | _{name of the scope granted to the client}_ |
 | username | _{username of the seeded user}_ |
 | password | _{password of the seeded user}_ |
 | client_id | TestAutomationClient |
-| client_secret | _{client secret value}\_ |
+| client_secret | _{client secret value}_ |
 
 ## API Changes
 
@@ -551,7 +555,7 @@ Once you have two certificates per environment you must:
 
 - Upload the certificates to the appropriate location (see [here](https://dev.azure.com/audacia/Audacia/_wiki/wikis/Audacia.wiki/4317/Adding-Token-Signing-or-Encryption-Certificates) for instructions).
 - Specify the location of the certificates in configuration, if required; they default to `"CurrentUser"`, but this can also be set to `"LocalMachine"`.
-- Specify the thumbprints of the certificates in configuration (see [here](#configuration-in-appsettingsjson) for more information).
+- Specify the thumbprints of the certificates in configuration (see [here](#configuration-in-appsettings.json) for more information).
 
 ### Seeding the Database in a Pipeline
 
@@ -578,13 +582,15 @@ You should now be able to deploy all the changes made and successfully perform a
 
 ## Swagger
 
-Using `Audacia.Auth` as the way of implementing OpenId Connect and OAuth for your Identity provider, you will most likely need to configure Swagger so that users can authenticate and call protected endpoints.
+Using `Audacia.Auth` as the way of implementing OpenId Connect and OAuth for your Identity provider, you will most likely need to configure Swagger, allowing users to authenticate and call protected endpoints.
+
+In the following example we are using `Swashbuckle` to implement Swagger.
 
 ### SwaggerGen configuration
 
 Using the `AddSwaggerGen()` method on a `IServiceCollection` variable allows you to configure your the swagger generation from your application.
 
-You will need to add the following options to allow Swagger to pick up how it will authenticate and provide the authentication cookie/ token to be parsed by the API to allow access to protected resources.
+You will need to add the following options to allow Swagger to pick up how it will authenticate and provide the authentication token to be parsed by the API to allow access to protected resources.
 
 ### Security Definition
 
@@ -616,7 +622,6 @@ internal static IServiceCollection AddSwagger(this IServiceCollection services, 
 
     return services.AddSwaggerGen(options =>
     {
-        options.UseInlineDefinitionsForEnums();
         options.AddSecurityDefinition(SecurityDefinitionName, new OpenApiSecurityScheme
         {
             Type = SecuritySchemeType.OAuth2,
@@ -660,7 +665,7 @@ internal static IServiceCollection AddSwagger(this IServiceCollection services, 
 
 ### SwaggerUI configuration
 
-To display the swagger documentation at `<api-url>/swagger/index.html` within your API you will need to use `.UseSwaggerUI()` to configure the client and scopes set up within `OpenIdConnectConfig`, see [appsettings.json section](#configuration-in-appsettingsjson).
+To display the swagger documentation at `<api-url>/swagger/index.html` within your API you will need to use `.UseSwaggerUI()` to configure the client and scopes set up within `OpenIdConnectConfig`, see [appsettings.json section](#configuration-in-appsettings.json).
 
 ```csharp
 app.UseSwaggerUI(options =>
