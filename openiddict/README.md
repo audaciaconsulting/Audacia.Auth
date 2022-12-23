@@ -193,6 +193,17 @@ This can be achieved by calling an extension method on `IServiceCollection` prov
 
 OpenIddict saves issued tokens to the database, so to avoid that data building up over time, it is important to remove old data periodically. OpenIddict comes with built-in support for doing this cleanup in a background job using Quartz. This is implemented in the `Audacia.Auth.OpenIddict.QuartzCleanup` NuGet package. Unless you have another mechanism for cleaning up this data (such as a scheduled Azure Function) then you should use Quartz cleanup.
 
+The Quartz job only deletes tokens older than a certain age. The default value now used for this age is 6 hours (it previously used the OpenIddict default of 14 days), however this value is configurable by adding a `ConfigurableTimespan` object to the `OpenIdConnectConfig` section in `appsettings.json` and creating an `OpenIdConnectCleanupConfig` object to pass into `AddOpenIddictWithCleanup` (rather than `OpenIdConnectConfig`):
+```json
+"OpenIdConnectConfig": {
+    // Other config here
+    "MinimumAgeToCleanup": {
+        "Type": "Hours",
+        "Value": "4"
+    }
+}
+```
+
 For example, suppose your user type is `ApplicationUser` and the primary key of `ApplicationUser` is an `int`, and you are using `EntityFrameworkCore` as your ORM with a database context `OpenIddictDbContext`. If you are also using the built-in Quartz cleanup, registering the services would look something like this (without the Quartz cleanup the code would be identical, it would just call the `AddOpenIddict` method rather than `AddOpenIddictWithCleanup`):
 ```csharp
 var openIddictBuilder = services.AddOpenIddictWithCleanup<ApplicationUser, int>(options =>
@@ -209,7 +220,7 @@ var openIddictBuilder = services.AddOpenIddictWithCleanup<ApplicationUser, int>(
 
 The additional parameters are:
 - The lambda expression `user => user.Id` is the `userIdGetter`, and just needs to be a delegate that returns the user Id.
-- `openIdConnectConfig` is an instance of `OpenIdConnectConfig` (see [appsettings.json section above](#configuration-in-appsettings.json)).
+- `openIdConnectConfig` is an instance of `OpenIdConnectConfig` or `OpenIdConnectCleanupConfig` (see [appsettings.json section above](#configuration-in-appsettings.json)).
 - `hostingEnvironment` is an instance of `IWebHostEnvironment`.
 
 This should replace `services.AddIdentityServer()` if you are replacing Identity Server.

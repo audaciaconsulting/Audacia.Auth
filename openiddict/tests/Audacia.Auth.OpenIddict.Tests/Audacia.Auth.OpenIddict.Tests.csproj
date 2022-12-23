@@ -22,6 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Audacia.Auth.OpenIddict.QuartzCleanup\Audacia.Auth.OpenIddict.QuartzCleanup.csproj" />
     <ProjectReference Include="..\..\src\Audacia.Auth.OpenIddict\Audacia.Auth.OpenIddict.csproj" />
   </ItemGroup>
 
