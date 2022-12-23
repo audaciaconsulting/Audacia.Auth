@@ -55,9 +55,9 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
                     throw new ArgumentException(string.IsNullOrEmpty(tokenName) ? "The type is not recognised." : $"The type for {tokenName} is not recognised");
             }
 
-            if (Value == default)
+            if (Value <= 0)
             {
-                throw new ArgumentException(string.IsNullOrEmpty(tokenName) ? "The value cannot be zero." : $"The value for {tokenName} cannot be zero");
+                throw new ArgumentException(string.IsNullOrEmpty(tokenName) ? "The value cannot be less than or equal to zero." : $"The value for {tokenName} cannot be less than or equal to zero");
             }
 
             return span;
