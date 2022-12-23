@@ -31,7 +31,7 @@ namespace Audacia.Auth.OpenIddict.Tests.QuartzCleanup
         }
 
         [Fact]
-        public void Adding_OpenIddict_with_cleanup_uses_12_hour_token_lifespan_default()
+        public void Adding_OpenIddict_with_cleanup_uses_6_hour_token_lifespan_default()
         {
             var services = new ServiceCollection();
             services.AddOpenIddictWithCleanup<DummyUser, string>(
@@ -43,11 +43,11 @@ namespace Audacia.Auth.OpenIddict.Tests.QuartzCleanup
             var provider = services.BuildServiceProvider();
             var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
-            options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(12));
+            options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(6));
         }
 
         [Fact]
-        public void Adding_OpenIddict_with_cleanup_uses_12_hour_authorization_lifespan_default()
+        public void Adding_OpenIddict_with_cleanup_uses_6_hour_authorization_lifespan_default()
         {
             var services = new ServiceCollection();
             services.AddOpenIddictWithCleanup<DummyUser, string>(
@@ -59,7 +59,7 @@ namespace Audacia.Auth.OpenIddict.Tests.QuartzCleanup
             var provider = services.BuildServiceProvider();
             var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
-            options.CurrentValue.MinimumAuthorizationLifespan.Should().Be(TimeSpan.FromHours(12));
+            options.CurrentValue.MinimumAuthorizationLifespan.Should().Be(TimeSpan.FromHours(6));
         }
 
         [Fact]
@@ -117,7 +117,7 @@ namespace Audacia.Auth.OpenIddict.Tests.QuartzCleanup
             var provider = services.BuildServiceProvider();
             var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
-            options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(12));
+            options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(6));
         }
 
         [Fact]
@@ -133,7 +133,7 @@ namespace Audacia.Auth.OpenIddict.Tests.QuartzCleanup
             var provider = services.BuildServiceProvider();
             var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
-            options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(12));
+            options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(6));
         }
     }
 
