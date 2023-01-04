@@ -21,11 +21,17 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
         /// <summary>
         /// Gets the values that are in settings in Timespan form.
         /// </summary>
+        /// <returns>A timespan representation of the token from appsettings.</returns>
+        public TimeSpan GetLifetime() => GetLifetime(string.Empty);
+
+        /// <summary>
+        /// Gets the values that are in settings in Timespan form.
+        /// </summary>
         /// <param name="tokenName">The name of the token that is being retrieved from appsettings.</param>
         /// <returns>A timespan representation of the token from appsettings.</returns>
         /// <exception cref="ArgumentException">The given <paramref name="tokenName"/> is invalid.</exception>
         [SuppressMessage("Maintainability", "ACL1002:Member or local function contains too many statements", Justification = "Dependent on the number of ConfigurableTimespanTypes.")]
-        public TimeSpan GetLifetime(string tokenName)
+        public virtual TimeSpan GetLifetime(string tokenName)
         {
             TimeSpan span;
 
@@ -46,12 +52,12 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
                     span = TimeSpan.FromSeconds(Value);
                     break;
                 default:
-                    throw new ArgumentException($"The type for {tokenName} is not recognised");
+                    throw new ArgumentException(string.IsNullOrEmpty(tokenName) ? "The type is not recognised." : $"The type for {tokenName} is not recognised");
             }
 
-            if (Value == default)
+            if (Value <= 0)
             {
-                throw new ArgumentException($"The value for {tokenName} cannot be zero");
+                throw new ArgumentException(string.IsNullOrEmpty(tokenName) ? "The value cannot be less than or equal to zero." : $"The value for {tokenName} cannot be less than or equal to zero");
             }
 
             return span;
