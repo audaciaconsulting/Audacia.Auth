@@ -67,8 +67,17 @@ However if you are replacing IdentityServer4 in an existing project then it is g
 The structure of the config is as follows:
 - `EncryptionCertificateThumbprint`: The thumbprint of the self-signed certificate that will be used to encrypt tokens; note this is not required when developing locally, so no certificates need to be generated for local development and this setting can be left blank; when set for deployed environments it must be a different certificate to the one used for signing (see [here](#token-signing-and-encryption-certificates) for more information).
 - `SigningCertificateThumbprint`: The thumbprint of the self-signed certificate that will be used to sign tokens; note this is not required when developing locally, so no certificates need to be generated for local development and this setting can be left blank; when set for deployed environments it must be a different certificate to the one used for encryption (see [here](#token-signing-and-encryption-certificates) for more information).
-- `CertificateStoreLocation`: Optional, defaults to `"CurrentUser"`; the other valid value is `"LocalMachine"`:
-    - Generally speaking you should use `"CurrentUser"` (or omit entirely) if deploying to Azure App Services, and use `"LocalMachine"` if deploying to IIS.
+- `CertificateStoreLocation`: Optional, defaults to `"CurrentUser"`; the other valid values are `"LocalMachine"` and `"Custom"`; each respective value should generally be used in the following circumstances:
+    - `"CurrentUser"` (or omit entirely) if deploying to Azure App Services and the certificates have been uploaded as private key certificates as described [here](https://dev.azure.com/audacia/Audacia/_wiki/wikis/Audacia.wiki/4317/Adding-Token-Signing-or-Encryption-Certificates?anchor=azure-hosted-apps).
+    - `"LocalMachine"` if deploying to IIS and the certificates have been imported to the certificate store on the web server as described [here](https://dev.azure.com/audacia/Audacia/_wiki/wikis/Audacia.wiki/4317/Adding-Token-Signing-or-Encryption-Certificates?anchor=iis-hosted-apps).
+    - `"Custom"` in all other cases; it is up to the user of the library to obtain and add the certificates to OpenIddict themselves, using code something like this:
+    ```csharp
+    openIddictBuilder.AddServer(options =>
+    {
+        options.AddEncryptionCertificate(/*Pass in the certificate*/);
+        options.AddSigningCertificate(/*Pass in the certificate*/);
+    })
+    ```
 - `Url`: The base url of the Identity app.
 - `ClientCredentialsClients`: Clients that will use the Client Credentials flow; this is typically APIs and other back-end applications that don't need to obtain tokens on behalf of a user.
 - `AuthorizationCodeClients`: Clients that will use the Authorization Code (with PKCE) flow; this will generally be any UI-based application (e.g. web app, mobile app).
