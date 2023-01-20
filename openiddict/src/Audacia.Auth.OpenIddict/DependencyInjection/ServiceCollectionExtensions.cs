@@ -293,6 +293,12 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection
                     .DisableAccessTokenEncryption();
             }
 
+            if (string.Equals(openIdConnectConfig.CertificateStoreLocation, CertificateLocationOptions.Custom, StringComparison.OrdinalIgnoreCase))
+            {
+                // If custom location then the client is responsible for loading the certificates
+                return openIddictServerBuilder;
+            }
+
             if (openIdConnectConfig.EncryptionCertificateThumbprint == openIdConnectConfig.SigningCertificateThumbprint)
             {
                 throw new OpenIddictConfigurationException("The certificates used for token encryption and token signing should not be the same.");
