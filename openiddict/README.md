@@ -417,7 +417,7 @@ services.AddCustomGrantTypeProvider<SamlClaimsPrincipalProvider>();
 
 ### Configuring Application Cookie
 
-When an authentication cookie is issued, the authentication handler executes and can determine if a user is no longer authenticated, is denied access or where to log the user our. 
+The Identity application uses a cookie to determine whether or not the user is authenticated. When a request is made, the cookie authentication handler executes and can determine if a user is no longer authenticated, is denied access or where to log the user out. 
 
 It's important that we set where the user will be redirected too for these scenarios so the authentication handler knows where.
 
@@ -432,6 +432,25 @@ serviceCollection.ConfigureApplicationCookie(options =>
         options.LogoutPath = new PathString("/Identity/Account/Logout");
     });
 ```
+
+### OpenIddictServerOptions Configuration
+To set the logout endpoint URIs for OpenIddict, you can use the OpenIddictServerOptions class in your application's startup code. Here is an example:
+
+```csharp
+services.AddOpenIddict()
+    .AddServer(options =>
+    {
+        options.SetLogoutEndpointUris("/logout");
+        // You can set multiple URIs by passing an array of strings:
+        // options.SetLogoutEndpointUris(new[] { "/logout", "/signout" });
+    });
+```
+
+In this example, the SetLogoutEndpointUris method is used to set the logout endpoint URI to /logout. You can set multiple URIs by passing an array of strings to this method.
+
+Once you have set the logout endpoint URI(s), you can add a logout button to your web application that redirects to the specified endpoint when clicked. When the user is redirected to the logout endpoint, their session will be invalidated and they will be logged out of the application.
+
+You can also customize the behavior of the logout feature by configuring the OnRemoteLogout event handler in the OpenIddictServerOptions class. This event handler is called when a remote application logs the user out of your application. For example, you can use this event handler to delete any tokens that were issued to the user when they log out.
 
 ### Accessing Signing and Encryption Credentials - **_optional_**
 
