@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Audacia.Auth.OpenIddict.Common;
 using Audacia.Auth.OpenIddict.Common.Configuration;
+using Audacia.Auth.OpenIddict.Seeding.OpenIddictExtensions;
 using Microsoft.Extensions.Logging;
 using OpenIddict.Abstractions;
 using static OpenIddict.Abstractions.OpenIddictConstants;
@@ -100,30 +101,9 @@ namespace Audacia.Auth.OpenIddict.Seeding
                 }
             };
 
-            // Attach URLs that the user can be redirected to after logout
-            applicationClient.PostLogoutRedirectUris.Add(clientConfig.BaseUrl);
-
-            // Attach URLs required for authentication, i.e. auth-callbacks, silent renew
-            if (clientConfig.RedirectUris == null)
-            {
-                applicationClient.RedirectUris.Add(clientConfig.BaseUrl);
-            }
-            else
-            {
-                foreach (var uri in clientConfig.RedirectUris)
-                {
-                    applicationClient.RedirectUris.Add(uri);
-                }
-            }
-
-            if (clientConfig.ClientScopes != null)
-            {
-                // Define what client scopes this client can access, i.e. booking-api, finance-api
-                foreach (var scope in clientConfig.ClientScopes)
-                {
-                    applicationClient.Permissions.Add(Permissions.Prefixes.Scope + scope);
-                }
-            }
+            applicationClient.AddPostLogoutRedirectUris(clientConfig);
+            applicationClient.AddRedirectUris(clientConfig);
+            applicationClient.AddScopes(clientConfig);
 
             return applicationClient;
         }
@@ -161,14 +141,7 @@ namespace Audacia.Auth.OpenIddict.Seeding
                 }
             };
 
-            // Attach what client scopes can be inspected by this resource client, i.e. booking-api, finance-api
-            if (clientConfig.ClientScopes != null)
-            {
-                foreach (var scope in clientConfig.ClientScopes)
-                {
-                    applicationClient.Permissions.Add(Permissions.Prefixes.Scope + scope);
-                }
-            }
+            applicationClient.AddScopes(clientConfig);
 
             return applicationClient;
         }
@@ -207,14 +180,7 @@ namespace Audacia.Auth.OpenIddict.Seeding
                 }
             };
 
-            // Attach what client scopes can be inspected by this resource client, i.e. booking-api, finance-api
-            if (clientConfig.ClientScopes != null)
-            {
-                foreach (var scope in clientConfig.ClientScopes)
-                {
-                    applicationClient.Permissions.Add(Permissions.Prefixes.Scope + scope);
-                }
-            }
+            applicationClient.AddScopes(clientConfig);
 
             return applicationClient;
         }
@@ -255,14 +221,7 @@ namespace Audacia.Auth.OpenIddict.Seeding
                 }
             };
 
-            // Attach what client scopes can be inspected by this resource client, i.e. booking-api, finance-api
-            if (clientConfig.ClientScopes != null)
-            {
-                foreach (var scope in clientConfig.ClientScopes)
-                {
-                    applicationClient.Permissions.Add(Permissions.Prefixes.Scope + scope);
-                }
-            }
+            applicationClient.AddScopes(clientConfig);
 
             if (clientConfig.ClientUris != null)
             {
