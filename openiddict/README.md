@@ -103,6 +103,7 @@ Within each client configuration object, the following properties can be set:
 - `AccessTokenLifetime`: Optionally sets a custom access token lifetime.
 - `BaseUrl`: The base url of the client app _(applies to Authorization Code Clients only)_.
 - `RedirectUris`: The set of urls within the client app to which OpenIddict is allowed to redirect _(applies to Authorization Code Clients only)_.
+- `PostLogoutRedirectUris`: The set of urls within the client app to which OpenIddict is allowed to redirect after a successful logout _(applies to Authorization Code Clients only - not always needed)_.
 
 An example config section is as follow; **note you should replace values as appropriate, particularly urls and client ids/secrets**:
 
@@ -129,6 +130,10 @@ An example config section is as follow; **note you should replace values as appr
           "https://localhost:44351",
           "https://localhost:44351/auth-callback",
           "https://localhost:44351/assets/silent-renew.html"
+        ],
+        "PostLogoutRedirectUris": [
+          "https://localhost:44351",
+          "https://localhost:44351/post-logout-callback"
         ],
         "AccessTokenLifetime": {
           "Value": "30",

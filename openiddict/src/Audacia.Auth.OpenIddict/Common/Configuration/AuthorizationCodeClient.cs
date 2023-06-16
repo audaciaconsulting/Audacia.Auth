@@ -18,5 +18,10 @@ namespace Audacia.Auth.OpenIddict.Common.Configuration
         /// Used for auth-callbacks, slient-renewals, and redirect-uris...
         /// </summary>
         public IReadOnlyCollection<Uri>? RedirectUris { get; set; }
+
+        /// <summary>
+        /// Gets or sets the URLs that the client will redirect to after a logout is completed.
+        /// </summary>
+        public IReadOnlyCollection<Uri>? PostLogoutRedirectUris { get; set; }
     }
 }
