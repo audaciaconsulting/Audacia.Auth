@@ -13,6 +13,7 @@ namespace Audacia.Auth.OpenIddict.Seeding;
 /// <summary>
 /// Base type for seeding a database with OpenIddict application and scope entities.
 /// </summary>
+[System.Diagnostics.CodeAnalysis.SuppressMessage("member-design", "AV1130:Return interfaces to unchangeable collections.", Justification = "Allows for further extensions of IServiceCollection")]
 public abstract class OpenIddictSeedBase<TKey> where TKey : IEquatable<TKey>
 {
     private readonly string _identityProjectBasePath;
@@ -36,7 +37,7 @@ public abstract class OpenIddictSeedBase<TKey> where TKey : IEquatable<TKey>
     public async Task SeedAsync()
     {
         var services = ConfigureServices();
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
         var runner = provider.GetRequiredService<OpenIddictSeedingRunner>();
         await runner.RunAsync().ConfigureAwait(false);
     }

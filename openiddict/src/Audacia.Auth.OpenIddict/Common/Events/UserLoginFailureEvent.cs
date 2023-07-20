@@ -47,12 +47,34 @@ public class UserLoginFailureEvent : AuthEvent
     /// <param name="username">The username.</param>
     /// <param name="error">The error.</param>
     /// <param name="interactive">Specifies if login was interactive.</param>
+#pragma warning disable AV1564 // Parameter in public or internal member is of type bool or bool?
+    public UserLoginFailureEvent(string username, string error, bool interactive = true)
+#pragma warning restore AV1564 // Parameter in public or internal member is of type bool or bool?
+        : base(EventCategories.Authentication, "User Login Failure", EventTypes.Failure, EventIds.UserLoginFailure, error)
+    {
+        Username = username.Obfuscate();
+
+        if (interactive)
+        {
+            Endpoint = "UI";
+        }
+        else
+        {
+            Endpoint = EndpointNames.Token;
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserLoginFailureEvent" /> class.
+    /// </summary>
+    /// <param name="username">The username.</param>
+    /// <param name="error">The error.</param>
+    /// <param name="interactive">Specifies if login was interactive.</param>
     /// <param name="clientId">The client id.</param>
 #pragma warning disable AV1564 // Parameter in public or internal member is of type bool or bool?
-    public UserLoginFailureEvent(string username, string error, bool interactive = true, string? clientId = null)
+    public UserLoginFailureEvent(string username, string error, bool interactive, string? clientId)
 #pragma warning restore AV1564 // Parameter in public or internal member is of type bool or bool?
-        : base(EventCategories.Authentication, "User Login Failure", EventTypes.Failure, EventIds.UserLoginFailure,
-              error)
+        : base(EventCategories.Authentication, "User Login Failure", EventTypes.Failure, EventIds.UserLoginFailure, error)
     {
         Username = username.Obfuscate();
         ClientId = clientId;
@@ -74,13 +96,38 @@ public class UserLoginFailureEvent : AuthEvent
     /// <param name="subjectId">The subject Id.</param>
     /// <param name="error">The error.</param>
     /// <param name="interactive">Specifies if login was interactive.</param>
+#pragma warning disable AV1564 // Parameter in public or internal member is of type bool or bool?
+    [SuppressMessage("Maintainability", "ACL1003:Signature contains too many parameters", Justification = "Needs all parameters.")]
+    public UserLoginFailureEvent(string username, string? subjectId, string error, bool interactive = true)
+#pragma warning restore AV1564 // Parameter in public or internal member is of type bool or bool?
+        : base(EventCategories.Authentication, "User Login Failure", EventTypes.Failure, EventIds.UserLoginFailure, error)
+    {
+        Username = username.Obfuscate();
+        SubjectId = subjectId;
+
+        if (interactive)
+        {
+            Endpoint = "UI";
+        }
+        else
+        {
+            Endpoint = EndpointNames.Token;
+        }
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="UserLoginFailureEvent" /> class.
+    /// </summary>
+    /// <param name="username">The username.</param>
+    /// <param name="subjectId">The subject Id.</param>
+    /// <param name="error">The error.</param>
+    /// <param name="interactive">Specifies if login was interactive.</param>
     /// <param name="clientId">The client id.</param>
 #pragma warning disable AV1564 // Parameter in public or internal member is of type bool or bool?
     [SuppressMessage("Maintainability", "ACL1003:Signature contains too many parameters", Justification = "Needs all parameters.")]
-    public UserLoginFailureEvent(string username, string? subjectId, string error, bool interactive = true, string? clientId = null)
+    public UserLoginFailureEvent(string username, string? subjectId, string error, bool interactive, string? clientId)
 #pragma warning restore AV1564 // Parameter in public or internal member is of type bool or bool?
-        : base(EventCategories.Authentication, "User Login Failure", EventTypes.Failure, EventIds.UserLoginFailure,
-              error)
+        : base(EventCategories.Authentication, "User Login Failure", EventTypes.Failure, EventIds.UserLoginFailure, error)
     {
         Username = username.Obfuscate();
         SubjectId = subjectId;

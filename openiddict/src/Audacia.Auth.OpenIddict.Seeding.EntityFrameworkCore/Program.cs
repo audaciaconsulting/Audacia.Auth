@@ -4,7 +4,7 @@ using Audacia.Auth.OpenIddict.Seeding.EntityFrameworkSupport;
 
 namespace Audacia.Auth.OpenIddict.Seeding.EntityFrameworkCore;
 
-internal class Program
+internal static class Program
 {
     public static async Task Main(string[] args)
     {

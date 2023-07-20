@@ -95,10 +95,29 @@ public abstract class AuthEvent
     /// <param name="name">The name.</param>
     /// <param name="type">The type.</param>
     /// <param name="id">The identifier.</param>
+    /// <exception cref="ArgumentNullException">category.</exception>
+#pragma warning disable ACL1003 // Signature contains too many parameters
+    protected AuthEvent(string category, string name, EventTypes type, int id)
+#pragma warning restore ACL1003 // Signature contains too many parameters
+    {
+        Category = category ?? throw new ArgumentNullException(nameof(category));
+        Name = name ?? throw new ArgumentNullException(nameof(name));
+
+        EventType = type;
+        Id = id;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AuthEvent" /> class.
+    /// </summary>
+    /// <param name="category">The category.</param>
+    /// <param name="name">The name.</param>
+    /// <param name="type">The type.</param>
+    /// <param name="id">The identifier.</param>
     /// <param name="message">The message.</param>
     /// <exception cref="ArgumentNullException">category.</exception>
 #pragma warning disable ACL1003 // Signature contains too many parameters
-    protected AuthEvent(string category, string name, EventTypes type, int id, string? message = null)
+    protected AuthEvent(string category, string name, EventTypes type, int id, string? message)
 #pragma warning restore ACL1003 // Signature contains too many parameters
     {
         Category = category ?? throw new ArgumentNullException(nameof(category));

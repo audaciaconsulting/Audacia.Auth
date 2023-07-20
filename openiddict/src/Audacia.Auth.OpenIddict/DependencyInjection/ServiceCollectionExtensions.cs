@@ -20,6 +20,7 @@ namespace Audacia.Auth.OpenIddict.DependencyInjection;
 /// <summary>
 /// Extensions to the <see cref="IServiceCollection"/> type.
 /// </summary>
+[System.Diagnostics.CodeAnalysis.SuppressMessage("member-design", "AV1130:Return interfaces to unchangeable collections.", Justification = "Allows for further extensions")]
 public static class ServiceCollectionExtensions
 {
     /// <summary>

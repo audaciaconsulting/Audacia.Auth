@@ -98,7 +98,7 @@ public class PasswordClaimsPrincipalProvider<TUser, TId> : IClaimsPrincipalProvi
     }
 
     private Task RaiseLoginFailureEventAsync(OpenIddictRequest request, string? userId, string error) =>
-        _eventService.RaiseAsync(new UserLoginFailureEvent(request.Username ?? "Unknown user", userId, error, clientId: request.ClientId));
+        _eventService.RaiseAsync(new UserLoginFailureEvent(request.Username ?? "Unknown user", userId, error, true, request.ClientId));
 
     private async Task<ClaimsPrincipal> CreatePrincipalForPasswordFlowAsync(OpenIddictRequest openIddictRequest, UserWrapper<TUser, TId> user)
     {

@@ -77,6 +77,7 @@ internal static class ClaimsPrincipalExtensions
     /// </summary>
     /// <param name="principal">The <see cref="ClaimsPrincipal"/> from which to get the claims.</param>
     /// <returns>An <see cref="IDictionary{TKey, TValue}"/> representing the claims of the given <paramref name="principal"/> as key-value pairs.</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("member-design", "AV1130:Return interfaces to unchangeable collections.", Justification = "Collection is limited to dictionaries, as defined in the method name")]
     internal static IDictionary<string, string> ToClaimsDictionary(this ClaimsPrincipal principal) =>
         principal.Claims.ToDictionary(claim => claim.Type, claim => claim.Value);
 
