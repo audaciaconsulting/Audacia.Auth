@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount;
 
 namespace Audacia.Auth.OpenIddict.Common.Events;
 
@@ -96,9 +97,7 @@ public abstract class AuthEvent
     /// <param name="type">The type.</param>
     /// <param name="id">The identifier.</param>
     /// <exception cref="ArgumentNullException">category.</exception>
-#pragma warning disable ACL1003 // Signature contains too many parameters
     protected AuthEvent(string category, string name, EventTypes type, int id)
-#pragma warning restore ACL1003 // Signature contains too many parameters
     {
         Category = category ?? throw new ArgumentNullException(nameof(category));
         Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -116,9 +115,8 @@ public abstract class AuthEvent
     /// <param name="id">The identifier.</param>
     /// <param name="message">The message.</param>
     /// <exception cref="ArgumentNullException">category.</exception>
-#pragma warning disable ACL1003 // Signature contains too many parameters
+    [MaxParameterCount(5)]
     protected AuthEvent(string category, string name, EventTypes type, int id, string? message)
-#pragma warning restore ACL1003 // Signature contains too many parameters
     {
         Category = category ?? throw new ArgumentNullException(nameof(category));
         Name = name ?? throw new ArgumentNullException(nameof(name));
