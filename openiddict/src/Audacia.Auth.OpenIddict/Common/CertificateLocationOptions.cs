@@ -1,13 +1,12 @@
-﻿namespace Audacia.Auth.OpenIddict.Common
+﻿namespace Audacia.Auth.OpenIddict.Common;
+
+/// <summary>
+/// Constants for additional certificate location options.
+/// </summary>
+internal static class CertificateLocationOptions
 {
     /// <summary>
-    /// Constants for additional certificate location options.
+    /// A custom location.
     /// </summary>
-    internal static class CertificateLocationOptions
-    {
-        /// <summary>
-        /// A custom location.
-        /// </summary>
-        internal const string Custom = "Custom";
-    }
+    internal const string Custom = "Custom";
 }
