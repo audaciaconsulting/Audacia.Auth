@@ -83,13 +83,7 @@ namespace Audacia.Auth.OpenIddict.Token
                         {
                             Destinations.AccessToken,
                             Destinations.IdentityToken
-                        },
-
-                    // Otherwise, only store the claim in the access tokens.
-                    _ => new[]
-                    {
-                        Destinations.AccessToken
-                    }
+                        }
                 };
             });
         }
