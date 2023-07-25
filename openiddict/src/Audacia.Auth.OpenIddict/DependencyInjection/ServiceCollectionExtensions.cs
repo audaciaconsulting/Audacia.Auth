@@ -277,12 +277,10 @@ public static class ServiceCollectionExtensions
         });
     }
 
-#pragma warning disable ACL1002 // Member or local function contains too many statements
     private static OpenIddictServerBuilder ConfigureSigningCredential(
         OpenIddictServerBuilder openIddictServerBuilder,
         OpenIdConnectConfig openIdConnectConfig,
         IWebHostEnvironment hostingEnvironment)
-#pragma warning restore ACL1002 // Member or local function contains too many statements
     {
         if (hostingEnvironment.IsDevelopment())
         {
@@ -300,6 +298,16 @@ public static class ServiceCollectionExtensions
             return openIddictServerBuilder;
         }
 
+        // Find certificates and validate their existance.
+        var (encryptionCertificate, signingCertificate) = GetCertificates(openIddictServerBuilder, openIdConnectConfig);
+
+        return openIddictServerBuilder
+            .AddEncryptionCertificate(encryptionCertificate)
+            .AddSigningCertificate(signingCertificate);
+    }
+
+    private static (X509Certificate2 EncryptionCertificate, X509Certificate2 SigningCertificate) GetCertificates(OpenIddictServerBuilder openIddictServerBuilder, OpenIdConnectConfig openIdConnectConfig)
+    {
         if (openIdConnectConfig.EncryptionCertificateThumbprint == openIdConnectConfig.SigningCertificateThumbprint)
         {
             throw new OpenIddictConfigurationException("The certificates used for token encryption and token signing should not be the same.");
@@ -317,9 +325,7 @@ public static class ServiceCollectionExtensions
             throw new OpenIddictConfigurationException("Unable to load token signing certificate");
         }
 
-        return openIddictServerBuilder
-            .AddEncryptionCertificate(encryptionCertificate)
-            .AddSigningCertificate(signingCertificate);
+        return (encryptionCertificate, signingCertificate);
     }
 
     private static X509Certificate2? FindCertificate(string? certificateThumbprint, string? certificateStoreLocation)

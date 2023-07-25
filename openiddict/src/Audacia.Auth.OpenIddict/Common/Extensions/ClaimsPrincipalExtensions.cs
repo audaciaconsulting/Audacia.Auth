@@ -23,9 +23,8 @@ internal static class ClaimsPrincipalExtensions
         }
     }
 
-#pragma warning disable ACL1002 // Member or local function contains too many statements
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability", "ACL1002:Member or local function contains too many statements", Justification = "Easier to understand, not worth breaking up.")]
     private static IEnumerable<string> GetDestinations(Claim claim, ClaimsPrincipal principal)
-#pragma warning restore ACL1002 // Member or local function contains too many statements
     {
         // Note: by default, claims are NOT automatically included in the access and identity tokens.
         // To allow OpenIddict to serialize them, you must attach them a destination, that specifies

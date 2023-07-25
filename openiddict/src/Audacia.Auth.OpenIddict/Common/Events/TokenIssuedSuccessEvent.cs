@@ -25,9 +25,9 @@ public class TokenIssuedSuccessEvent : AuthEvent
     /// <value>
     /// The redirect URI.
     /// </value>
-#pragma warning disable CA1056 // URI-like properties should not be strings
+
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1056:URI-like properties should not be strings", Justification = "As string to be easily readable by humans.")]
     public string? RedirectUri { get; set; }
-#pragma warning restore CA1056 // URI-like properties should not be strings
 
     /// <summary>
     /// Gets or sets the endpoint.
