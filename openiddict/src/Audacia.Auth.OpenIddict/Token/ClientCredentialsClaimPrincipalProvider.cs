@@ -14,6 +14,7 @@ namespace Audacia.Auth.OpenIddict.Token
     public class ClientCredentialsClaimPrincipalProvider : IClaimsPrincipalProvider
     {
         private readonly IOpenIddictApplicationManager _applicationManager;
+
         private readonly IOpenIddictScopeManager _scopeManager;
 
         /// <summary>
@@ -21,7 +22,9 @@ namespace Audacia.Auth.OpenIddict.Token
         /// </summary>
         /// <param name="applicationManager">An implementation of <see cref="IOpenIddictApplicationManager"/>.</param>
         /// <param name="scopeManager">An implementation of <see cref="IOpenIddictScopeManager"/>.</param>
-        public ClientCredentialsClaimPrincipalProvider(IOpenIddictApplicationManager applicationManager, IOpenIddictScopeManager scopeManager)
+        public ClientCredentialsClaimPrincipalProvider(
+            IOpenIddictApplicationManager applicationManager,
+            IOpenIddictScopeManager scopeManager)
         {
             _applicationManager = applicationManager;
             _scopeManager = scopeManager;
@@ -35,7 +38,8 @@ namespace Audacia.Auth.OpenIddict.Token
             // Note: the client credentials are automatically validated by OpenIddict:
             // if client_id or client_secret are invalid, this action won't be invoked.
 
-            var application = await _applicationManager.FindByClientIdAsync(openIddictRequest.ClientId!).ConfigureAwait(false);
+            var application = await _applicationManager.FindByClientIdAsync(openIddictRequest.ClientId!)
+                .ConfigureAwait(false);
             if (application == null)
             {
                 throw new InvalidOperationException("The application details cannot be found in the database.");
@@ -48,24 +52,50 @@ namespace Audacia.Auth.OpenIddict.Token
                 Claims.Name,
                 Claims.Role);
             await AddAdditionalClientCredentialsClaimsAsync(application, identity).ConfigureAwait(false);
-            
-            return await CreatePrincipalForClientCredentialsFlowAsync(openIddictRequest, identity).ConfigureAwait(false);
+
+            return await CreatePrincipalForClientCredentialsFlowAsync(openIddictRequest, identity)
+                .ConfigureAwait(false);
         }
 
         private async Task AddAdditionalClientCredentialsClaimsAsync(object application, ClaimsIdentity identity)
         {
-            // Use the client_id as the subject identifier.
             var clientId = await _applicationManager.GetClientIdAsync(application).ConfigureAwait(false);
-            identity.AddClaim(Claims.Subject, clientId!, Destinations.AccessToken, Destinations.IdentityToken);
-
             var displayName = await _applicationManager.GetDisplayNameAsync(application).ConfigureAwait(false);
-            if (displayName != null)
+
+            // Use the client_id as the subject identifier.
+            identity.SetClaim(Claims.Subject, clientId);
+            identity.SetClaim(Claims.Name, displayName);
+
+            identity.SetDestinations(claim =>
             {
-                identity.AddClaim(Claims.Name, displayName, Destinations.AccessToken, Destinations.IdentityToken);
-            }
+                return claim.Type switch
+                {
+                    Claims.Subject => new[]
+                    {
+                        Destinations.AccessToken,
+                        Destinations.IdentityToken
+                    },
+
+                    // Allow the "name" claim to be stored in both the access and identity tokens
+                    // when the "profile" scope was granted (by calling principal.SetScopes(...)).
+                    Claims.Name when displayName != null
+                        => new[]
+                        {
+                            Destinations.AccessToken,
+                            Destinations.IdentityToken
+                        },
+
+                    // Otherwise, only store the claim in the access tokens.
+                    _ => new[]
+                    {
+                        Destinations.AccessToken
+                    }
+                };
+            });
         }
 
-        private async Task<ClaimsPrincipal> CreatePrincipalForClientCredentialsFlowAsync(OpenIddictRequest openIddictRequest, ClaimsIdentity identity)
+        private async Task<ClaimsPrincipal> CreatePrincipalForClientCredentialsFlowAsync(
+            OpenIddictRequest openIddictRequest, ClaimsIdentity identity)
         {
             // Note: In the original OAuth 2.0 specification, the client credentials grant
             // doesn't return an identity token, which is an OpenID Connect concept.
@@ -78,7 +108,9 @@ namespace Audacia.Auth.OpenIddict.Token
             // Set the list of scopes granted to the client application in access_token.
             var principal = new ClaimsPrincipal(identity);
             principal.SetScopes(openIddictRequest.GetScopes());
-            principal.SetResources(await _scopeManager.ListResourcesAsync(principal.GetScopes()).ToListAsync().ConfigureAwait(false));
+            principal.SetResources(await _scopeManager.ListResourcesAsync(principal.GetScopes())
+                .ToListAsync()
+                .ConfigureAwait(false));
 
             return principal;
         }
