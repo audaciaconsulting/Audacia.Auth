@@ -85,7 +85,7 @@ namespace Audacia.Auth.OpenIddict.Token
                             Destinations.IdentityToken
                         },
 
-                    // Otherwise, only store the claim in the access tokens.
+                    // Otherwise, return no destinations
                     _ => Array.Empty<string>()
                 };
             });
