@@ -115,7 +115,7 @@ public abstract class AuthEvent
     /// <param name="id">The identifier.</param>
     /// <param name="message">The message.</param>
     /// <exception cref="ArgumentNullException">category.</exception>
-    [MaxParameterCount(5)]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability", "ACL1003:Signature contains too many parameters", Justification = "Need all paramaters")]
     protected AuthEvent(string category, string name, EventTypes type, int id, string? message)
     {
         Category = category ?? throw new ArgumentNullException(nameof(category));
