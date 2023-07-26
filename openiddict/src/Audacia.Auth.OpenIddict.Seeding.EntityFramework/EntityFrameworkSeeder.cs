@@ -7,7 +7,7 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFramework;
 /// <summary>
 /// Implementation of <see cref="OpenIddictSeedBase{TKey}"/> that uses Entity Framework 6.x stores.
 /// </summary>
-/// <typeparam name="TKey"></typeparam>
+/// <typeparam name="TKey">The type of the primary key used in OpenIddict.</typeparam>
 public class EntityFrameworkSeeder<TKey> : OpenIddictSeedBase<TKey>
     where TKey : IEquatable<TKey>
 {

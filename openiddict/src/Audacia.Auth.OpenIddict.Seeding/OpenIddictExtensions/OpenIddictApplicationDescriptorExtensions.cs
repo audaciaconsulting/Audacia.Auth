@@ -5,7 +5,7 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 namespace Audacia.Auth.OpenIddict.Seeding.OpenIddictExtensions;
 
 /// <summary>
-/// Extensions to the 
+/// Extension methods for the type <see cref="OpenIddictApplicationDescriptor"/>.
 /// </summary>
 internal static class OpenIddictApplicationDescriptorExtensions
 {

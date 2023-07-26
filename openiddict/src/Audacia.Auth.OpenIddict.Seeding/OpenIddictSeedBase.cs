@@ -13,6 +13,7 @@ namespace Audacia.Auth.OpenIddict.Seeding;
 /// <summary>
 /// Base type for seeding a database with OpenIddict application and scope entities.
 /// </summary>
+/// <typeparam name="TKey">The type of the primary key used in OpenIddict.</typeparam>
 [System.Diagnostics.CodeAnalysis.SuppressMessage("member-design", "AV1130:Return interfaces to unchangeable collections.", Justification = "Allows for further extensions of IServiceCollection")]
 public abstract class OpenIddictSeedBase<TKey> where TKey : IEquatable<TKey>
 {
@@ -33,7 +34,7 @@ public abstract class OpenIddictSeedBase<TKey> where TKey : IEquatable<TKey>
     /// <summary>
     /// Seeds the database with OpenIddict configuration.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>A task that updates the database.</returns>
     public async Task SeedAsync()
     {
         var services = ConfigureServices();

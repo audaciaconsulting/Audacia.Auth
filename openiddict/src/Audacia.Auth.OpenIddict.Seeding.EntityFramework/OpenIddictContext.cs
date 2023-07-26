@@ -13,11 +13,16 @@ namespace Audacia.Auth.OpenIddict.Seeding.EntityFramework;
 internal class OpenIddictContext<TKey> : DbContext
     where TKey : IEquatable<TKey>
 {
+    /// <summary>
+    /// Initializes an instance of <see cref="OpenIddictContext{TKey}"/>.
+    /// </summary>
+    /// <param name="connectionString">Database connection string.</param>
     public OpenIddictContext(string connectionString)
         : base(connectionString)
     {
     }
 
+    /// <inheritdoc/>
     protected override void OnModelCreating(DbModelBuilder modelBuilder)
     {
         modelBuilder.UseOpenIddict<TKey>();

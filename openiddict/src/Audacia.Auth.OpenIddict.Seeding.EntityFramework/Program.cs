@@ -4,8 +4,16 @@ using Audacia.Auth.OpenIddict.Seeding.EntityFrameworkSupport;
 
 namespace Audacia.Auth.OpenIddict.Seeding.EntityFramework;
 
+/// <summary>
+/// Main program, run on initialization.
+/// </summary>
 internal static class Program
 {
+    /// <summary>
+    /// Main program, run on initialization.
+    /// </summary>
+    /// <param name="args">Any arguments provided when program is executed.</param>
+    /// <returns>A task to execute program.</returns>
     public static async Task Main(string[] args)
     {
         /*
