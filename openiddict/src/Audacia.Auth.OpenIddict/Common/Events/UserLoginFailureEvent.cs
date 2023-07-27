@@ -7,6 +7,8 @@ namespace Audacia.Auth.OpenIddict.Common.Events;
 /// Event for failed user authentication.
 /// </summary>
 /// <seealso cref="AuthEvent" />
+[SuppressMessage("Maintainability", "AV1564:Parameter in public or internal member is of type bool or bool?", 
+    Justification = "Booleans are ")]
 public class UserLoginFailureEvent : AuthEvent
 {
     /// <summary>
@@ -47,9 +49,7 @@ public class UserLoginFailureEvent : AuthEvent
     /// <param name="username">The username.</param>
     /// <param name="error">The error.</param>
     /// <param name="interactive">Specifies if login was interactive.</param>
-#pragma warning disable AV1564 // Parameter in public or internal member is of type bool or bool?
     public UserLoginFailureEvent(string username, string error, bool interactive = true)
-#pragma warning restore AV1564 // Parameter in public or internal member is of type bool or bool?
         : base(EventCategories.Authentication, "User Login Failure", EventTypes.Failure, EventIds.UserLoginFailure, error)
     {
         Username = username.Obfuscate();
@@ -71,9 +71,8 @@ public class UserLoginFailureEvent : AuthEvent
     /// <param name="error">The error.</param>
     /// <param name="interactive">Specifies if login was interactive.</param>
     /// <param name="clientId">The client id.</param>
-#pragma warning disable AV1564 // Parameter in public or internal member is of type bool or bool?
-    public UserLoginFailureEvent(string username, string error, bool interactive, string? clientId)
-#pragma warning restore AV1564 // Parameter in public or internal member is of type bool or bool?
+    [SuppressMessage("Maintainability", "AV1553:Do not use optional parameters with default value null for strings, collections or tasks", Justification = "Don't set a default cliendId")]
+    public UserLoginFailureEvent(string username, string error, bool interactive = true, string? clientId = null)
         : base(EventCategories.Authentication, "User Login Failure", EventTypes.Failure, EventIds.UserLoginFailure, error)
     {
         Username = username.Obfuscate();
@@ -96,8 +95,6 @@ public class UserLoginFailureEvent : AuthEvent
     /// <param name="subjectId">The subject Id.</param>
     /// <param name="error">The error.</param>
     /// <param name="interactive">Specifies if login was interactive.</param>
-#pragma warning disable AV1564 // Parameter in public or internal member is of type bool or bool?
-    [SuppressMessage("Maintainability", "ACL1003:Signature contains too many parameters", Justification = "Needs all parameters.")]
     public UserLoginFailureEvent(string username, string? subjectId, string error, bool interactive = true)
 #pragma warning restore AV1564 // Parameter in public or internal member is of type bool or bool?
         : base(EventCategories.Authentication, "User Login Failure", EventTypes.Failure, EventIds.UserLoginFailure, error)
@@ -123,7 +120,6 @@ public class UserLoginFailureEvent : AuthEvent
     /// <param name="error">The error.</param>
     /// <param name="interactive">Specifies if login was interactive.</param>
     /// <param name="clientId">The client id.</param>
-#pragma warning disable AV1564 // Parameter in public or internal member is of type bool or bool?
     [SuppressMessage("Maintainability", "ACL1003:Signature contains too many parameters", Justification = "Needs all parameters.")]
     public UserLoginFailureEvent(string username, string? subjectId, string error, bool interactive, string? clientId)
 #pragma warning restore AV1564 // Parameter in public or internal member is of type bool or bool?
