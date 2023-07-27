@@ -1,35 +1,36 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Authors>Audacia</Authors>
-    <PackageIcon>package-icon.png</PackageIcon>
-    <Description>Helper library for using OpenIddict as an authorization server with Entity Framework 6.x as an ORM.</Description>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Version>1.5.0</Version>
-    <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Authors>Audacia</Authors>
+		<PackageIcon>package-icon.png</PackageIcon>
+		<Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
+		<Description>Helper library for using OpenIddict as an authorization server with Entity Framework 6.x as an ORM.</Description>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<Version>1.5.0</Version>
+		<Nullable>enable</Nullable>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\..\package-icon.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\package-icon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.5.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="OpenIddict.EntityFramework" Version="3.1.1" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.5.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="OpenIddict.EntityFramework" Version="3.1.1" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Audacia.Auth.OpenIddict\Audacia.Auth.OpenIddict.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Audacia.Auth.OpenIddict\Audacia.Auth.OpenIddict.csproj" />
+	</ItemGroup>
 
 </Project>
