@@ -15,7 +15,6 @@ namespace Audacia.Auth.OpenIddict;
 /// </summary>
 /// <typeparam name="TUser">The user type.</typeparam>
 /// <typeparam name="TId">The type of the user's primary key.</typeparam>
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Roslynator", "RCS1046:Asynchronous method name should end with 'Async'.", Justification = "Required names for auth process")]
 public class AuthorizationController<TUser, TId> : Controller
     where TUser : class
     where TId : IEquatable<TId>

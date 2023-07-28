@@ -6,6 +6,11 @@
 # Code files
 [*.cs]
 
+# [NAMING] Asynchronous method name should be suffixed with 'Async'
+dotnet_diagnostic.ACL1005.severity = warning
+
+# [NAMING] Asynchronous method name should end with 'Async' *** Suppress as covered by ACL1005 ***
+dotnet_diagnostic.RCS1046.severity = none
 
 # [DESIGN] Implement standard exception constructors
 dotnet_diagnostic.CA1032.severity = warning
