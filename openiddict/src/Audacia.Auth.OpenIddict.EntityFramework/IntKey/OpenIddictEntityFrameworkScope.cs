@@ -1,9 +1,8 @@
 ﻿using OpenIddict.EntityFramework.Models;
 
-namespace Audacia.Auth.OpenIddict.EntityFramework.IntKey
+namespace Audacia.Auth.OpenIddict.EntityFramework.IntKey;
+
+/// <inheritdoc />
+public class OpenIddictEntityFrameworkScope : OpenIddictEntityFrameworkScope<int>
 {
-    /// <inheritdoc />
-    public class OpenIddictEntityFrameworkScope : OpenIddictEntityFrameworkScope<int>
-    {
-    }
 }

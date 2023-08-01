@@ -1,33 +1,40 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Version>1.4.0</Version>
-    <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <OutputType>Exe</OutputType>
-    <ToolCommandName>openiddict-efcore-seeding</ToolCommandName>
-    <PackAsTool>true</PackAsTool>
-    <Authors>Audacia</Authors>
-    <PackageIcon>package-icon.png</PackageIcon>
-    <Description>.NET tool to seed OpenIddict applications and scopes in a database using Entity Framework Core as the ORM.</Description>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<OutputType>Exe</OutputType>
+		<Authors>Audacia</Authors>
+		<PackageIcon>package-icon.png</PackageIcon>
+		<Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
+		<Description>.NET tool to seed OpenIddict applications and scopes in a database using Entity Framework Core as the ORM.</Description>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<Version>1.5.0</Version>
+		<Nullable>enable</Nullable>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+		<ToolCommandName>openiddict-efcore-seeding</ToolCommandName>
+		<PackAsTool>true</PackAsTool>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\..\package-icon.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\..\package-icon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.1" />
-    <PackageReference Include="OpenIddict.EntityFrameworkCore" Version="3.1.1" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.5.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.1" />
+		<PackageReference Include="OpenIddict.EntityFrameworkCore" Version="3.1.1" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Audacia.Auth.OpenIddict.Seeding\Audacia.Auth.OpenIddict.Seeding.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\Audacia.Auth.OpenIddict.Seeding\Audacia.Auth.OpenIddict.Seeding.csproj" />
+	</ItemGroup>
 
 </Project>
