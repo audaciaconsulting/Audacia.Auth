@@ -7,8 +7,7 @@ namespace Audacia.Auth.OpenIddict.Common.Events;
 /// Event for failed user authentication.
 /// </summary>
 /// <seealso cref="AuthEvent" />
-[SuppressMessage("Maintainability", "AV1564:Parameter in public or internal member is of type bool or bool?", 
-    Justification = "Booleans are ")]
+[SuppressMessage("Maintainability", "AV1564:Parameter in public or internal member is of type bool or bool?", Justification = "Using booleans provides an easy to understand parameter and maintains consistancy through methods .")]
 public class UserLoginFailureEvent : AuthEvent
 {
     /// <summary>

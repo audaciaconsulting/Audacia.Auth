@@ -14,6 +14,7 @@ internal static class Program
     /// </summary>
     /// <param name="args">Any arguments provided when program is executed.</param>
     /// <returns>A task to execute program.</returns>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Naming", "ACL1005:Asynchronous method name is not suffixed with 'Async'.", Justification = "The `Main` method is the entry point of a C# application.")]
     public static async Task Main(string[] args)
     {
         /*
