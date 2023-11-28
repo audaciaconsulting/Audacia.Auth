@@ -9,46 +9,45 @@ using Microsoft.Extensions.Hosting;
 using Moq;
 using Xunit;
 
-namespace Audacia.Auth.OpenIddict.Tests.DependencyInjection
+namespace Audacia.Auth.OpenIddict.Tests.DependencyInjection;
+
+public class TypeResolutionTests
 {
-    public class TypeResolutionTests
+    private readonly IServiceCollection _services;
+
+    public TypeResolutionTests()
     {
-        private readonly IServiceCollection _services;
+        var mockHostingEnvironment = new Mock<IWebHostEnvironment>();
+        mockHostingEnvironment.SetupGet(env => env.EnvironmentName).Returns(Environments.Development);
 
-        public TypeResolutionTests()
-        {
-            var mockHostingEnvironment = new Mock<IWebHostEnvironment>();
-            mockHostingEnvironment.SetupGet(env => env.EnvironmentName).Returns(Environments.Development);
+        _services = new ServiceCollection();
+        _services
+            .AddTransient(_ => new Mock<IRoleStore<DummyRole>>().Object)
+            .AddTransient(_ => new Mock<IUserStore<DummyUser>>().Object)
+            .AddIdentity<DummyUser, DummyRole>()
+            .AddUserManager<UserManager<DummyUser>>();
+        _services.AddOpenIddict<DummyUser, int>(
+            _ => { },
+            user => user.Id,
+            new OpenIdConnectConfig(),
+            mockHostingEnvironment.Object);
+    }
 
-            _services = new ServiceCollection();
-            _services
-                .AddTransient(_ => new Mock<IRoleStore<DummyRole>>().Object)
-                .AddTransient(_ => new Mock<IUserStore<DummyUser>>().Object)
-                .AddIdentity<DummyUser, DummyRole>()
-                .AddUserManager<UserManager<DummyUser>>();
-            _services.AddOpenIddict<DummyUser, int>(
-                _ => { },
-                user => user.Id,
-                new OpenIdConnectConfig(),
-                mockHostingEnvironment.Object);
-        }
+    [Fact]
+    public void Can_resolve_user_info_handler()
+    {
+        var serviceProvider = _services.BuildServiceProvider();
 
-        [Fact]
-        public void Can_resolve_user_info_handler()
-        {
-            var serviceProvider = _services.BuildServiceProvider();
+        var userInfoHandler = serviceProvider.GetRequiredService<IUserInfoHandler<DummyUser, int>>();
 
-            var userInfoHandler = serviceProvider.GetRequiredService<IUserInfoHandler<DummyUser, int>>();
+        userInfoHandler.Should().NotBeNull();
+    }
 
-            userInfoHandler.Should().NotBeNull();
-        }
+    public class DummyUser : IdentityUser<int>
+    {
+    }
 
-        public class DummyUser : IdentityUser<int>
-        {
-        }
-
-        public class DummyRole : IdentityRole<int>
-        {
-        }
+    public class DummyRole : IdentityRole<int>
+    {
     }
 }

@@ -594,7 +594,7 @@ Once the UI is configured you should make sure that the following actions work:
 
 ### Token Signing and Encryption Certificates
 
-In all deployed environments you must provide two certificates: one for signing tokens and one for encrypting tokens. The easiest way to do this is to generate self-signed certificates, which can done by executing the [CreateTokenSigningCert.sh](https://dev.azure.com/audacia/Audacia/_git/Audacia.Build?path=/tools/security/certificates/CreateTokenSigningCert.sh) and [ConvertTokenSigningCertToPfx.sh](https://dev.azure.com/audacia/Audacia/_git/Audacia.Build?path=/tools/security/certificates/ConvertTokenSigningCertToPfx.sh) bash scripts.
+In all deployed environments you must provide two certificates: one for signing tokens and one for encrypting tokens. The easiest way to do this is to generate self-signed certificates, which can done by executing the [CreateTokenSigningCert.sh](https://dev.azure.com/audacia/Audacia/_git/Audacia.Build?path=/src/utils/scripts/certificates/CreateTokenSigningCert.sh) and [ConvertTokenSigningCertToPfx.sh](https://dev.azure.com/audacia/Audacia/_git/Audacia.Build?path=/src/utils/scripts/certificates/ConvertTokenSigningCertToPfx.sh) bash scripts.
 
 Once you have two certificates per environment you must:
 

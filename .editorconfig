@@ -1,4 +1,4 @@
-# NOTE: Requires **VS2019 16.3** or later
+# NOTE: Requires **VS2022**
 
 # Default Rules
 # Description: CodeAnalysis.ruleset
@@ -8,6 +8,8 @@ root = true
 # Code files
 [*.cs]
 
+# New files created with file-scoped namespaces
+csharp_style_namespace_declarations = file_scoped
 
 # Private fields should be prefixed with an underscore.
 dotnet_diagnostic.ACL1000.severity = warning
@@ -34,6 +36,20 @@ dotnet_diagnostic.ACL1006.severity = warning
 
 # ACL1007: ThenByDescending follows OrderBy or OrderByDescending.
 dotnet_diagnostic.ACL1007.severity = suggestion
+
+# Controller action should have at least one ProducesResponseType attribute
+dotnet_diagnostic.ACL1008.severity = none
+
+# Method overload should call another overload
+dotnet_diagnostic.ACL1009.severity = none
+
+# [Maintainability] ACL1011: Don't nest too many control statements
+dotnet_diagnostic.ACL1011.severity = warning
+dotnet_diagnostic.ACL1011.max_control_statement_depth = 2
+
+# [Maintainability] ACL1012: Don't pass predicates into 'Where' methods with too many clauses
+dotnet_diagnostic.ACL1012.severity = warning
+dotnet_diagnostic.ACL1012.max_where_clauses = 3
 
 # A class or interface should have a single purpose
 dotnet_diagnostic.AV1000.severity = warning
@@ -101,6 +117,12 @@ dotnet_diagnostic.AV1537.severity = none
 # Call the more overloaded method from other overloads
 dotnet_diagnostic.AV1551.severity = warning
 
+# Only use optional parameters to replace overloads
+dotnet_diagnostic.AV1553.severity = warning
+
+# Do not use optional parameters in interface methods or their concrete implementations
+dotnet_diagnostic.AV1554.severity = warning
+
 # Avoid using named arguments
 dotnet_diagnostic.AV1555.severity = none
 
@@ -116,6 +138,9 @@ dotnet_diagnostic.AV1564.severity = warning
 # Don't use parameters as temporary variables
 dotnet_diagnostic.AV1568.severity = suggestion
 
+# Write code that is easy to debug
+dotnet_diagnostic.AV1580.severity = suggestion
+
 # Don't include numbers in variables, parameters and type members
 dotnet_diagnostic.AV1704.severity = warning
 
@@ -123,7 +148,7 @@ dotnet_diagnostic.AV1704.severity = warning
 dotnet_diagnostic.AV1706.severity = none
 
 # Name types using nouns, noun phrases or adjective phrases
-dotnet_diagnostic.AV1708.severity = warning
+dotnet_diagnostic.AV1708.severity = suggestion
 
 # Don't repeat the name of a class or enumeration in its members
 dotnet_diagnostic.AV1710.severity = warning
@@ -153,7 +178,7 @@ dotnet_diagnostic.AV1755.severity = none
 dotnet_diagnostic.AV2202.severity = warning
 
 # Build with the highest warning level
-dotnet_diagnostic.AV2210.severity = suggestion
+dotnet_diagnostic.AV2210.severity = warning
 
 # Avoid LINQ query syntax for simple expressions
 dotnet_diagnostic.AV2220.severity = none
@@ -390,7 +415,7 @@ dotnet_diagnostic.CA1806.severity = warning
 dotnet_diagnostic.CA1810.severity = warning
 
 # [PERFORMANCE] Avoid uninstantiated internal classes
-dotnet_diagnostic.CA1812.severity = warning
+dotnet_diagnostic.CA1812.severity = suggestion
 
 # [PERFORMANCE] Avoid unsealed attributes
 dotnet_diagnostic.CA1813.severity = warning
@@ -761,6 +786,9 @@ dotnet_diagnostic.CA5399.severity = warning
 # [SECURITY] Ensure HttpClient certificate revocation list check is not disabled
 dotnet_diagnostic.CA5400.severity = warning
 
+# [DESIGN] Use ValueTasks correctly - (ValueTask) CSharpGuidlines has better instructions *** Suppress as covered by AV1840 ***
+dotnet_diagnostic.CA2012.severity = none
+
 # A <remarks> or <note> documentation element contains content which is not wrapped in a block-level element.
 dotnet_diagnostic.DOC100.severity = warning
 
@@ -808,6 +836,15 @@ dotnet_diagnostic.DOC207.severity = warning
 
 # The documentation contains a `<see href="..."/>` element with an unrecognized URI.
 dotnet_diagnostic.DOC209.severity = warning
+
+# Use simple using statement
+dotnet_diagnostic.IDE0063.severity = warning
+
+# Use switch expression
+dotnet_diagnostic.IDE0066.severity = warning
+
+# Use file-scoped namespaces
+dotnet_diagnostic.IDE0161.severity = warning
 
 # Dispose created.
 dotnet_diagnostic.IDISP001.severity = warning
@@ -926,8 +963,8 @@ dotnet_diagnostic.RCS1016.severity = suggestion
 # [STYLE] Avoid multiline expression body
 dotnet_diagnostic.RCS1017.severity = none
 
-# [READABILITY] Add default access modifier
-dotnet_diagnostic.RCS1018.severity = warning
+# [READABILITY] Add default access modifier *** Suppressed as covered by SA1400 ***
+dotnet_diagnostic.RCS1018.severity = none
 
 # [READABILITY] Order modifiers *** Suppressed as covered by SA1206 ***
 dotnet_diagnostic.RCS1019.severity = none
@@ -977,8 +1014,8 @@ dotnet_diagnostic.RCS1034.severity = warning
 # [REDUNDANCY] Remove redundant comma in initializer
 dotnet_diagnostic.RCS1035.severity = warning
 
-# [REDUNDANCY] Remove redundant empty line
-dotnet_diagnostic.RCS1036.severity = warning
+# [REDUNDANCY] Remove redundant empty line *** Suppressed as covered by SA1507 ***
+dotnet_diagnostic.RCS1036.severity = none
 
 # [REDUNDANCY] Remove trailing white-space
 dotnet_diagnostic.RCS1037.severity = none
@@ -1185,7 +1222,7 @@ dotnet_diagnostic.RCS1108.severity = warning
 dotnet_diagnostic.RCS1110.severity = warning
 
 # [SIMPLIFICATION] Combine 'Enumerable.Where' method chain
-dotnet_diagnostic.RCS1112.severity = warning
+dotnet_diagnostic.RCS1112.severity = none
 
 # [GENERAL] Mark local variable as const
 dotnet_diagnostic.RCS1118.severity = warning
@@ -1298,8 +1335,8 @@ dotnet_diagnostic.RCS1172.severity = warning
 # [SIMPLIFICATION] Use coalesce expression instead of if
 dotnet_diagnostic.RCS1173.severity = warning
 
-# [REDUNDANCY] Remove redundant async/await
-dotnet_diagnostic.RCS1174.severity = warning
+# [REDUNDANCY] Remove redundant async/await *** Suppressed as not considered best practice (see https://blog.stephencleary.com/2016/12/eliding-async-await.html) ***
+dotnet_diagnostic.RCS1174.severity = none
 
 # [REDUNDANCY] Unused this parameter
 dotnet_diagnostic.RCS1175.severity = suggestion
@@ -1391,7 +1428,7 @@ dotnet_diagnostic.RCS1207.severity = warning
 # [READABILITY] Order type parameter constraints
 dotnet_diagnostic.RCS1209.severity = warning
 
-# [USAGE] Return Task.FromResult instead of returning null *** Suppress as covered by AV1135 ***
+# [USAGE] Return Task.FromResult instead of returning null  *** Suppress as covered by AV1135 ***
 dotnet_diagnostic.RCS1210.severity = none
 
 # [REDUNDANCY] Remove unnecessary else clause
@@ -1925,8 +1962,8 @@ dotnet_diagnostic.SA1316.severity = warning
 # The access modifier for a C# element has not been explicitly defined.
 dotnet_diagnostic.SA1400.severity = warning
 
-# A field within a C# class has an access modifier other than private.
-dotnet_diagnostic.SA1401.severity = warning
+# A field within a C# class has an access modifier other than private *** Suppress as covered by CA1051 ***
+dotnet_diagnostic.SA1401.severity = none
 
 # A C# code file contains more than one unique type.
 dotnet_diagnostic.SA1402.severity = suggestion
@@ -2189,96 +2226,11 @@ dotnet_diagnostic.SA1651.severity = suggestion
 # This rule was moved to [SA0001](SA0001.md)
 dotnet_diagnostic.SA1652.severity = none
 
-# [SECURITY] Command Injection
-dotnet_diagnostic.SCS0001.severity = warning
+# Remove unused private member *** Suppress as covered by ACL1000 ***
+dotnet_diagnostic.IDE0051.severity = none
 
-# [SECURITY] SQL Injection
-dotnet_diagnostic.SCS0002.severity = warning
+# 'member1' hides inherited member 'member2'. Use the new keyword if hiding was intended
+dotnet_diagnostic.CS0108.severity = warning
 
-# [SECURITY] XPath Injection
-dotnet_diagnostic.SCS0003.severity = warning
-
-# [SECURITY] Certificate Validation Disabled
-dotnet_diagnostic.SCS0004.severity = warning
-
-# [SECURITY] Weak Random Number Generator
-dotnet_diagnostic.SCS0005.severity = none
-
-# [SECURITY] Weak Hashing Function
-dotnet_diagnostic.SCS0006.severity = warning
-
-# [SECURITY] XML eXternal Entity Injection (XXE)
-dotnet_diagnostic.SCS0007.severity = warning
-
-# [SECURITY] Cookie Without SSL Flag
-dotnet_diagnostic.SCS0008.severity = warning
-
-# [SECURITY] Cookie Without HttpOnly Flag
-dotnet_diagnostic.SCS0009.severity = warning
-
-# [SECURITY] Weak cipher algorithm
-dotnet_diagnostic.SCS0010.severity = warning
-
-# [SECURITY] Unsafe XSLT setting used
-dotnet_diagnostic.SCS0011.severity = warning
-
-# [SECURITY] Controller method is potentially vulnerable to authorization bypass
-# NOTE: This can be disabled if there is a fallback authorization policy set to require an authentication user
-dotnet_diagnostic.SCS0012.severity = warning
-
-# [SECURITY] Potential usage of weak CipherMode mode
-dotnet_diagnostic.SCS0013.severity = warning
-
-# [SECURITY] Hardcoded Password
-dotnet_diagnostic.SCS0015.severity = warning
-
-# [SECURITY] Cross-Site Request Forgery (CSRF)
-dotnet_diagnostic.SCS0016.severity = warning
-
-# [SECURITY] Request Validation Disabled (Attribute)
-dotnet_diagnostic.SCS0017.severity = warning
-
-# [SECURITY] Path Traversal
-dotnet_diagnostic.SCS0018.severity = warning
-
-# [SECURITY] OutputCache Conflict
-dotnet_diagnostic.SCS0019.severity = warning
-
-# [SECURITY] Request Validation Disabled (Configuration File)
-dotnet_diagnostic.SCS0021.severity = warning
-
-# [SECURITY] Event Validation Disabled
-dotnet_diagnostic.SCS0022.severity = warning
-
-# [SECURITY] View State Not Encrypted
-dotnet_diagnostic.SCS0023.severity = warning
-
-# [SECURITY] View State MAC Disabled
-dotnet_diagnostic.SCS0024.severity = warning
-
-# [SECURITY] LDAP Distinguished Name Injection
-dotnet_diagnostic.SCS0026.severity = warning
-
-# [SECURITY] Open Redirect
-dotnet_diagnostic.SCS0027.severity = warning
-
-# [SECURITY] Insecure Deserialization
-dotnet_diagnostic.SCS0028.severity = warning
-
-# [SECURITY] Cross-Site Scripting (XSS)
-dotnet_diagnostic.SCS0029.severity = warning
-
-# [SECURITY] Request validation is enabled only for pages (Configuration File)
-dotnet_diagnostic.SCS0030.severity = warning
-
-# [SECURITY] LDAP Filter Injection
-dotnet_diagnostic.SCS0031.severity = warning
-
-# [SECURITY] Password RequiredLength Too Small
-dotnet_diagnostic.SCS0032.severity = warning
-
-# [SECURITY] Password Complexity
-dotnet_diagnostic.SCS0033.severity = warning
-
-# [SECURITY] Password RequiredLength Not Set
-dotnet_diagnostic.SCS0034.severity = warning
+# ValueTask should be awaited before assignment - (ValueTask)
+dotnet_diagnostic.AV1840.severity = warning
