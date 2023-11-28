@@ -190,11 +190,11 @@ public static class ServiceCollectionExtensions
     private static void AddEndpoints(OpenIddictServerBuilder options)
     {
         // Enable endpoints, these need to be explicitly enabled
-        options.SetAuthorizationEndpointUris("/connect/authorize")
-            .SetLogoutEndpointUris("/account/logout")
-            .SetIntrospectionEndpointUris("/connect/introspect")
-            .SetTokenEndpointUris("/connect/token")
-            .SetUserinfoEndpointUris("/connect/userinfo");
+        options.SetAuthorizationEndpointUris("connect/authorize")
+            .SetLogoutEndpointUris("account/logout")
+            .SetIntrospectionEndpointUris("connect/introspect")
+            .SetTokenEndpointUris("connect/token")
+            .SetUserinfoEndpointUris("connect/userinfo");
     }
 
     private static void AddFlows(OpenIddictServerBuilder options, OpenIdConnectConfig openIdConnectConfig)
