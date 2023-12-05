@@ -9,7 +9,7 @@
 		<Description>.NET tool to seed OpenIddict applications and scopes in a database using Entity Framework Core as the ORM.</Description>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<Version>1.5.0</Version>
+		<Version>2.0.0</Version>
 		<Nullable>enable</Nullable>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
@@ -30,7 +30,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.1" />
-		<PackageReference Include="OpenIddict.EntityFrameworkCore" Version="3.1.1" />
+		<PackageReference Include="OpenIddict.EntityFrameworkCore" Version="4.6.0" />
 	</ItemGroup>
 
 	<ItemGroup>
