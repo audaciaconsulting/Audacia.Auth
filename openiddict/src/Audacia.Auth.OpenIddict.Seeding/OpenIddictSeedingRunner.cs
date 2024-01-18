@@ -81,7 +81,7 @@ public class OpenIddictSeedingRunner
         {
             ClientId = clientConfig.ClientId,
             ConsentType = ConsentTypes.Implicit, // Whether the user needs to provide consent to resource access
-            Type = ClientTypes.Public,
+            ClientType = ClientTypes.Public,
             Permissions =
             {
                 Permissions.Endpoints.Authorization,
@@ -130,7 +130,7 @@ public class OpenIddictSeedingRunner
             ClientId = clientConfig.ClientId,
             ClientSecret = clientConfig.ClientSecret,
             ConsentType = ConsentTypes.Implicit,
-            Type = ClientTypes.Confidential,
+            ClientType = ClientTypes.Confidential,
             Permissions =
             {
                 // Minimum requirement for a resource server
@@ -168,7 +168,7 @@ public class OpenIddictSeedingRunner
             ClientId = clientConfig.ClientId,
             ClientSecret = clientConfig.ClientSecret,
             ConsentType = ConsentTypes.Implicit,
-            Type = ClientTypes.Confidential,
+            ClientType = ClientTypes.Confidential,
             Permissions =
             {
                 // Minimum requirement for a resource server
@@ -207,7 +207,7 @@ public class OpenIddictSeedingRunner
             ClientId = clientConfig.ClientId,
             ClientSecret = clientConfig.ClientSecret,
             ConsentType = ConsentTypes.Implicit,
-            Type = clientConfig.ClientType,
+            ClientType = clientConfig.ClientType,
             Permissions =
             {
                 // Minimum requirement for a resource server
