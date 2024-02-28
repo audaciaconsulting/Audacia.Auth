@@ -3,16 +3,48 @@
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     </PropertyGroup>
 
-    <ItemGroup>
+    <!-- Package Versions for .NET 6.0 -->
+    <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '6.0'))">
         <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.1" />
         <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
-        <PackageVersion Include="OpenIddict" Version="5.0.1" />
-        <PackageVersion Include="OpenIddict.AspNetCore" Version="5.0.1" />
-        <PackageVersion Include="OpenIddict.EntityFramework" Version="5.0.1" />
-        <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="5.0.1" />
-        <PackageVersion Include="OpenIddict.Quartz" Version="5.0.1" />
-        <PackageVersion Include="OpenIddict.Server.AspNetCore" Version="5.0.1" />
-        <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.3.3" />
+
+        <PackageVersion Include="OpenIddict" Version="5.2.0" />
+        <PackageVersion Include="OpenIddict.AspNetCore" Version="5.2.0" />
+        <PackageVersion Include="OpenIddict.EntityFramework" Version="5.2.0" />
+        <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="5.2.0" />
+        <PackageVersion Include="OpenIddict.Quartz" Version="5.2.0" />
+        <PackageVersion Include="OpenIddict.Server.AspNetCore" Version="5.2.0" />
+
+        <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.8.1" />
+
+        <PackageReference Include="FluentAssertions" Version="6.2.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+        <PackageReference Include="Moq" Version="4.16.1" />
+        <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
+        <PackageReference Include="coverlet.collector" Version="3.1.0" />
+    </ItemGroup>
+
+    <!-- Package Versions for .NET 8.0 -->
+    <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '8.0'))">
+        <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.2" />
+        <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+
+        <PackageVersion Include="OpenIddict" Version="5.2.0" />
+        <PackageVersion Include="OpenIddict.AspNetCore" Version="5.2.0" />
+        <PackageVersion Include="OpenIddict.EntityFramework" Version="5.2.0" />
+        <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="5.2.0" />
+        <PackageVersion Include="OpenIddict.Quartz" Version="5.2.0" />
+        <PackageVersion Include="OpenIddict.Server.AspNetCore" Version="5.2.0" />
+
+        <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.8.1" />
+
+        <PackageReference Include="FluentAssertions" Version="6.2.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
+        <PackageReference Include="Moq" Version="4.16.1" />
+        <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3" />
+        <PackageReference Include="coverlet.collector" Version="3.1.0" />
     </ItemGroup>
 
     <ItemGroup>
