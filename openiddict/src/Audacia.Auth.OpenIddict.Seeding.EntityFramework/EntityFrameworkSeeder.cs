@@ -29,7 +29,10 @@ public class EntityFrameworkSeeder<TKey> : OpenIddictSeedBase<TKey>
     protected override IServiceCollection ConfigureAdditionalServices(IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString(_connectionStringName);
-        services.AddScoped(_ => new OpenIddictContext<TKey>(connectionString));
+        if (connectionString != null)
+        {
+            services.AddScoped(_ => new OpenIddictContext<TKey>(connectionString));
+        }
 
         return base.ConfigureAdditionalServices(services, configuration);
     }
