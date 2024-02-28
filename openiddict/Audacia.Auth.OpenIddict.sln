@@ -25,6 +25,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.Auth.OpenIddict.See
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.Auth.OpenIddict.EntityFramework", "src\Audacia.Auth.OpenIddict.EntityFramework\Audacia.Auth.OpenIddict.EntityFramework.csproj", "{C7870014-244D-4CF7-8376-DDEA7BC8A45A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{ED9A59BD-EA37-4C4B-B130-9D2765E9405C}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Packages.props = Directory.Packages.props
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

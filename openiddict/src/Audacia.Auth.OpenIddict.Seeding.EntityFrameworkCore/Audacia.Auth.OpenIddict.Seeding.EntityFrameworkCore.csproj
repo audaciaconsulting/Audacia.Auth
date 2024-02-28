@@ -25,12 +25,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.5.1">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.1" />
-		<PackageReference Include="OpenIddict.EntityFrameworkCore" Version="5.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+		<PackageReference Include="OpenIddict.EntityFrameworkCore" />
 	</ItemGroup>
 
 	<ItemGroup>

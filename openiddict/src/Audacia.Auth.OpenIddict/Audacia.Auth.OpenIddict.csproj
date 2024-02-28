@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFrameworks>net6.0</TargetFrameworks>
         <Authors>Audacia</Authors>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
@@ -22,16 +22,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Audacia.CodeAnalysis" Version="1.5.1">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Audacia.CodeAnalysis.Analyzers.Helpers" Version="1.1.1">
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
-        <PackageReference Include="OpenIddict" Version="5.0.1" />
-        <PackageReference Include="OpenIddict.AspNetCore" Version="5.0.1" />
-        <PackageReference Include="OpenIddict.Server.AspNetCore" Version="5.0.1" />
+        <PackageReference Include="OpenIddict" />
+        <PackageReference Include="OpenIddict.AspNetCore" />
+        <PackageReference Include="OpenIddict.Server.AspNetCore" />
     </ItemGroup>
 
 </Project>

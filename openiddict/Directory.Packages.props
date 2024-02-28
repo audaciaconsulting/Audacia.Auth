@@ -1,0 +1,21 @@
+<Project>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.1" />
+        <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+        <PackageVersion Include="OpenIddict" Version="5.0.1" />
+        <PackageVersion Include="OpenIddict.AspNetCore" Version="5.0.1" />
+        <PackageVersion Include="OpenIddict.EntityFramework" Version="5.0.1" />
+        <PackageVersion Include="OpenIddict.EntityFrameworkCore" Version="5.0.1" />
+        <PackageVersion Include="OpenIddict.Quartz" Version="5.0.1" />
+        <PackageVersion Include="OpenIddict.Server.AspNetCore" Version="5.0.1" />
+        <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.3.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <GlobalPackageReference Include="Audacia.CodeAnalysis" Version="1.5.1" />
+    </ItemGroup>
+</Project>
