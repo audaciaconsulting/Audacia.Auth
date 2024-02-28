@@ -153,6 +153,7 @@ public static class ServiceCollectionExtensions
             .AddTransient<CustomGrantTypeClaimsPrincipalProvider<TUser>>()
             .AddTransient<ISigningCredentialsProvider, DefaultCredentialsProvider>()
             .AddTransient<IEncryptionCredentialsProvider, DefaultCredentialsProvider>()
+            .AddTransient<IUtcTimeProvider, UtcTimeProvider>()
             .AddEventService<DefaultEventService>()
             .AddEventSink<DefaultEventSink>()
             .AddEventSerializer<DefaultJsonEventSerializer>();
@@ -204,12 +205,12 @@ public static class ServiceCollectionExtensions
             options.AllowAuthorizationCodeFlow()
                 .RequireProofKeyForCodeExchange();
         }
-        
+
         if (openIdConnectConfig.ClientCredentialsClients?.Any() == true)
         {
             options.AllowClientCredentialsFlow();
         }
-            
+
         if (openIdConnectConfig.ResourceOwnerPasswordClients?.Any() == true)
         {
             options.AllowPasswordFlow();
