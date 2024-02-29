@@ -25,9 +25,23 @@
 		</None>
 	</ItemGroup>
 
+	<!-- Package Versions for .NET 6.0 -->
+	<ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '6.0'))">
+		<PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.1" />
+	</ItemGroup>
+
+	<!-- Package Versions for .NET 8.0 -->
+	<ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '8.0'))">
+		<PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.2" />
+	</ItemGroup>
+
 	<ItemGroup>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
-		<PackageReference Include="OpenIddict.EntityFrameworkCore" />
+		<PackageReference Include="OpenIddict.EntityFrameworkCore" Version="5.2.0" />
+
+		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.5.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>

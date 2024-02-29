@@ -22,7 +22,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="OpenIddict.EntityFramework" />
+		<PackageReference Include="OpenIddict.EntityFramework" Version="5.2.0" />
+
+		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.5.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>

@@ -22,9 +22,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="OpenIddict" />
-        <PackageReference Include="OpenIddict.AspNetCore" />
-        <PackageReference Include="OpenIddict.Server.AspNetCore" />
+        <PackageReference Include="OpenIddict" Version="5.2.0" />
+        <PackageReference Include="OpenIddict.AspNetCore" Version="5.2.0" />
+        <PackageReference Include="OpenIddict.Server.AspNetCore" Version="5.2.0" />
+
+        <PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.5.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
 </Project>
