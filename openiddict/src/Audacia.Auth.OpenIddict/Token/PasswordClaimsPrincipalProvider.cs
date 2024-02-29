@@ -66,7 +66,7 @@ public class PasswordClaimsPrincipalProvider<TUser, TId> : IClaimsPrincipalProvi
 
         // Validate the username/password parameters and ensure the account is not locked out.
         var userProxy = new UserWrapper<TUser, TId>(user);
-        var result = await _signInManager.CheckPasswordSignInAsync(user, openIddictRequest.Password, lockoutOnFailure: true).ConfigureAwait(false);
+        var result = await _signInManager.CheckPasswordSignInAsync(user, openIddictRequest.Password!, lockoutOnFailure: true).ConfigureAwait(false);
         if (!result.Succeeded)
         {
             await HandleFailedSignInAsync(result, userProxy, openIddictRequest).ConfigureAwait(false);

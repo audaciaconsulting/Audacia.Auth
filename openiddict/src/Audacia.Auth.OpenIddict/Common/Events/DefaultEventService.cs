@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 
 namespace Audacia.Auth.OpenIddict.Common.Events;
@@ -12,19 +11,19 @@ public class DefaultEventService : IEventService
 {
     private readonly IEventSink _eventSink;
     private readonly IHttpContextAccessor _contextAccessor;
-    private readonly ISystemClock _clock;
+    private readonly IUtcTimeProvider _utcTimeProvider;
 
     /// <summary>
     /// Initializes an instance of <see cref="DefaultEventService"/>.
     /// </summary>
     /// <param name="eventSink">An <see cref="IEventSink"/> to persist events.</param>
     /// <param name="contextAccessor">An object from which the <see cref="HttpContext"/> can be obtained.</param>
-    /// <param name="clock">The system clock.</param>
-    public DefaultEventService(IEventSink eventSink, IHttpContextAccessor contextAccessor, ISystemClock clock)
+    /// <param name="utcTimeProvider">The UTC time provider.</param>
+    public DefaultEventService(IEventSink eventSink, IHttpContextAccessor contextAccessor, IUtcTimeProvider utcTimeProvider)
     {
         _eventSink = eventSink;
         _contextAccessor = contextAccessor;
-        _clock = clock;
+        _utcTimeProvider = utcTimeProvider;
     }
 
     /// <inheritdoc />
@@ -54,9 +53,9 @@ public class DefaultEventService : IEventService
         }
 
         authEvent.ActivityId = httpContext.TraceIdentifier;
-        authEvent.TimeStamp = _clock.UtcNow.UtcDateTime;
+        authEvent.TimeStamp = _utcTimeProvider.UtcDateTime;
         authEvent.ProcessId = Environment.ProcessId;
-        SetIpAddressProperties(httpContext, authEvent);            
+        SetIpAddressProperties(httpContext, authEvent);
 
         return authEvent.PrepareAsync();
     }

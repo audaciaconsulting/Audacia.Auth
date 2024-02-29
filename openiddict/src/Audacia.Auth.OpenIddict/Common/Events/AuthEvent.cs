@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Audacia.CodeAnalysis.Analyzers.Helpers.ParameterCount;
 
 namespace Audacia.Auth.OpenIddict.Common.Events;
 

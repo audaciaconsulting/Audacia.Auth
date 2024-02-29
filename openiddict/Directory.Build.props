@@ -1,0 +1,5 @@
+<Project>
+    <PropertyGroup>
+        <CustomTargetFrameworks>net6.0;net8.0;</CustomTargetFrameworks>
+    </PropertyGroup>
+</Project>
