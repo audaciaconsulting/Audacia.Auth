@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<Authors>Audacia</Authors>
 		<PackageIcon>package-icon.png</PackageIcon>
@@ -9,12 +9,13 @@
 		<Description>.NET tool to seed OpenIddict applications and scopes in a database using Entity Framework Core as the ORM.</Description>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<Version>3.0.0</Version>
+		<Version>4.0.0</Version>
 		<Nullable>enable</Nullable>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 		<ToolCommandName>openiddict-efcore-seeding</ToolCommandName>
 		<PackAsTool>true</PackAsTool>
+		<GenerateProgramFile>false</GenerateProgramFile>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -24,13 +25,23 @@
 		</None>
 	</ItemGroup>
 
+	<!-- Package Versions for .NET 6.0 -->
+	<ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '6.0'))">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.1" />
+	</ItemGroup>
+
+	<!-- Package Versions for .NET 8.0 -->
+	<ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '8.0'))">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.2" />
+	</ItemGroup>
+
 	<ItemGroup>
+		<PackageReference Include="OpenIddict.EntityFrameworkCore" Version="5.2.0" />
+
 		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.5.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.1" />
-		<PackageReference Include="OpenIddict.EntityFrameworkCore" Version="5.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>

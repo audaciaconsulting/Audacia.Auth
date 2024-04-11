@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
 		<Authors>Audacia</Authors>
 		<PackageIcon>package-icon.png</PackageIcon>
 		<Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
@@ -9,7 +9,7 @@
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 		<Nullable>enable</Nullable>
-		<Version>3.0.0</Version>
+		<Version>4.0.0</Version>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	</PropertyGroup>
@@ -21,12 +21,21 @@
 		</None>
 	</ItemGroup>
 
+	<!-- Package Versions for .NET 6.0 -->
+	<ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '6.0'))">
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+	</ItemGroup>
+
+	<!-- Package Versions for .NET 8.0 -->
+	<ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '8.0'))">
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+	</ItemGroup>
+
 	<ItemGroup>
-		<PackageReference Include="Audacia.CodeAnalysis" Version="1.5.1">
+		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.5.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

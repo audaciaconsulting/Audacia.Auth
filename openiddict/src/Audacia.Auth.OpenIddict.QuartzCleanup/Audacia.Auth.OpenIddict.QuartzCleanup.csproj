@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
 		<Authors>Audacia</Authors>
 		<PackageIcon>package-icon.png</PackageIcon>
 		<Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
 		<Description>Library for using a Quartz.NET background job to cleanup OpenIddict authorization tokens in the database.</Description>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<Version>3.0.0</Version>
+		<Version>4.0.0</Version>
 		<Nullable>enable</Nullable>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
@@ -21,12 +21,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Audacia.CodeAnalysis" Version="1.5.1">
+		<PackageReference Include="OpenIddict.Quartz" Version="5.2.0" />
+		<PackageReference Include="Quartz.Extensions.Hosting" Version="3.8.1" />
+
+		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.5.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="OpenIddict.Quartz" Version="5.0.1" />
-		<PackageReference Include="Quartz.Extensions.Hosting" Version="3.3.3" />
 	</ItemGroup>
 
 	<ItemGroup>
