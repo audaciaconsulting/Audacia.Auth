@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using Audacia.Auth.OpenIddict.Common.Extensions;
 using OpenIddict.Abstractions;
@@ -61,6 +62,14 @@ public class TokenIssuedSuccessEvent : AuthEvent
     public string? GrantType { get; set; }
 
     /// <summary>
+    /// Gets or sets the claims.
+    /// </summary>
+    /// <value>
+    /// The claims.
+    /// </value>
+    public IEnumerable<Claim> Claims { get; set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="TokenIssuedSuccessEvent"/> class.
     /// </summary>
     /// <param name="endpointName">The name of the endpoint called.</param>
@@ -77,5 +86,6 @@ public class TokenIssuedSuccessEvent : AuthEvent
         SubjectId = claimsPrincipal.GetSubjectId();
         GrantType = request.GrantType;
         Scopes = request.Scope;
+        Claims = claimsPrincipal.Claims;
     }
 }
