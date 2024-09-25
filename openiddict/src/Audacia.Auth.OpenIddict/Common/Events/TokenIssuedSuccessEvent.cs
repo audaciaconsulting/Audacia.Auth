@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using Audacia.Auth.OpenIddict.Common.Extensions;
 using OpenIddict.Abstractions;
@@ -86,6 +87,6 @@ public class TokenIssuedSuccessEvent : AuthEvent
         SubjectId = claimsPrincipal.GetSubjectId();
         GrantType = request.GrantType;
         Scopes = request.Scope;
-        Claims = claimsPrincipal.Claims;
+        Claims = claimsPrincipal.Claims.ToList();
     }
 }

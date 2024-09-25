@@ -1,5 +1,9 @@
 # Changelog
 
+## 4.0.1
+### Changed
+- Updated TokenIssuedSuccessEvent to include claims.
+
 ## 4.0.0 - 2024-04-11
 ### Added
 - Added .Net 6.0 and .Net 8.0 multi-targeting ([1d93a32](https://github.com/audaciaconsulting/Audacia.Auth/pull/5/commits/1d93a327618f9effd1392be864f8aa0bed3f099a))
