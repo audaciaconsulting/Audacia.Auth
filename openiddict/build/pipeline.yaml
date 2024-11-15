@@ -5,22 +5,36 @@ trigger:
   paths:
     include:
       - 'openiddict/*'
-pr: { branches: { include: [main] } }
-resources: { repositories: [ { repository: templates, type: git, name: Audacia/Audacia.Build } ] }
-pool: { vmImage: windows-2022 }
+pr:
+  branches:
+    include:
+      - main
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      endpoint: shared-github
+      name: audaciaconsulting/Audacia.Build
+pool:
+  vmImage: windows-2022
 
 stages:
-- stage: Build
-  displayName: Build
-  jobs:
-    - template: src/build/dotnet/jobs/nuget-package.job.yaml@templates
-      parameters:
-        projects: 'openiddict/src/**/*.csproj'
-        tests: 'openiddict/tests/Audacia.Auth.OpenIddict.Tests/Audacia.Auth.OpenIddict.Tests.csproj'
-        releaseBranchName: main
-        skipDependencyChecks: true
+  - stage: Stage_Build
+    displayName: Build
+    jobs:
+      - template: src/build/dotnet/jobs/nuget-package.job.yaml@templates
+        parameters:
+          projects: 'openiddict/src/**/*.csproj'
+          tests: 'openiddict/tests/Audacia.Auth.OpenIddict.Tests/Audacia.Auth.OpenIddict.Tests.csproj'
 
-- stage: Release
-  displayName: Release
-  jobs: [ { template: src/deployment/nuget/jobs/internal-public-nuget-package.job.yaml@templates } ]
-  condition: and(succeeded(), and(not(eq(variables['Build.Reason'], 'PullRequest')), not(eq(variables['Build.Reason'], 'Schedule'))))
+  - stage: Stage_Release
+    displayName: Release
+    dependsOn: Stage_Build
+    condition: >
+      and(
+        succeeded(),
+        notIn(variables['Build.Reason'], 'PullRequest', 'Schedule'),
+        eq(dependencies.Stage_Build.outputs['Job_Build.UpdateVersions.ShouldPublish'], true)
+      )
+    jobs:
+      - template: src/deployment/nuget/jobs/internal-public-nuget-package.job.yaml@templates

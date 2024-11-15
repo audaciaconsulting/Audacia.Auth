@@ -1,5 +1,3 @@
-[[_TOC_]]
-
 # Introduction
 
 The `Audacia.Auth.OpenIddict` library is designed to make it easier for apps to use OpenIddict as an OpenID Connect and OAuth provider. It uses ASP.NET Core Identity for the underlying user login and provides the following functionality:
