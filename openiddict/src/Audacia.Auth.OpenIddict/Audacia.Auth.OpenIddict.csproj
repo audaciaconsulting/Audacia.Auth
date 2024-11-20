@@ -1,35 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
-        <Authors>Audacia</Authors>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
-        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <Description>Core library for using OpenIddict as an authorization server.</Description>
-        <PackageIcon>package-icon.png</PackageIcon>
-        <Version>4.1.0</Version>
-        <Nullable>enable</Nullable>
-        <GenerateDocumentationFile>True</GenerateDocumentationFile>
-        <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
+    <Authors>Audacia</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Description>Core library for using OpenIddict as an authorization server.</Description>
+    <PackageIcon>package-icon.png</PackageIcon>
+    <Version>4.1.0</Version>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <None Include="..\..\package-icon.png">
-            <Pack>True</Pack>
-            <PackagePath>\</PackagePath>
-        </None>
-    </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\package-icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="OpenIddict" Version="5.2.0" />
-        <PackageReference Include="OpenIddict.AspNetCore" Version="5.2.0" />
-        <PackageReference Include="OpenIddict.Server.AspNetCore" Version="5.2.0" />
+  <!-- Package Versions for .NET 6.0 -->
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '6.0'))">
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.3" />
+  </ItemGroup>
 
-        <PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.5.1">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-    </ItemGroup>
+  <!-- Package Versions for .NET 8.0 -->
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '8.0'))">
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenIddict" Version="5.2.0" />
+    <PackageReference Include="OpenIddict.AspNetCore" Version="5.2.0" />
+    <PackageReference Include="OpenIddict.Server.AspNetCore" Version="5.2.0" />
+
+    <PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.5.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
 
 </Project>
