@@ -29,7 +29,7 @@ public static class AsyncEnumerableExtensions
         {
             var list = new List<T>();
 
-            await foreach (var element in source)
+            await foreach (var element in source.ConfigureAwait(false))
             {
                 list.Add(element);
             }

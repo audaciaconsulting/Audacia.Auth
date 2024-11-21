@@ -40,7 +40,8 @@ public class ParsedEntityFrameworkArguments
             throw new ArgumentNullException(nameof(rawArguments));
         }
 
-        if (rawArguments.Length != 4)
+        const int requiredArgumentCount = 4;
+        if (rawArguments.Length != requiredArgumentCount)
         {
             throw new ArgumentException("Exactly four arguments are expected.");
         }

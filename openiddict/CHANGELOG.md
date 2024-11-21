@@ -1,5 +1,15 @@
 # Changelog
 
+## 4.1.1
+### Added
+- No new functionality added
+
+### Changed
+- No functionality changed
+
+### Fixed
+- Upgraded vulnerable versions ([5a7bbeb](https://github.com/audaciaconsulting/Audacia.Auth/commit/5a7bbebe9caf19ff26e380b740a39f33d681ab5b))
+
 ## 4.1.0
 ### Changed
 - Updated TokenIssuedSuccessEvent to include claims.
@@ -11,6 +21,7 @@
 ## 3.0.0 - 2024-02-12
 ### Added
 - No new functionality added
+
 ### Changed
 - OpenIddict package references updated to 5.0.1 ([90e14cc](https://github.com/audaciaconsulting/Audacia.Auth/pull/3/commits/90e14cc40404674fb65fb01a27e91785774b59d0))
 - `Type` renamed to `ClientType`
@@ -20,5 +31,6 @@
 ## 2.0.0 - 2023-12-05
 ### Added
 - No new functionality added
+
 ### Changed
 - Upgraded to support OpenIddict version 4.6.0 ([e570cc9](https://github.com/audaciaconsulting/Audacia.Auth/pull/2/commits/e570cc9b42315a159eb20d8e9b09bd9b475c5714))

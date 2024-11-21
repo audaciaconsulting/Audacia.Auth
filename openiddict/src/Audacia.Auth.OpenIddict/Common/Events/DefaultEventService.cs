@@ -64,7 +64,7 @@ public class DefaultEventService : IEventService
     {
         if (httpContext.Connection.LocalIpAddress != null)
         {
-            authEvent.LocalIpAddress = httpContext.Connection.LocalIpAddress.ToString() + ":" + httpContext.Connection.LocalPort;
+            authEvent.LocalIpAddress = httpContext.Connection.LocalIpAddress + ":" + httpContext.Connection.LocalPort;
         }
         else
         {

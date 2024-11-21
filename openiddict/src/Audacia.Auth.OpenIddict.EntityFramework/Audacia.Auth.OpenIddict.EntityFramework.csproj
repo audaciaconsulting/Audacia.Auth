@@ -8,7 +8,7 @@
 		<Description>Helper library for using OpenIddict as an authorization server with Entity Framework 6.x as an ORM.</Description>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<Version>4.0.1</Version>
+		<Version>4.1.1</Version>
 		<Nullable>enable</Nullable>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
@@ -24,10 +24,14 @@
 	<ItemGroup>
 		<PackageReference Include="OpenIddict.EntityFramework" Version="5.2.0" />
 
-		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.5.1">
+		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.11.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+
+		<PackageReference Include="System.Drawing.Common" Version="4.7.3" />
 	</ItemGroup>
 
 	<ItemGroup>

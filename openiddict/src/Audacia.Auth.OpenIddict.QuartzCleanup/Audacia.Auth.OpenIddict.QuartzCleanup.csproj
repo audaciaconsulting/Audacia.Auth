@@ -8,8 +8,9 @@
 		<Description>Library for using a Quartz.NET background job to cleanup OpenIddict authorization tokens in the database.</Description>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<Version>4.0.1</Version>
+		<Version>4.1.1</Version>
 		<Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
@@ -21,10 +22,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Audacia.CodeAnalysis.Analyzers.Helpers" Version="1.1.3">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
 		<PackageReference Include="OpenIddict.Quartz" Version="5.2.0" />
 		<PackageReference Include="Quartz.Extensions.Hosting" Version="3.8.1" />
-
-		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.5.1">
+    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.11.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

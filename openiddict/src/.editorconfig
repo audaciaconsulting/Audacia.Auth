@@ -9,6 +9,9 @@
 # [NAMING] Asynchronous method name should be suffixed with 'Async'
 dotnet_diagnostic.ACL1005.severity = warning
 
+# Controller action should return TypedResults instead of IActionResult ** Suppress as IActionResult is being used and returned from library code that may be directly consumed by clients; moving away from this would be a breaking change **
+dotnet_diagnostic.ACL1016.severity = none
+
 # [NAMING] Asynchronous method name should end with 'Async' *** Suppress as covered by ACL1005 ***
 dotnet_diagnostic.RCS1046.severity = none
 

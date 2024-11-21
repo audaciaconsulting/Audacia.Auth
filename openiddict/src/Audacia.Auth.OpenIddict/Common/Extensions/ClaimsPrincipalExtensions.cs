@@ -61,9 +61,10 @@ internal static class ClaimsPrincipalExtensions
                 }
 
                 yield break;
-
+#pragma warning disable ACL1001 // Variable declaration uses a magic number - it's not a magic number
             // Never include the security stamp in the access and identity tokens, as it's a secret value.
             case "AspNet.Identity.SecurityStamp": yield break;
+#pragma warning restore ACL1001 // Variable declaration uses a magic number
 
             default:
                 yield return Destinations.AccessToken;
