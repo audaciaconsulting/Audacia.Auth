@@ -314,7 +314,7 @@ public class OpenIddictSeedingRunner
     private async Task<IEnumerable<object>> GetDeletedApplicationsAsync()
     {
         var deletedApplications = new List<object>();
-        await foreach (var application in _applicationManager.ListAsync())
+        await foreach (var application in _applicationManager.ListAsync().ConfigureAwait(false))
         {
             var applicationDescriptor = new OpenIddictApplicationDescriptor();
             await _applicationManager.PopulateAsync(applicationDescriptor, application).ConfigureAwait(false);
@@ -341,7 +341,7 @@ public class OpenIddictSeedingRunner
     private async Task<IEnumerable<object>> GetDeletedScopesAsync()
     {
         var deletedScopes = new List<object>();
-        await foreach (var scope in _scopeManager.ListAsync())
+        await foreach (var scope in _scopeManager.ListAsync().ConfigureAwait(false))
         {
             var scopeDescriptor = new OpenIddictScopeDescriptor();
             await _scopeManager.PopulateAsync(scopeDescriptor, scope).ConfigureAwait(false);

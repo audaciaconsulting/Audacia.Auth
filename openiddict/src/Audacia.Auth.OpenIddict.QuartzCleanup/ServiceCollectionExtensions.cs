@@ -79,6 +79,7 @@ public static class ServiceCollectionExtensions
             minimumAgeToCleanup);
     }
 
+    [CodeAnalysis.Analyzers.Helpers.ParameterCount.MaxParameterCount(5, Justification = "Code is clear enough with 5 params.")]
     private static OpenIddictBuilder AddOpenIddictWithCleanup<TUser, TId>(
         this IServiceCollection services,
         Action<OpenIddictCoreBuilder> optionsBuilder,
@@ -99,7 +100,6 @@ public static class ServiceCollectionExtensions
         return services
             .AddQuartz(options =>
             {
-                options.UseMicrosoftDependencyInjectionJobFactory();
                 options.UseSimpleTypeLoader();
                 options.UseInMemoryStore();
             })
