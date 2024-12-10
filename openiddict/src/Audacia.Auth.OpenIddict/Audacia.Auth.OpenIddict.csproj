@@ -8,7 +8,6 @@
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Core library for using OpenIddict as an authorization server.</Description>
     <PackageIcon>package-icon.png</PackageIcon>
-    <Version>4.1.1</Version>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
