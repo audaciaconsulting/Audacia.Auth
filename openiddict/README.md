@@ -464,13 +464,13 @@ To set the logout endpoint URIs for OpenIddict, you can use the OpenIddictServer
 services.AddOpenIddict()
     .AddServer(options =>
     {
-        options.SetLogoutEndpointUris("/logout");
+        options.SetEndSessionEndpointUris("/logout");
         // You can set multiple URIs by passing an array of strings:
-        // options.SetLogoutEndpointUris(new[] { "/logout", "/signout" });
+        // options.SetEndSessionEndpointUris(new[] { "/logout", "/signout" });
     });
 ```
 
-In this example, the SetLogoutEndpointUris method is used to set the logout endpoint URI to /logout. You can set multiple URIs by passing an array of strings to this method.
+In this example, the SetEndSessionEndpointUris method is used to set the logout endpoint URI to /logout. You can set multiple URIs by passing an array of strings to this method.
 
 Once you have set the logout endpoint URI(s), you can add a logout button to your web application that redirects to the specified endpoint when clicked. When the user is redirected to the logout endpoint, their session will be invalidated and they will be logged out of the application.
 

@@ -192,10 +192,10 @@ public static class ServiceCollectionExtensions
     {
         // Enable endpoints, these need to be explicitly enabled
         options.SetAuthorizationEndpointUris("connect/authorize")
-            .SetLogoutEndpointUris("account/logout")
+            .SetEndSessionEndpointUris("account/logout")
             .SetIntrospectionEndpointUris("connect/introspect")
             .SetTokenEndpointUris("connect/token")
-            .SetUserinfoEndpointUris("connect/userinfo");
+            .SetUserInfoEndpointUris("connect/userinfo");
     }
 
     private static void AddFlows(OpenIddictServerBuilder options, OpenIdConnectConfig openIdConnectConfig)
@@ -259,9 +259,9 @@ public static class ServiceCollectionExtensions
             .UseAspNetCore()
             .EnableStatusCodePagesIntegration()
             .EnableAuthorizationEndpointPassthrough()
-            .EnableLogoutEndpointPassthrough()
+            .EnableEndSessionEndpointPassthrough()
             .EnableTokenEndpointPassthrough()
-            .EnableUserinfoEndpointPassthrough();
+            .EnableUserInfoEndpointPassthrough();
     }
 
     private static OpenIddictBuilder ConfigureOpenIddictValidation(this OpenIddictBuilder openIddictBuilder, OpenIdConnectConfig openIdConnectConfig)
