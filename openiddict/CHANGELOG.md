@@ -1,5 +1,27 @@
 # Changelog
 
+## 5.0.0
+### Added
+- No new functionality added
+
+### Changed
+- **BREAKING**: Upgraded OpenIddict packages from 5.2.0 to 6.4.0
+  - Updated endpoint naming: `SetLogoutEndpointUris` → `SetEndSessionEndpointUris`, `SetUserinfoEndpointUris` → `SetUserInfoEndpointUris`
+  - Updated prompt API: `Prompts` → `PromptValues`, `HasPrompt()` → `HasPromptValue()`, `GetPrompts()` → `GetPromptValues()`
+  - Updated permissions: `Permissions.Endpoints.Logout` → `Permissions.Endpoints.EndSession`
+- Upgraded Microsoft.EntityFrameworkCore.SqlServer to minimum required versions (6.0.36 for .NET 6.0, 8.0.17 for .NET 8.0)
+- Upgraded Microsoft.Extensions.Hosting.Abstractions to minimum required versions (6.0.1 for .NET 6.0, 8.0.1 for .NET 8.0)
+- Upgraded System.Drawing.Common from 4.7.3 to 6.0.0
+- See full OpenIddict migration guide [here](https://documentation.openiddict.com/guides/migration/50-to-60)
+
+### Fixed
+- No bugs fixed
+
+### Notes
+- **No database migration required** - OpenIddict 6.x is fully compatible with 5.x database schema
+- All deprecated APIs have been updated to their v6 equivalents
+- 100% test pass rate maintained
+
 ## 4.1.1
 ### Added
 - No new functionality added
