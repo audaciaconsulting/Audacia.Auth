@@ -3,13 +3,14 @@
 	<PropertyGroup>
 		<TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
 		<Authors>Audacia</Authors>
+        <Version>4.1.1</Version>
 		<PackageIcon>package-icon.png</PackageIcon>
 		<Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
 		<Description>Library for using a Quartz.NET background job to cleanup OpenIddict authorization tokens in the database.</Description>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 		<Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 

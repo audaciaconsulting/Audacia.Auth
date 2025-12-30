@@ -1,0 +1,110 @@
+name: $(Year:yy)$(DayOfYear).$(Rev:r)
+trigger:
+  - master
+pr: none
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      endpoint: shared-github
+      name: audaciaconsulting/Audacia.Build
+
+pool:
+  vmImage: windows-latest
+
+variables:
+  - group: Audacia.Libraries.Dependency-Track
+
+  # Secrets / env
+  - name: DT_API_KEY
+    value: $(DT-API-KEY)
+  - name: DT_API_URL
+    value: $(DT-API-URL)
+
+  # Template-parameter variables
+  - name: systemName
+    value: Audacia.Libraries
+  - name: deactivateOld
+    value: true
+
+  # Optional parent project
+  - name: parentProjectName
+    value: 'Audacia - Libraries'
+  - name: parentProjectVersion
+    value: ''
+
+  # Project paths and settings
+  - name: audaciaAuthProjectPaths
+    value: |
+      $(System.DefaultWorkingDirectory)/openiddict/src/Audacia.Auth.OpenIddict/Audacia.Auth.OpenIddict.csproj
+      $(System.DefaultWorkingDirectory)/openiddict/src/Audacia.Auth.OpenIddict.EntityFramework/Audacia.Auth.OpenIddict.EntityFramework.csproj
+      $(System.DefaultWorkingDirectory)/openiddict/src/Audacia.Auth.OpenIddict.QuartzCleanup/Audacia.Auth.OpenIddict.QuartzCleanup.csproj
+      $(System.DefaultWorkingDirectory)/openiddict/src/Audacia.Auth.OpenIddict.Seeding/Audacia.Auth.OpenIddict.Seeding.csproj
+      $(System.DefaultWorkingDirectory)/openiddict/src/Audacia.Auth.OpenIddict.Seeding.EntityFramework/Audacia.Auth.OpenIddict.Seeding.EntityFramework.csproj
+      $(System.DefaultWorkingDirectory)/openiddict/src/Audacia.Auth.OpenIddict.Seeding.EntityFrameworkCore/Audacia.Auth.OpenIddict.Seeding.EntityFrameworkCore.csproj
+      $(System.DefaultWorkingDirectory)/openiddict/tests/Audacia.Auth.OpenIddict.Tests/Audacia.Auth.OpenIddict.Tests.csproj
+
+  - name: artifactName
+    value: 'sbom-files'
+  - name: publishArtifact
+    value: true
+  - name: failOnUploadError
+    value: true
+  - name: tryDownloadArtifact
+    value: true
+  - name: vstsFeed
+    value: 'Audacia.Public/AudaciaPublic'
+
+stages:
+  # =========================
+  # 1) GENERATE STAGE
+  # =========================
+  - stage: generate
+    displayName: "Generate SBOMs (.NET via CycloneDX)"
+    jobs:
+      - job: generate_sbom
+        displayName: "Generate SBOMs & publish artifact"
+        steps:
+          # Generate .NET SBOMs
+          - template: /src/security/dependency-track/steps/generate-dotnet-sbom.steps.yaml@templates
+            parameters:
+              dotnetProjects: $(audaciaAuthProjectPaths)
+              vstsFeed: ${{ variables.vstsFeed }}
+              publishArtifact: ${{ variables.publishArtifact }}
+              artifactName: $(artifactName)
+
+  # =========================
+  # 2) UPLOAD STAGE
+  # =========================
+  - stage: upload
+    displayName: "Upload SBOMs to Dependency-Track"
+    dependsOn: generate
+    jobs:
+      - job: upload_sbom
+        displayName: "Upload SBOM & Log Summary"
+        steps:
+          - checkout: none
+          - template: /src/security/dependency-track/steps/upload-sbom.steps.yaml@templates
+            parameters:
+              systemName: $(systemName)
+              failOnUploadError: ${{ variables.failOnUploadError }}
+              parentProjectName: ${{ variables.parentProjectName }}
+              parentProjectVersion: ${{ variables.parentProjectVersion }}
+
+  # =========================
+  # 3) DEACTIVATE STAGE (run standalone or after upload)
+  # =========================
+  - stage: deactivate
+    displayName: "Deactivate old Dependency-Track project versions"
+    dependsOn: upload
+    condition: and(succeeded('upload'), eq(variables['deactivateOld'], true))
+    jobs:
+      - job: deactivate_old_versions
+        displayName: "Set non-latest versions to inactive"
+        steps:
+          - checkout: none
+          - template: /src/security/dependency-track/steps/deactivate-nonlatest.steps.yaml@templates
+            parameters:
+              artifactName: $(artifactName)
+              tryDownloadArtifact: ${{ variables.tryDownloadArtifact }}
+              parentProjectName: ${{ variables.parentProjectName }}

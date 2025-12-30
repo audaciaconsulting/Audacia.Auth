@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Authors>Audacia</Authors>
+    <Version>4.1.1</Version>
     <TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
