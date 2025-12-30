@@ -17,15 +17,22 @@ resources:
       name: audaciaconsulting/Audacia.Build
 pool:
   vmImage: windows-2022
+variables:
+  - group: Code Signing
 
 stages:
   - stage: Stage_Build
     displayName: Build
     jobs:
-      - template: src/build/dotnet/jobs/nuget-package.job.yaml@templates
+      - template: src/build/dotnet/jobs/signed-nuget-package.job.yaml@templates
         parameters:
-          projects: 'openiddict/src/**/*.csproj'
-          tests: 'openiddict/tests/Audacia.Auth.OpenIddict.Tests/Audacia.Auth.OpenIddict.Tests.csproj'
+          trustedSigningEndpoint: $(TrustedSigningEndpoint)
+          trustedSigningAccount: $(TrustedSigningAccount)
+          trustedSigningCertificateProfile: $(TrustedSigningCertificateProfile)
+          directory: $(Build.SourcesDirectory)/openiddict/src
+          fileToSignPattern: 'Audacia.Auth.OpenIddict.dll'
+          serviceConnection: 'Audacia Code Signing'
+          excludePaths: '*.Tests.csproj,*.Demo.csproj'
 
   - stage: Stage_Release
     displayName: Release
@@ -37,4 +44,4 @@ stages:
         eq(dependencies.Stage_Build.outputs['Job_Build.UpdateVersions.ShouldPublish'], true)
       )
     jobs:
-      - template: src/deployment/nuget/jobs/internal-public-nuget-package.job.yaml@templates
+      - template: src/deployment/nuget/jobs/public-nuget-package.job.yaml@templates
