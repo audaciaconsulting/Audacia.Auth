@@ -3,6 +3,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
 		<Authors>Audacia</Authors>
+        <Version>4.1.1</Version>
 		<PackageIcon>package-icon.png</PackageIcon>
 		<Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
 		<Description>Library to seed OpenIddict applications and scopes in the database.</Description>

@@ -4,6 +4,7 @@
 		<TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
 		<OutputType>Exe</OutputType>
 		<Authors>Audacia</Authors>
+        <Version>4.1.1</Version>
 		<PackageIcon>package-icon.png</PackageIcon>
 		<Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
 		<Description>.NET tool to seed OpenIddict applications and scopes in a database using Entity Framework Core as the ORM.</Description>

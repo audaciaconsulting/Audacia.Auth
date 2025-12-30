@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
     <Authors>Audacia</Authors>
+    <Version>4.1.1</Version>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
