@@ -36,7 +36,12 @@ variables:
   # Project paths and settings
   - name: audaciaAuthProjectPaths
     value: |
+      $(System.DefaultWorkingDirectory)/openiddict/src/Audacia.Auth.OpenIddict/Audacia.Auth.OpenIddict.csproj
+      $(System.DefaultWorkingDirectory)/openiddict/src/Audacia.Auth.OpenIddict.EntityFramework/Audacia.Auth.OpenIddict.EntityFramework.csproj
+      $(System.DefaultWorkingDirectory)/openiddict/src/Audacia.Auth.OpenIddict.QuartzCleanup/Audacia.Auth.OpenIddict.QuartzCleanup.csproj
       $(System.DefaultWorkingDirectory)/openiddict/src/Audacia.Auth.OpenIddict.Seeding/Audacia.Auth.OpenIddict.Seeding.csproj
+      $(System.DefaultWorkingDirectory)/openiddict/src/Audacia.Auth.OpenIddict.Seeding.EntityFramework/Audacia.Auth.OpenIddict.Seeding.EntityFramework.csproj
+      $(System.DefaultWorkingDirectory)/openiddict/src/Audacia.Auth.OpenIddict.Seeding.EntityFrameworkCore/Audacia.Auth.OpenIddict.Seeding.EntityFrameworkCore.csproj
       $(System.DefaultWorkingDirectory)/openiddict/tests/Audacia.Auth.OpenIddict.Tests/Audacia.Auth.OpenIddict.Tests.csproj
 
   - name: artifactName
@@ -55,7 +60,7 @@ stages:
   # 1) GENERATE STAGE
   # =========================
   - stage: generate
-    displayName: "Generate SBOMs (npm + .NET via CycloneDX)"
+    displayName: "Generate SBOMs (.NET via CycloneDX)"
     jobs:
       - job: generate_sbom
         displayName: "Generate SBOMs & publish artifact"
