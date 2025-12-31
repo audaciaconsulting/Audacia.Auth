@@ -23,13 +23,13 @@ variables:
 
   # Template-parameter variables
   - name: systemName
-    value: Audacia.Libraries
+    value: Audacia.Auth.Libraries
   - name: deactivateOld
     value: true
 
   # Optional parent project
   - name: parentProjectName
-    value: 'Audacia - Libraries'
+    value: 'Audacia.Auth - Libraries'
   - name: parentProjectVersion
     value: ''
 
