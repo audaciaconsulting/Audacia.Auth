@@ -85,7 +85,7 @@ public class OpenIddictSeedingRunner
             Permissions =
             {
                 Permissions.Endpoints.Authorization,
-                Permissions.Endpoints.Logout,
+                Permissions.Endpoints.EndSession,
                 Permissions.Endpoints.Token,
                 Permissions.Endpoints.Revocation,
                 Permissions.GrantTypes.AuthorizationCode,
@@ -214,7 +214,7 @@ public class OpenIddictSeedingRunner
                 Permissions.Endpoints.Introspection,
                 // Required for resources that also interact with the identity server
                 Permissions.Endpoints.Token,
-                Permissions.Endpoints.Logout,
+                Permissions.Endpoints.EndSession,
                 Permissions.GrantTypes.RefreshToken,
                 Permissions.Scopes.Profile,
                 CustomPermissions.GrantType(clientConfig.GrantType)

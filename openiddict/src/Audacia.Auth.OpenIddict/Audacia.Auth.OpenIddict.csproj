@@ -32,9 +32,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenIddict" Version="5.2.0" />
-    <PackageReference Include="OpenIddict.AspNetCore" Version="5.2.0" />
-    <PackageReference Include="OpenIddict.Server.AspNetCore" Version="5.2.0" />
+    <PackageReference Include="OpenIddict" Version="6.4.0" />
+    <PackageReference Include="OpenIddict.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="OpenIddict.Server.AspNetCore" Version="6.4.0" />
 
     <PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.11.0">
       <PrivateAssets>all</PrivateAssets>
