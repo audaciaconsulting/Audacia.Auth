@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.3.11520.95 d18.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Audacia.Auth.OpenIddict", "src\Audacia.Auth.OpenIddict\Audacia.Auth.OpenIddict.csproj", "{98616CCA-5E54-4D29-B5B5-CE80779D622F}"
 EndProject
@@ -28,6 +28,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{ED9A59BD-EA37-4C4B-B130-9D2765E9405C}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{30E47FF3-05FC-4A09-9BB9-FB54E8D28135}"
+	ProjectSection(SolutionItems) = preProject
+		build\dependency-track.pipeline.yaml = build\dependency-track.pipeline.yaml
+		build\pipeline.yaml = build\pipeline.yaml
 	EndProjectSection
 EndProject
 Global

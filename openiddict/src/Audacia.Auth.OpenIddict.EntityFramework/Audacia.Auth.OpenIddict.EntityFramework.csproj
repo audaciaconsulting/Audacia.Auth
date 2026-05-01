@@ -3,7 +3,6 @@
 	<PropertyGroup>
 		<TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
 		<Authors>Audacia</Authors>
-        <Version>4.1.1</Version>
 		<PackageIcon>package-icon.png</PackageIcon>
 		<Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
 		<Description>Helper library for using OpenIddict as an authorization server with Entity Framework 6.x as an ORM.</Description>
@@ -28,6 +27,10 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+
+		<PackageReference Include="OpenIddict.EntityFrameworkCore" Version="7.3.0" />
+
+		<PackageReference Include="OpenIddict.Quartz" Version="7.3.0" />
 
 		<PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
 

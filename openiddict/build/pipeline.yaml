@@ -33,7 +33,6 @@ stages:
           fileToSignPattern: 'Audacia.Auth.OpenIddict.dll'
           serviceConnection: 'Audacia Code Signing'
           excludePaths: '*.Tests.csproj,*.Demo.csproj'
-          runTests: false
 
   - stage: Stage_Release
     displayName: Release
