@@ -20,7 +20,7 @@ public class EntityFrameworkCoreSeeder<TKey> : OpenIddictSeedBase<TKey>
     /// <param name="identityProjectBasePath">The base path to the Identity project containing the relevant appsettings.json file.</param>
     /// <param name="identityProjectName">The name of the Identity project.</param>
     /// <param name="connectionStringName">The name of the connection string in config.</param>
-    public EntityFrameworkCoreSeeder(string identityProjectBasePath, string identityProjectName, string connectionStringName) 
+    public EntityFrameworkCoreSeeder(string identityProjectBasePath, string identityProjectName, string connectionStringName)
         : base(identityProjectBasePath, identityProjectName)
     {
         _connectionStringName = connectionStringName;
