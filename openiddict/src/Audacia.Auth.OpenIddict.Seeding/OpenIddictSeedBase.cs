@@ -38,7 +38,7 @@ public abstract class OpenIddictSeedBase<TKey> where TKey : IEquatable<TKey>
     public async Task SeedAsync()
     {
         var services = ConfigureServices();
-        using var provider = services.BuildServiceProvider();
+        await using var provider = services.BuildServiceProvider();
         var runner = provider.GetRequiredService<OpenIddictSeedingRunner>();
         await runner.RunAsync().ConfigureAwait(false);
     }
@@ -60,12 +60,14 @@ public abstract class OpenIddictSeedBase<TKey> where TKey : IEquatable<TKey>
         return services;
     }
 
-    private IConfiguration LoadConfiguration() =>
-        new ConfigurationBuilder()
+    private IConfiguration LoadConfiguration()
+    {
+        return new ConfigurationBuilder()
             .SetBasePath(_identityProjectBasePath)
             .AddJsonFile("appsettings.json")
             .AddEnvironmentVariables()
             .Build();
+    }
 
     private OpenIdConnectConfig GetOpenIdConnectConfig(IConfiguration configuration)
     {
@@ -77,13 +79,8 @@ public abstract class OpenIddictSeedBase<TKey> where TKey : IEquatable<TKey>
         if (!mapperTypes.Any())
         {
             // No implementation of IOpenIdConnectConfigMapper, so try and get the config object directly
-            var openIdConnectConfig = configuration.GetSection("OpenIdConnectConfig").Get<OpenIdConnectConfig>();
-            if (openIdConnectConfig is null)
-            {
-                throw new InvalidOperationException($"Either an implementation of '{nameof(IOpenIdConnectConfigMapper)}' must be provided in project {_identityProjectName}, or an 'OpenIdConnectConfig' section must be present in configuration that maps to an object of type '${nameof(OpenIdConnectConfig)}'.");
-            }
-
-            return openIdConnectConfig;
+            return configuration.GetSection("OpenIdConnectConfig").Get<OpenIdConnectConfig>()
+                ?? throw new InvalidOperationException($"Either an implementation of '{nameof(IOpenIdConnectConfigMapper)}' must be provided in project {_identityProjectName}, or an 'OpenIdConnectConfig' section must be present in configuration that maps to an object of type '${nameof(OpenIdConnectConfig)}'.");
         }
 
         if (Activator.CreateInstance(mapperTypes.First()) is not IOpenIdConnectConfigMapper mapper)
