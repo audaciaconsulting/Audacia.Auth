@@ -78,8 +78,8 @@ public class DefaultAuthenticateResultHandler<TUser, TId> : IAuthenticateResultH
         ViewDataDictionary viewDataDictionary,
         AuthenticateResult? result)
     {
-        if (openIddictRequest == null) throw new ArgumentNullException(nameof(openIddictRequest));
-        if (httpRequest == null) throw new ArgumentNullException(nameof(httpRequest));
+        ArgumentNullException.ThrowIfNull(openIddictRequest);
+        ArgumentNullException.ThrowIfNull(httpRequest);
 
         if (result?.Succeeded != true)
         {
@@ -186,15 +186,12 @@ public class DefaultAuthenticateResultHandler<TUser, TId> : IAuthenticateResultH
         // Automatically create a permanent authorization to avoid requiring explicit consent
         // for future authorization or token requests containing the same scopes.
         var authorization = authorizations.LastOrDefault();
-        if (authorization is null)
-        {
-            authorization = await _authorizationManager.CreateAsync(
+        authorization ??= await _authorizationManager.CreateAsync(
                 principal: principal,
                 subject: user.GetId()!.ToString()!,
                 client: applicationId,
                 type: AuthorizationTypes.Permanent,
                 scopes: principal.GetScopes()).ConfigureAwait(false);
-        }
 
         principal.SetAuthorizationId(await _authorizationManager.GetIdAsync(authorization).ConfigureAwait(false));
         principal.SetDestinations();
@@ -241,8 +238,7 @@ public class DefaultAuthenticateResultHandler<TUser, TId> : IAuthenticateResultH
 
     private static bool CookieTooOld(OpenIddictRequest openIddictRequest, AuthenticateResult result)
     {
-        return 
-            openIddictRequest.MaxAge != null &&
+        return openIddictRequest.MaxAge != null &&
             result.Properties?.IssuedUtc != null &&
             DateTimeOffset.UtcNow - result.Properties.IssuedUtc > TimeSpan.FromSeconds(openIddictRequest.MaxAge.Value);
     }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
 namespace Audacia.Auth.OpenIddict.Common.Events;
@@ -23,6 +24,10 @@ public class DefaultEventSink : IEventSink
     }
 
     /// <inheritdoc />
+    [SuppressMessage(
+        "Usage",
+        "CA2254:Template should be a static expression",
+        Justification = "Context of the log is as dynamic middleware, therefore non-static messages are required.")]
     public virtual Task PersistAsync(AuthEvent authEvent)
     {
         var output = _eventSerializer.Serialize(authEvent);
