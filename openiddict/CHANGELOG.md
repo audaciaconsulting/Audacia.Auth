@@ -1,5 +1,21 @@
 # Changelog
 
+## 5.0.0
+### Added
+- .NET 10 support.
+- A base `.editorconfig` from [Audacia.CodeAnalysis](https://github.com/audaciaconsulting/Audacia.CodeAnalysis/blob/master/dotnet-roslyn/config/Audacia.CodeAnalysis/Base/.editorconfig).
+
+### Removed
+- .NET 6 support.
+
+### Changed
+- Upgraded all OpenIddict packages from `5.2.0` to `7.5.0`.
+     - <b>IMPORTANT</b> this will require a database migration as the index on the OpenIddictTokens was changed to allow larger values.
+- Enabled `runTests` in pipeline.
+
+### Fixed
+- Upgraded away from deprecated version of `System.Drawing.Common`.
+
 ## 4.1.1
 ### Added
 - No new functionality added
