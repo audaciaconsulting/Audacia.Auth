@@ -36,7 +36,7 @@ public class TypeResolutionTests
     [Fact]
     public void Can_resolve_user_info_handler()
     {
-        var serviceProvider = _services.BuildServiceProvider();
+        using var serviceProvider = _services.BuildServiceProvider();
 
         var userInfoHandler = serviceProvider.GetRequiredService<IUserInfoHandler<DummyUser, int>>();
 

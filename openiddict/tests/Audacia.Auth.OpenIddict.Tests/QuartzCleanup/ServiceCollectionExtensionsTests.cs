@@ -40,7 +40,7 @@ public class ServiceCollectionExtensionsTests
             _openIdConnectConfig as OpenIdConnectConfig,
             _webHostEnvironmentMock.Object);
 
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
         var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
         options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(6));
@@ -56,7 +56,7 @@ public class ServiceCollectionExtensionsTests
             _openIdConnectConfig as OpenIdConnectConfig,
             _webHostEnvironmentMock.Object);
 
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
         var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
         options.CurrentValue.MinimumAuthorizationLifespan.Should().Be(TimeSpan.FromHours(6));
@@ -77,7 +77,7 @@ public class ServiceCollectionExtensionsTests
             _openIdConnectConfig,
             _webHostEnvironmentMock.Object);
 
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
         var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
         options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(3));
@@ -98,7 +98,7 @@ public class ServiceCollectionExtensionsTests
             _openIdConnectConfig,
             _webHostEnvironmentMock.Object);
 
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
         var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
         options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(3));
@@ -114,7 +114,7 @@ public class ServiceCollectionExtensionsTests
             _openIdConnectConfig,
             _webHostEnvironmentMock.Object);
 
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
         var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
         options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(6));
@@ -130,7 +130,7 @@ public class ServiceCollectionExtensionsTests
             _openIdConnectConfig,
             _webHostEnvironmentMock.Object);
 
-        var provider = services.BuildServiceProvider();
+        using var provider = services.BuildServiceProvider();
         var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
         options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(6));
