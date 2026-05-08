@@ -1,27 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
-		<Authors>Audacia</Authors>
-		<PackageIcon>package-icon.png</PackageIcon>
-		<Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
 		<Description>Helper library for using OpenIddict as an authorization server with Entity Framework 6.x as an ORM.</Description>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<Nullable>enable</Nullable>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 	</PropertyGroup>
-
+	
 	<ItemGroup>
-		<None Include="..\..\package-icon.png">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="OpenIddict.EntityFramework" Version="7.3.0" />
+		<PackageReference Include="OpenIddict.EntityFramework" Version="7.5.0" />
 
 		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.12.1">
 			<PrivateAssets>all</PrivateAssets>

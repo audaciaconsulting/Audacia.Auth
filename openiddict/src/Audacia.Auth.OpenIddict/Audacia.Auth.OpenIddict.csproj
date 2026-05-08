@@ -1,24 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
-    <Authors>Audacia</Authors>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Core library for using OpenIddict as an authorization server.</Description>
-    <PackageIcon>package-icon.png</PackageIcon>
-    <Nullable>enable</Nullable>
-    <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="..\..\package-icon.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="OpenIddict" Version="7.5.0" />

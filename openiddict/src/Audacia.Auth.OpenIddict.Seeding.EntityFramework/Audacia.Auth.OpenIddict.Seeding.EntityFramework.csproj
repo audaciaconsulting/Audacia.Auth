@@ -1,31 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
 		<OutputType>Exe</OutputType>
-		<Authors>Audacia</Authors>
-		<PackageIcon>package-icon.png</PackageIcon>
-		<Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
-		<Description>.NET tool to seed OpenIddict applications and scopes in a database using Entity Framework 6.x as the ORM.</Description>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<Nullable>enable</Nullable>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
-		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-		<ToolCommandName>openiddict-ef6-seeding</ToolCommandName>
 		<PackAsTool>true</PackAsTool>
 		<GenerateProgramFile>false</GenerateProgramFile>
+		<ToolCommandName>openiddict-ef6-seeding</ToolCommandName>
+		<Description>.NET tool to seed OpenIddict applications and scopes in a database using Entity Framework 6.x as the ORM.</Description>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="..\..\package-icon.png">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="OpenIddict.EntityFramework" Version="7.3.0" />
+		<PackageReference Include="OpenIddict.EntityFramework" Version="7.5.0" />
 
 		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.12.1">
 			<PrivateAssets>all</PrivateAssets>

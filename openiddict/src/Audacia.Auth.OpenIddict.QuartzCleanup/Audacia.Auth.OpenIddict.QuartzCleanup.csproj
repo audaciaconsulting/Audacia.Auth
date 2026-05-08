@@ -1,24 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>$(CustomTargetFrameworks)</TargetFrameworks>
-		<Authors>Audacia</Authors>
-		<PackageIcon>package-icon.png</PackageIcon>
-		<Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
 		<Description>Library for using a Quartz.NET background job to cleanup OpenIddict authorization tokens in the database.</Description>
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<Nullable>enable</Nullable>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<None Include="..\..\package-icon.png">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Audacia.CodeAnalysis.Analyzers.Helpers" Version="2.0.0">
