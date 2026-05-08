@@ -2,13 +2,13 @@
 using Audacia.Auth.OpenIddict.Common.Configuration;
 using Audacia.Auth.OpenIddict.QuartzCleanup;
 using Audacia.Auth.OpenIddict.QuartzCleanup.Configuration;
-using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using OpenIddict.Quartz;
+using Shouldly;
 using Xunit;
 
 namespace Audacia.Auth.OpenIddict.Tests.QuartzCleanup;
@@ -43,7 +43,7 @@ public class ServiceCollectionExtensionsTests
         using var provider = services.BuildServiceProvider();
         var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
-        options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(6));
+        options.CurrentValue.MinimumTokenLifespan.ShouldBe(TimeSpan.FromHours(6));
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class ServiceCollectionExtensionsTests
         using var provider = services.BuildServiceProvider();
         var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
-        options.CurrentValue.MinimumAuthorizationLifespan.Should().Be(TimeSpan.FromHours(6));
+        options.CurrentValue.MinimumAuthorizationLifespan.ShouldBe(TimeSpan.FromHours(6));
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public class ServiceCollectionExtensionsTests
         using var provider = services.BuildServiceProvider();
         var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
-        options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(3));
+        options.CurrentValue.MinimumTokenLifespan.ShouldBe(TimeSpan.FromHours(3));
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public class ServiceCollectionExtensionsTests
         using var provider = services.BuildServiceProvider();
         var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
-        options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(3));
+        options.CurrentValue.MinimumTokenLifespan.ShouldBe(TimeSpan.FromHours(3));
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class ServiceCollectionExtensionsTests
         using var provider = services.BuildServiceProvider();
         var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
-        options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(6));
+        options.CurrentValue.MinimumTokenLifespan.ShouldBe(TimeSpan.FromHours(6));
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class ServiceCollectionExtensionsTests
         using var provider = services.BuildServiceProvider();
         var options = provider.GetRequiredService<IOptionsMonitor<OpenIddictQuartzOptions>>();
 
-        options.CurrentValue.MinimumTokenLifespan.Should().Be(TimeSpan.FromHours(6));
+        options.CurrentValue.MinimumTokenLifespan.ShouldBe(TimeSpan.FromHours(6));
     }
 }
 

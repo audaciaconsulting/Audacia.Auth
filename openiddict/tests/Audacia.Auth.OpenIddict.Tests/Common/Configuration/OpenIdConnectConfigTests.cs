@@ -1,5 +1,5 @@
 using Audacia.Auth.OpenIddict.Common.Configuration;
-using FluentAssertions;
+using Shouldly;
 using Xunit;
 
 namespace Audacia.Auth.OpenIddict.Tests;
@@ -19,7 +19,7 @@ public class OpenIdConnectConfigTests
 
         var allClients = _config.AllClients;
 
-        allClients.Should().Contain(client => client.ClientId == clientId);
+        allClients.ShouldContain(client => client.ClientId == clientId);
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public class OpenIdConnectConfigTests
 
         var allClients = _config.AllClients;
 
-        allClients.Should().Contain(client => client.ClientId == clientId);
+        allClients.ShouldContain(client => client.ClientId == clientId);
     }
 
     [Fact]
@@ -47,6 +47,6 @@ public class OpenIdConnectConfigTests
 
         var allClients = _config.AllClients;
 
-        allClients.Should().Contain(client => client.ClientId == clientId);
+        allClients.ShouldContain(client => client.ClientId == clientId);
     }
 }

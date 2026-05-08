@@ -29,3 +29,9 @@ dotnet_diagnostic.CA1707.severity = none
 
 # [NAMING] Asynchronous method name should end with 'Async' ** Suppress as we don't want to suffix test methods ***
 dotnet_diagnostic.RCS1046.severity = none
+
+# [MAINTAINABILITY] Missing XML comment for publicly visible type or member ** Suppressed as the models are only used as test data and the usages of the fields is implied through simple naming **
+dotnet_diagnostic.CS1591.severity = none
+
+# [MAINTAINABILITY] Method contains one or more digits in its name ** Suppressed as test case names often have numbers to denote lifespan lengths **
+dotnet_diagnostic.ACL1014.severity = none

@@ -1,12 +1,12 @@
 ﻿using Audacia.Auth.OpenIddict.Common.Configuration;
 using Audacia.Auth.OpenIddict.DependencyInjection;
 using Audacia.Auth.OpenIddict.UserInfo;
-using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Moq;
+using Shouldly;
 using Xunit;
 
 namespace Audacia.Auth.OpenIddict.Tests.DependencyInjection;
@@ -40,7 +40,7 @@ public class TypeResolutionTests
 
         var userInfoHandler = serviceProvider.GetRequiredService<IUserInfoHandler<DummyUser, int>>();
 
-        userInfoHandler.Should().NotBeNull();
+        userInfoHandler.ShouldNotBeNull();
     }
 
     public class DummyUser : IdentityUser<int>
