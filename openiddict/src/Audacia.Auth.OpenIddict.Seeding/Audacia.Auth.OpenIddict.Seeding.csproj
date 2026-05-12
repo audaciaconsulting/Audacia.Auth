@@ -4,13 +4,22 @@
 		<Description>Library to seed OpenIddict applications and scopes in the database.</Description>
 	</PropertyGroup>
 
+	<ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '8.0'))">
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.1" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '10.0'))">
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.7" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.7" />
+	</ItemGroup>
+	
 	<ItemGroup>
 		<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.12.1">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 
-		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.7" />
 	</ItemGroup>
 
 	<ItemGroup>

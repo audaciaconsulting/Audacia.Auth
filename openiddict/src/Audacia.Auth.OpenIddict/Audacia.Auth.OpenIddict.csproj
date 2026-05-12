@@ -4,13 +4,18 @@
     <Description>Core library for using OpenIddict as an authorization server.</Description>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '8.0'))">
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And $([MSBuild]::VersionEquals($(TargetFrameworkVersion), '10.0'))">
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.7" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="OpenIddict" Version="7.5.0" />
     <PackageReference Include="OpenIddict.AspNetCore" Version="7.5.0" />
     <PackageReference Include="OpenIddict.Server.AspNetCore" Version="7.5.0" />
-	<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="10.0.7" />
-
-	<PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.12.1">
+    <PackageReference Include="Audacia.CodeAnalysis.EntityFrameworkCore" Version="1.12.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

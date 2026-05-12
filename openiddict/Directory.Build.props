@@ -1,6 +1,6 @@
 <Project>
-    <PropertyGroup>
-        <Version>5.0.0</Version>
+  <PropertyGroup>
+    <Version>5.0.0</Version>
 		<TargetFrameworks>net8.0;net10.0</TargetFrameworks>
 		<Authors>Audacia</Authors>
 		<Copyright>Copyright © Audacia $([System.DateTime]::UtcNow.Year)</Copyright>
@@ -11,7 +11,7 @@
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-    </PropertyGroup>
+  </PropertyGroup>
 
 	<ItemGroup Condition=" '$(IsPackable)' == 'true' ">
 	  <None Include="$(MSBuildThisFileDirectory)/package-icon.png">
