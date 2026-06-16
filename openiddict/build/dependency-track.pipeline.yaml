@@ -1,6 +1,6 @@
 name: $(Year:yy)$(DayOfYear).$(Rev:r)
 trigger:
-  - master
+  - main
 pr: none
 resources:
   repositories:
