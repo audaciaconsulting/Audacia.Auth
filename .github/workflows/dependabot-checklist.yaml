@@ -1,0 +1,25 @@
+name: Dependabot reviewer checklist
+on:
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  checklist:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post reviewer checklist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          gh pr comment "$PR_URL" --body-file - <<'EOF'
+          ### Reviewer Checklist
+          - [ ] Code has been reviewed and doesn't contain any breaking changes
+          - [ ] All tests have been run and passed
+          - [ ] Build has been run locally
+          - [ ] Version numbers in `.csproj` or `Directory.Build.props` have been incremented correctly
+          EOF
